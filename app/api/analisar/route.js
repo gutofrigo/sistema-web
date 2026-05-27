@@ -5,6 +5,38 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 )
 
+function extrairProjetos(relatorio, responsavel) {
+  const projetos = []
+  const linhas = relatorio.split('\n')
+  
+  for (let i = 0; i < linhas.length; i++) {
+    const linha = linhas[i].trim()
+    
+    if (linha.match(/sugest[aã]o\s*\d|melhoria\s*\d|\d\)\s*[A-Z]/i)) {
+      const titulo = linha.replace(/^\d[\.\)]\s*/, '').substring(0, 80)
+      if (titulo.length > 10) {
+        projetos.push({
+          titulo: titulo,
+          descricao: linha,
+          responsavel: responsavel,
+          status: 'pendente'
+        })
+      }
+    }
+  }
+
+  if (projetos.length === 0) {
+    projetos.push({
+      titulo: 'Melhoria de processo - revisar relatorio',
+      descricao: relatorio.substring(0, 200),
+      responsavel: responsavel,
+      status: 'pendente'
+    })
+  }
+
+  return projetos.slice(0, 3)
+}
+
 export async function POST(req) {
   try {
     const body = await req.json()
@@ -13,7 +45,7 @@ export async function POST(req) {
     const respostas = body.respostas
 
     let texto = respostas.map(r => 'P: ' + r.pergunta + ' R: ' + r.resposta).join(' ')
-    const prompt = 'Analise o processo ' + processo + ' e gere: 1) Problemas encontrados 2) 3 Sugestoes de melhoria 3) Proximos passos. ' + texto
+    const prompt = 'Analise o processo ' + processo + ' e gere exatamente: 1) Problemas encontrados 2) 3 Sugestoes de melhoria numeradas como 1. 2. 3. 3) Proximos passos. Dados: ' + texto
 
     const resposta = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -28,13 +60,40 @@ export async function POST(req) {
     })
 
     const data = await resposta.json()
-    let relatorio = data.choices && data.choices[0] ? data.choices[0].message.content : 'Erro: ' + JSON.stringify(data)
 
-    await supabase.from('entrevistas').insert({
-      processo, responsavel: nome, respostas, relatorio
-    })
+    let relatorio = ''
+    if (data.choices && data.choices[0]) {
+      relatorio = data.choices[0].message.content
+    } else {
+      relatorio = 'Erro na IA: ' + JSON.stringify(data)
+    }
 
-    return Response.json({ relatorio })
+    const { data: entrevistaSalva } = await supabase
+      .from('entrevistas')
+      .insert({
+        processo: processo,
+        responsavel: nome,
+        respostas: respostas,
+        relatorio: relatorio
+      })
+      .select()
+
+    const entrevistaId = entrevistaSalva && entrevistaSalva[0] ? entrevistaSalva[0].id : null
+
+    const projetos = extrairProjetos(relatorio, nome)
+    
+    for (let i = 0; i < projetos.length; i++) {
+      await supabase.from('projetos').insert({
+        titulo: projetos[i].titulo,
+        descricao: projetos[i].descricao,
+        responsavel: projetos[i].responsavel,
+        entrevista_id: entrevistaId,
+        status: 'pendente'
+      })
+    }
+
+    return Response.json({ relatorio: relatorio, projetos_criados: projetos.length })
+
   } catch (e) {
     return Response.json({ relatorio: 'Erro: ' + e.message })
   }
