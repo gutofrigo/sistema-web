@@ -2,125 +2,180 @@
 import { useState } from 'react'
 
 const perguntas = [
-  "Descreva como funciona esse processo do início ao fim.",
-  "Quais são as principais dificuldades nesse processo?",
-  "Quanto tempo leva para completar esse processo?",
-  "Quais etapas geram mais retrabalho?",
-  "Se pudesse mudar uma coisa, o que seria?"
+  'Descreva como o processo funciona atualmente, do inicio ao fim.',
+  'Quais sao os principais problemas ou gargalos que voce enfrenta nesse processo?',
+  'Quanto tempo em media esse processo leva? Onde ocorrem os maiores atrasos?',
+  'Quais ferramentas ou sistemas sao usados? Eles atendem bem?',
+  'Se voce pudesse mudar uma coisa nesse processo, o que seria?'
 ]
 
 export default function Home() {
-  const [etapa, setEtapa] = useState('inicio')
+  const [tela, setTela] = useState('inicio')
   const [processo, setProcesso] = useState('')
   const [nome, setNome] = useState('')
+  const [etapa, setEtapa] = useState(0)
   const [respostas, setRespostas] = useState([])
   const [resposta, setResposta] = useState('')
-  const [perguntaAtual, setPerguntaAtual] = useState(0)
   const [relatorio, setRelatorio] = useState('')
-  const [carregando, setCarregando] = useState(false)
+  const [projetosCriados, setProjetosCriados] = useState(0)
 
-  function iniciar() {
-    if (processo && nome) setEtapa('entrevista')
+  function iniciarEntrevista() {
+    if (!processo || !nome) return alert('Preencha todos os campos')
+    setTela('entrevista')
+    setEtapa(0)
+    setRespostas([])
   }
 
-  function responder() {
-    if (!resposta) return
-    const novas = [...respostas, { pergunta: perguntas[perguntaAtual], resposta }]
+  async function responder() {
+    if (!resposta.trim()) return
+    const novas = [...respostas, { pergunta: perguntas[etapa], resposta: resposta }]
     setRespostas(novas)
     setResposta('')
-    if (perguntaAtual + 1 < perguntas.length) {
-      setPerguntaAtual(perguntaAtual + 1)
+
+    if (etapa < perguntas.length - 1) {
+      setEtapa(etapa + 1)
     } else {
-      gerarRelatorio(novas)
+      setTela('carregando')
+      const res = await fetch('/api/analisar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ processo, nome, respostas: novas })
+      })
+      const data = await res.json()
+      setRelatorio(data.relatorio)
+      setProjetosCriados(data.projetos_criados || 0)
+      setTela('relatorio')
     }
   }
 
-  async function gerarRelatorio(rs) {
-    setEtapa('carregando')
-    setCarregando(true)
-    const res = await fetch('/api/analisar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ processo, nome, respostas: rs })
-    })
-    const data = await res.json()
-    setRelatorio(data.relatorio)
-    setEtapa('relatorio')
-    setCarregando(false)
+  if (tela === 'inicio') {
+    return (
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', maxWidth: '600px', padding: '40px' }}>
+          <h1 style={{ fontSize: '32px', color: '#1e293b', marginBottom: '10px' }}>Sistema de Melhoria</h1>
+          <p style={{ color: '#64748b', marginBottom: '50px', fontSize: '16px' }}>Escolha o modulo que deseja usar</p>
+
+          <div style={{ display: 'flex', gap: '24px', justifyContent: 'center' }}>
+            <div
+              onClick={() => setTela('formulario')}
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '220px', cursor: 'pointer', transition: 'all 0.2s' }}
+              onMouseOver={e => e.currentTarget.style.borderColor = '#6366f1'}
+              onMouseOut={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+            >
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
+              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Analise de Processo</h2>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Entrevista com IA e relatorio de melhorias</p>
+            </div>
+
+            
+              <a href="/projetos"
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '220px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
+            >
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📁</div>
+              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Projetos</h2>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Gerencie projetos e tarefas com prazos</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  return (
-    <main style={{ maxWidth: 600, margin: '60px auto', padding: 24, fontFamily: 'sans-serif' }}>
-
-      {etapa === 'inicio' && (
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 8 }}>🗂️ Análise de Processos</h1>
-          <p style={{ color: '#666', marginBottom: 24 }}>Responda 5 perguntas e receba um relatório de melhorias com IA</p>
+  if (tela === 'formulario') {
+    return (
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: 'white', borderRadius: '16px', padding: '40px', width: '500px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <button onClick={() => setTela('inicio')} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', marginBottom: '20px', fontSize: '14px' }}>
+            Voltar
+          </button>
+          <h2 style={{ color: '#1e293b', marginBottom: '24px' }}>Analise de Processo</h2>
           <input
-            placeholder="Nome do processo (ex: Abertura de chamados)"
+            placeholder="Nome do processo (ex: Compras)"
             value={processo}
             onChange={e => setProcesso(e.target.value)}
-            style={{ width: '100%', padding: 12, marginBottom: 12, borderRadius: 8, border: '1px solid #ddd', fontSize: 14 }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box' }}
           />
           <input
             placeholder="Seu nome"
             value={nome}
             onChange={e => setNome(e.target.value)}
-            style={{ width: '100%', padding: 12, marginBottom: 16, borderRadius: 8, border: '1px solid #ddd', fontSize: 14 }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box' }}
           />
           <button
-            onClick={iniciar}
-            style={{ background: '#5B6BF8', color: 'white', padding: '12px 24px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 14, width: '100%' }}
+            onClick={iniciarEntrevista}
+            style={{ width: '100%', padding: '14px', background: '#6366f1', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: 'pointer' }}
           >
-            Iniciar Entrevista →
+            Iniciar Entrevista
           </button>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      {etapa === 'entrevista' && (
-        <div>
-          <p style={{ color: '#999', fontSize: 12, marginBottom: 8 }}>Pergunta {perguntaAtual + 1} de {perguntas.length} — {processo}</p>
-          <div style={{ background: '#F7F8FA', borderRadius: 10, padding: 20, marginBottom: 16 }}>
-            <p style={{ fontSize: 16, fontWeight: '500' }}>{perguntas[perguntaAtual]}</p>
+  if (tela === 'entrevista') {
+    return (
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: 'white', borderRadius: '16px', padding: '40px', width: '600px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+            <span style={{ color: '#6366f1', fontWeight: 'bold' }}>Pergunta {etapa + 1} de {perguntas.length}</span>
+            <span style={{ color: '#94a3b8' }}>{processo}</span>
+          </div>
+          <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+            <p style={{ color: '#1e293b', fontSize: '17px', margin: 0, lineHeight: '1.6' }}>{perguntas[etapa]}</p>
           </div>
           <textarea
-            placeholder="Digite sua resposta aqui..."
+            placeholder="Digite sua resposta..."
             value={resposta}
             onChange={e => setResposta(e.target.value)}
             rows={4}
-            style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #ddd', fontSize: 14, resize: 'none' }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', resize: 'vertical', boxSizing: 'border-box' }}
           />
           <button
             onClick={responder}
-            style={{ background: '#5B6BF8', color: 'white', padding: '12px 24px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 14, width: '100%', marginTop: 12 }}
+            style={{ width: '100%', marginTop: '16px', padding: '14px', background: '#6366f1', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: 'pointer' }}
           >
-            {perguntaAtual + 1 < perguntas.length ? 'Próxima →' : 'Gerar Relatório 🤖'}
+            {etapa < perguntas.length - 1 ? 'Proxima Pergunta' : 'Gerar Relatorio'}
           </button>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      {etapa === 'carregando' && (
-        <div style={{ textAlign: 'center', padding: 60 }}>
-          <p style={{ fontSize: 18 }}>🤖 A IA está analisando suas respostas...</p>
-          <p style={{ color: '#999', marginTop: 8 }}>Isso pode levar alguns segundos</p>
+  if (tela === 'carregando') {
+    return (
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '48px', marginBottom: '20px' }}>⏳</div>
+          <p style={{ color: '#1e293b', fontSize: '18px' }}>Analisando com IA...</p>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      {etapa === 'relatorio' && (
-        <div>
-          <h2 style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>📋 Relatório — {processo}</h2>
-          <div style={{ background: '#F7F8FA', borderRadius: 10, padding: 20, whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.7 }}>
+  if (tela === 'relatorio') {
+    return (
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', padding: '40px' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto', background: 'white', borderRadius: '16px', padding: '40px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <h2 style={{ color: '#1e293b', marginBottom: '8px' }}>Relatorio: {processo}</h2>
+          <p style={{ color: '#64748b', marginBottom: '24px' }}>Responsavel: {nome}</p>
+          <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: '#334155', marginBottom: '24px' }}>
             {relatorio}
           </div>
-          <button
-            onClick={() => { setEtapa('inicio'); setRespostas([]); setPerguntaAtual(0); setProcesso(''); setNome('') }}
-            style={{ background: '#22C55E', color: 'white', padding: '12px 24px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 14, width: '100%', marginTop: 16 }}
-          >
-            Nova Análise
-          </button>
+          {projetosCriados > 0 && (
+            <div style={{ background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '8px', padding: '16px', marginBottom: '20px', color: '#065f46' }}>
+              {projetosCriados} projeto(s) criado(s) automaticamente!
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={() => setTela('inicio')} style={{ flex: 1, padding: '12px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}>
+              Voltar ao Inicio
+            </button>
+            <a href="/projetos" style={{ flex: 1, padding: '12px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', textAlign: 'center', textDecoration: 'none' }}>
+              Ver Projetos
+            </a>
+          </div>
         </div>
-      )}
-
-    </main>
-  )
+      </div>
+    )
+  }
 }
