@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  'https://vaqxsqckkfsboppfcmsg.supabase.co',
-  'sb_publishable_sYiXHAT5Oa_K8Cwg3GThqw_ONq856_j'
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
 )
 
 export async function POST(req) {
@@ -18,33 +18,23 @@ export async function POST(req) {
     const resposta = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer ' + process.env.GROQ_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-120b',
+        model: 'llama-3.1-8b-instant',
         messages: [{ role: 'user', content: prompt }]
       })
     })
 
     const data = await resposta.json()
-
-    let relatorio = ''
-    if (data.choices && data.choices[0]) {
-      relatorio = data.choices[0].message.content
-    } else {
-      relatorio = 'Erro na IA: ' + JSON.stringify(data)
-    }
+    let relatorio = data.choices && data.choices[0] ? data.choices[0].message.content : 'Erro: ' + JSON.stringify(data)
 
     await supabase.from('entrevistas').insert({
-      processo: processo,
-      responsavel: nome,
-      respostas: respostas,
-      relatorio: relatorio
+      processo, responsavel: nome, respostas, relatorio
     })
 
-    return Response.json({ relatorio: relatorio })
-
+    return Response.json({ relatorio })
   } catch (e) {
     return Response.json({ relatorio: 'Erro: ' + e.message })
   }
