@@ -45,35 +45,44 @@ export default function Home() {
   if (tela === 'inicio') {
     return (
       <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', maxWidth: '800px', padding: '40px' }}>
+        <div style={{ textAlign: 'center', maxWidth: '960px', padding: '40px' }}>
           <h1 style={{ fontSize: '32px', color: '#1e293b', marginBottom: '10px' }}>Sistema de Melhoria</h1>
           <p style={{ color: '#64748b', marginBottom: '50px', fontSize: '16px' }}>Escolha o modulo que deseja usar</p>
-          <div style={{ display: 'flex', gap: '24px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <div
               onClick={() => setTela('formulario')}
-              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '200px', cursor: 'pointer' }}
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer' }}
               onMouseOver={e => e.currentTarget.style.borderColor = '#6366f1'}
               onMouseOut={e => e.currentTarget.style.borderColor = '#e2e8f0'}
             >
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Analise de Processo</h2>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Entrevista com IA e relatorio de melhorias</p>
+              <div style={{ fontSize: '44px', marginBottom: '14px' }}>📋</div>
+              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Analise de Processo</h2>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '13px' }}>Entrevista com IA e relatorio de melhorias</p>
             </div>
             <a
               href="/projetos"
-              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '200px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
             >
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📁</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Projetos</h2>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Gerencie projetos e tarefas com prazos</p>
+              <div style={{ fontSize: '44px', marginBottom: '14px' }}>📁</div>
+              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Projetos</h2>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '13px' }}>Gerencie projetos e tarefas com prazos</p>
             </a>
             <a
               href="/dashboard"
-              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '200px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
             >
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Dashboard</h2>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Visao geral do sistema</p>
+              <div style={{ fontSize: '44px', marginBottom: '14px' }}>📊</div>
+              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Dashboard</h2>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '13px' }}>Visao geral do sistema</p>
+            </a>
+            <a
+              href="/roadmap"
+              style={{ background: 'white', border: '2px solid #6366f1', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
+            >
+              <div style={{ fontSize: '44px', marginBottom: '14px' }}>🗺️</div>
+              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Roadmap</h2>
+              <p style={{ color: '#64748b', margin: '0 0 8px', fontSize: '13px' }}>Gerar plano de projeto com IA</p>
+              <span style={{ background: '#EEEDFE', color: '#3C3489', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>Novo</span>
             </a>
           </div>
         </div>
@@ -92,13 +101,13 @@ export default function Home() {
             placeholder="Nome do processo (ex: Compras)"
             value={processo}
             onChange={e => setProcesso(e.target.value)}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box', color: `#1e293b` }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box', color: '#1e293b' }}
           />
           <input
             placeholder="Seu nome"
             value={nome}
             onChange={e => setNome(e.target.value)}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box', color: `#1e293b` }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box', color: '#1e293b' }}
           />
           <button
             onClick={iniciarEntrevista}
@@ -126,7 +135,7 @@ export default function Home() {
             value={resposta}
             onChange={e => setResposta(e.target.value)}
             rows={4}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', resize: 'vertical', boxSizing: 'border-box', color: `#1e293b` }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', resize: 'vertical', boxSizing: 'border-box', color: '#1e293b' }}
           />
           <button
             onClick={responder}
