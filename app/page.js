@@ -92,13 +92,13 @@ export default function Home() {
             placeholder="Nome do processo (ex: Compras)"
             value={processo}
             onChange={e => setProcesso(e.target.value)}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box', color: `#1e293b` }}
           />
           <input
             placeholder="Seu nome"
             value={nome}
             onChange={e => setNome(e.target.value)}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box', color: `#1e293b` }}
           />
           <button
             onClick={iniciarEntrevista}
