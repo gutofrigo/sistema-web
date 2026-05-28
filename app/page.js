@@ -126,7 +126,7 @@ export default function Home() {
             value={resposta}
             onChange={e => setResposta(e.target.value)}
             rows={4}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', resize: 'vertical', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', resize: 'vertical', boxSizing: 'border-box', color: `#1e293b` }}
           />
           <button
             onClick={responder}
