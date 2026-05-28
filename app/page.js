@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-
 const perguntas = [
   'Descreva como o processo funciona atualmente, do inicio ao fim.',
   'Quais sao os principais problemas ou gargalos que voce enfrenta nesse processo?',
@@ -8,7 +7,6 @@ const perguntas = [
   'Quais ferramentas ou sistemas sao usados? Eles atendem bem?',
   'Se voce pudesse mudar uma coisa nesse processo, o que seria?'
 ]
-
 export default function Home() {
   const [tela, setTela] = useState('inicio')
   const [processo, setProcesso] = useState('')
@@ -18,20 +16,17 @@ export default function Home() {
   const [resposta, setResposta] = useState('')
   const [relatorio, setRelatorio] = useState('')
   const [projetosCriados, setProjetosCriados] = useState(0)
-
   function iniciarEntrevista() {
     if (!processo || !nome) return alert('Preencha todos os campos')
     setTela('entrevista')
     setEtapa(0)
     setRespostas([])
   }
-
   async function responder() {
     if (!resposta.trim()) return
     const novas = [...respostas, { pergunta: perguntas[etapa], resposta: resposta }]
     setRespostas(novas)
     setResposta('')
-
     if (etapa < perguntas.length - 1) {
       setEtapa(etapa + 1)
     } else {
@@ -47,18 +42,16 @@ export default function Home() {
       setTela('relatorio')
     }
   }
-
   if (tela === 'inicio') {
     return (
       <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', maxWidth: '600px', padding: '40px' }}>
+        <div style={{ textAlign: 'center', maxWidth: '800px', padding: '40px' }}>
           <h1 style={{ fontSize: '32px', color: '#1e293b', marginBottom: '10px' }}>Sistema de Melhoria</h1>
           <p style={{ color: '#64748b', marginBottom: '50px', fontSize: '16px' }}>Escolha o modulo que deseja usar</p>
-
           <div style={{ display: 'flex', gap: '24px', justifyContent: 'center' }}>
             <div
               onClick={() => setTela('formulario')}
-              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '220px', cursor: 'pointer', transition: 'all 0.2s' }}
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '200px', cursor: 'pointer' }}
               onMouseOver={e => e.currentTarget.style.borderColor = '#6366f1'}
               onMouseOut={e => e.currentTarget.style.borderColor = '#e2e8f0'}
             >
@@ -66,21 +59,27 @@ export default function Home() {
               <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Analise de Processo</h2>
               <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Entrevista com IA e relatorio de melhorias</p>
             </div>
-
-            
-              <a href="/projetos"
-              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '220px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
+            <a
+              href="/projetos"
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '200px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
             >
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>📁</div>
               <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Projetos</h2>
               <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Gerencie projetos e tarefas com prazos</p>
+            </a>
+            <a
+              href="/dashboard"
+              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px', width: '200px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}
+            >
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
+              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '18px' }}>Dashboard</h2>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Visao geral do sistema</p>
             </a>
           </div>
         </div>
       </div>
     )
   }
-
   if (tela === 'formulario') {
     return (
       <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -111,7 +110,6 @@ export default function Home() {
       </div>
     )
   }
-
   if (tela === 'entrevista') {
     return (
       <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -140,7 +138,6 @@ export default function Home() {
       </div>
     )
   }
-
   if (tela === 'carregando') {
     return (
       <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -151,7 +148,6 @@ export default function Home() {
       </div>
     )
   }
-
   if (tela === 'relatorio') {
     return (
       <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', padding: '40px' }}>
