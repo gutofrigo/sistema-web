@@ -1,4 +1,4 @@
-[09:50, 29/05/2026] Gustavo Frigo: 'use client'
+'use client'
 import { useState, useEffect } from 'react'
 
 export default function Projetos() {
