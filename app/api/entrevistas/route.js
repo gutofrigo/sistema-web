@@ -7,7 +7,7 @@ export async function GET() {
 export async function DELETE(req) {
   try {
     const body = await req.json()
-    const { error } = await supabase.from('entrevistas').delete().eq('id', body.id)
+    const { error } = await supabase.from('entrevistas').delete().eq('id', body.id).select()
     if (error) throw new Error(error.message)
     return Response.json({ ok: true })
   } catch (e) {
