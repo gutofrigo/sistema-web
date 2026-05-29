@@ -92,3 +92,13 @@ export async function POST(req) {
     return Response.json({ erro: e.message }, { status: 500 })
   }
 }
+export async function DELETE(req) {
+  try {
+    const body = await req.json()
+    const { error } = await supabase.from('roadmaps').delete().eq('id', body.id)
+    if (error) throw new Error(error.message)
+    return Response.json({ ok: true })
+  } catch (e) {
+    return Response.json({ erro: e.message }, { status: 500 })
+  }
+}
