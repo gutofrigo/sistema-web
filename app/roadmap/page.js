@@ -56,13 +56,31 @@ export default function Roadmap() {
     setResultado(data.dados)
     setTela('resultado')
   }
+  async function deletarRoadmap(e, id) {
+    e.stopPropagation()
+    if (!confirm('Deletar este roadmap?')) return
+    await fetch('/api/roadmap', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    buscarRoadmaps()
+  }
   async function verRoadmap(id) {
     const res = await fetch('/api/roadmap/' + id)
     const data = await res.json()
-    if (data) {
+    if (data && !data.erro) {
       setResultado(data)
       setTela('resultado')
+    } else {
+      alert('Nao foi possivel carregar este roadmap')
     }
+  }
+  async function deletarRoadmap(e, id) {
+    e.stopPropagation()
+    if (!confirm('Deletar este roadmap?')) return
+    await fetch('/api/roadmap', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    buscarRoadmaps()
   }
   if (tela === 'gerando') {
     return (
@@ -328,9 +346,16 @@ export default function Roadmap() {
                   <p style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 4px', color: '#1e293b' }}>{r.titulo}</p>
                   <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>{r.area || 'Sem area'} • {diasAtras(r.criado_em)}</p>
                 </div>
-                <span style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '20px', background: '#EEEDFE', color: '#3C3489', whiteSpace: 'nowrap' }}>
-                  {labelPorte(r.porte)}
-                </span>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '20px', background: '#EEEDFE', color: '#3C3489', whiteSpace: 'nowrap' }}>
+                    {labelPorte(r.porte)}
+                  </span>
+                  <button
+                    onClick={e => deletarRoadmap(e, r.id)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '4px', color: '#94a3b8' }}
+                    title="Deletar"
+                  >🗑️</button>
+                </div>
               </div>
             ))}
           </div>
