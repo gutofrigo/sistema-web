@@ -1,4 +1,4 @@
-'use client'
+[09:50, 29/05/2026] Gustavo Frigo: 'use client'
 import { useState, useEffect } from 'react'
 
 export default function Projetos() {
@@ -15,15 +15,28 @@ export default function Projetos() {
   async function buscarProjetos() {
     const res = await fetch('/api/projetos')
     const data = await res.json()
+    if…
+[09:53, 29/05/2026] Gustavo Frigo: 'use client'
+import { useState, useEffect } from 'react'
+export default function Projetos() {
+  const [tela, setTela] = useState('lista')
+  const [projetos, setProjetos] = useState([])
+  const [projetoAtivo, setProjetoAtivo] = useState(null)
+  const [tarefas, setTarefas] = useState([])
+  const [novoProj, setNovoProj] = useState({ titulo: '', responsavel: '', descricao: '' })
+  const [novaTarefa, setNovaTarefa] = useState({ titulo: '', responsavel: '', data_inicio: '', data_entrega: '', status: 'pendente', tarefa_pai_id: '' })
+  const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
+  useEffect(() => { buscarProjetos() }, [])
+  async function buscarProjetos() {
+    const res = await fetch('/api/projetos')
+    const data = await res.json()
     if (data.projetos) setProjetos(data.projetos)
   }
-
   async function buscarTarefas(projetoId) {
     const res = await fetch('/api/tarefas?projeto_id=' + projetoId)
     const data = await res.json()
     if (data.tarefas) setTarefas(data.tarefas)
   }
-
   async function criarProjeto() {
     if (!novoProj.titulo) return alert('Digite o titulo do projeto')
     await fetch('/api/projetos', {
@@ -35,13 +48,30 @@ export default function Projetos() {
     setTela('lista')
     buscarProjetos()
   }
-
+  async function deletarProjeto(e, id) {
+    e.stopPropagation()
+    if (!confirm('Deletar este projeto e todas as suas tarefas?')) return
+    await fetch('/api/projetos', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    buscarProjetos()
+  }
+  async function deletarTarefa(id) {
+    if (!confirm('Deletar esta tarefa?')) return
+    await fetch('/api/tarefas', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    buscarTarefas(projetoAtivo.id)
+  }
   async function abrirProjeto(projeto) {
     setProjetoAtivo(projeto)
     await buscarTarefas(projeto.id)
     setTela('projeto')
   }
-
   async function criarTarefa() {
     if (!novaTarefa.titulo) return alert('Digite o titulo da tarefa')
     await fetch('/api/tarefas', {
@@ -53,7 +83,6 @@ export default function Projetos() {
     setMostrarFormTarefa(false)
     buscarTarefas(projetoAtivo.id)
   }
-
   async function mudarStatusTarefa(id, status) {
     await fetch('/api/tarefas', {
       method: 'POST',
@@ -62,12 +91,9 @@ export default function Projetos() {
     })
     buscarTarefas(projetoAtivo.id)
   }
-
   const cores = { pendente: '#f59e0b', em_andamento: '#3b82f6', concluido: '#10b981' }
-
   const tarefasPai = tarefas.filter(t => !t.tarefa_pai_id)
   const tarefasFilho = (paiId) => tarefas.filter(t => t.tarefa_pai_id === paiId)
-
   if (tela === 'lista') return (
     <div style={{ fontFamily: 'Arial', padding: '40px', maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -79,30 +105,34 @@ export default function Projetos() {
           + Novo Projeto
         </button>
       </div>
-
       {projetos.length === 0 && (
         <div style={{ textAlign: 'center', padding: '60px', background: '#f8fafc', borderRadius: '12px', color: '#64748b' }}>
           <p style={{ fontSize: '18px' }}>Nenhum projeto ainda</p>
           <p>Crie um projeto ou faca uma entrevista de processo</p>
         </div>
       )}
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {projetos.map(p => (
           <div key={p.id} onClick={() => abrirProjeto(p)} style={{ background: 'white', border: '1px solid #e2e8f0', borderLeft: '4px solid ' + (cores[p.status] || '#6366f1'), borderRadius: '8px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h3 style={{ margin: '0 0 6px 0', color: '#1e293b' }}>{p.titulo}</h3>
                 <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>{p.responsavel || 'Sem responsavel'} • {new Date(p.criado_em).toLocaleDateString('pt-BR')}</p>
               </div>
-              <span style={{ background: cores[p.status] || '#6366f1', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '13px', height: 'fit-content' }}>{p.status}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ background: cores[p.status] || '#6366f1', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '13px' }}>{p.status}</span>
+                <button
+                  onClick={e => deletarProjeto(e, p.id)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#94a3b8', padding: '4px' }}
+                  title="Deletar projeto"
+                >🗑️</button>
+              </div>
             </div>
           </div>
         ))}
       </div>
     </div>
   )
-
   if (tela === 'novo') return (
     <div style={{ fontFamily: 'Arial', padding: '40px', maxWidth: '600px', margin: '0 auto' }}>
       <button onClick={() => setTela('lista')} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', marginBottom: '20px', fontSize: '14px' }}>
@@ -110,17 +140,16 @@ export default function Projetos() {
       </button>
       <h2 style={{ color: '#1e293b', marginBottom: '24px' }}>Novo Projeto</h2>
       <input placeholder="Titulo do projeto" value={novoProj.titulo} onChange={e => setNovoProj({ ...novoProj, titulo: e.target.value })}
-        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box' }} />
+        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box', color: '#1e293b' }} />
       <input placeholder="Responsavel" value={novoProj.responsavel} onChange={e => setNovoProj({ ...novoProj, responsavel: e.target.value })}
-        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box' }} />
+        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box', color: '#1e293b' }} />
       <textarea placeholder="Descricao (opcional)" value={novoProj.descricao} onChange={e => setNovoProj({ ...novoProj, descricao: e.target.value })} rows={3}
-        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box', resize: 'vertical' }} />
+        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box', resize: 'vertical', color: '#1e293b' }} />
       <button onClick={criarProjeto} style={{ width: '100%', padding: '14px', background: '#6366f1', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: 'pointer' }}>
         Criar Projeto
       </button>
     </div>
   )
-
   if (tela === 'projeto') return (
     <div style={{ fontFamily: 'Arial', padding: '40px', maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -135,14 +164,13 @@ export default function Projetos() {
           + Nova Tarefa
         </button>
       </div>
-
       {mostrarFormTarefa && (
         <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '24px', marginBottom: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
           <h3 style={{ margin: '0 0 16px 0', color: '#1e293b' }}>Nova Tarefa</h3>
           <input placeholder="Titulo da tarefa" value={novaTarefa.titulo} onChange={e => setNovaTarefa({ ...novaTarefa, titulo: e.target.value })}
-            style={{ width: '100%', padding: '10px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '14px', marginBottom: '10px', boxSizing: 'border-box' }} />
+            style={{ width: '100%', padding: '10px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '14px', marginBottom: '10px', boxSizing: 'border-box', color: '#1e293b' }} />
           <input placeholder="Responsavel" value={novaTarefa.responsavel} onChange={e => setNovaTarefa({ ...novaTarefa, responsavel: e.target.value })}
-            style={{ width: '100%', padding: '10px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '14px', marginBottom: '10px', boxSizing: 'border-box' }} />
+            style={{ width: '100%', padding: '10px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '14px', marginBottom: '10px', boxSizing: 'border-box', color: '#1e293b' }} />
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <div style={{ flex: 1 }}>
               <label style={{ fontSize: '12px', color: '#64748b' }}>Data inicio</label>
@@ -173,13 +201,11 @@ export default function Projetos() {
           </div>
         </div>
       )}
-
       {tarefas.length === 0 && !mostrarFormTarefa && (
         <div style={{ textAlign: 'center', padding: '60px', background: '#f8fafc', borderRadius: '12px', color: '#64748b' }}>
           <p>Nenhuma tarefa. Clique em "Nova Tarefa" para comecar.</p>
         </div>
       )}
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {tarefasPai.map(tarefa => (
           <div key={tarefa.id}>
@@ -193,15 +219,21 @@ export default function Projetos() {
                     {tarefasFilho(tarefa.id).length > 0 && <span>📎 {tarefasFilho(tarefa.id).length} subtarefa(s)</span>}
                   </div>
                 </div>
-                <select value={tarefa.status} onChange={e => mudarStatusTarefa(tarefa.id, e.target.value)}
-                  style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', background: cores[tarefa.status] || '#94a3b8', color: 'white', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}>
-                  <option value="pendente">Pendente</option>
-                  <option value="em_andamento">Em andamento</option>
-                  <option value="concluido">Concluido</option>
-                </select>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <select value={tarefa.status} onChange={e => mudarStatusTarefa(tarefa.id, e.target.value)}
+                    style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', background: cores[tarefa.status] || '#94a3b8', color: 'white', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}>
+                    <option value="pendente">Pendente</option>
+                    <option value="em_andamento">Em andamento</option>
+                    <option value="concluido">Concluido</option>
+                  </select>
+                  <button
+                    onClick={() => deletarTarefa(tarefa.id)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '15px', color: '#94a3b8', padding: '4px' }}
+                    title="Deletar tarefa"
+                  >🗑️</button>
+                </div>
               </div>
             </div>
-
             {tarefasFilho(tarefa.id).map(filho => (
               <div key={filho.id} style={{ marginLeft: '32px', marginTop: '4px', background: '#f8fafc', border: '1px solid #e2e8f0', borderLeft: '4px solid ' + (cores[filho.status] || '#94a3b8'), borderRadius: '8px', padding: '14px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -212,12 +244,19 @@ export default function Projetos() {
                       {filho.data_entrega && <span>📅 {new Date(filho.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR')}</span>}
                     </div>
                   </div>
-                  <select value={filho.status} onChange={e => mudarStatusTarefa(filho.id, e.target.value)}
-                    style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #e2e8f0', background: cores[filho.status] || '#94a3b8', color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
-                    <option value="pendente">Pendente</option>
-                    <option value="em_andamento">Em andamento</option>
-                    <option value="concluido">Concluido</option>
-                  </select>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <select value={filho.status} onChange={e => mudarStatusTarefa(filho.id, e.target.value)}
+                      style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #e2e8f0', background: cores[filho.status] || '#94a3b8', color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+                      <option value="pendente">Pendente</option>
+                      <option value="em_andamento">Em andamento</option>
+                      <option value="concluido">Concluido</option>
+                    </select>
+                    <button
+                      onClick={() => deletarTarefa(filho.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: '#94a3b8', padding: '4px' }}
+                      title="Deletar subtarefa"
+                    >🗑️</button>
+                  </div>
                 </div>
               </div>
             ))}

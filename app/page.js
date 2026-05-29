@@ -16,6 +16,8 @@ export default function Home() {
   const [resposta, setResposta] = useState('')
   const [relatorio, setRelatorio] = useState('')
   const [projetosCriados, setProjetosCriados] = useState(0)
+  const [entrevistas, setEntrevistas] = useState([])
+  const [entrevistaAberta, setEntrevistaAberta] = useState(null)
   function iniciarEntrevista() {
     if (!processo || !nome) return alert('Preencha todos os campos')
     setTela('entrevista')
@@ -41,6 +43,31 @@ export default function Home() {
       setProjetosCriados(data.projetos_criados || 0)
       setTela('relatorio')
     }
+  }
+  async function buscarEntrevistas() {
+    const res = await fetch('/api/entrevistas')
+    const data = await res.json()
+    setEntrevistas(data || [])
+  }
+  async function deletarEntrevista(id) {
+    if (!confirm('Deletar este relatorio?')) return
+    await fetch('/api/entrevistas', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    buscarEntrevistas()
+    setEntrevistaAberta(null)
+  }
+  function abrirHistorico() {
+    buscarEntrevistas()
+    setTela('historico')
+  }
+  function diasAtras(data) {
+    const diff = Math.floor((new Date() - new Date(data)) / (1000 * 60 * 60 * 24))
+    if (diff === 0) return 'hoje'
+    if (diff === 1) return '1 dia atras'
+    return diff + ' dias atras'
   }
   if (tela === 'inicio') {
     return (
@@ -85,6 +112,68 @@ export default function Home() {
               <span style={{ background: '#EEEDFE', color: '#3C3489', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>Novo</span>
             </a>
           </div>
+          <button
+            onClick={abrirHistorico}
+            style={{ marginTop: '32px', background: 'none', border: 'none', color: '#94a3b8', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Ver historico de relatorios
+          </button>
+        </div>
+      </div>
+    )
+  }
+  if (tela === 'historico') {
+    return (
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', padding: '40px' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '28px' }}>
+            <button onClick={() => { setTela('inicio'); setEntrevistaAberta(null) }} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', fontSize: '14px' }}>
+              ← Voltar
+            </button>
+            <h1 style={{ color: '#1e293b', margin: 0, fontSize: '22px' }}>📋 Historico de Relatorios</h1>
+          </div>
+          {entrevistas.length === 0 && (
+            <div style={{ background: 'white', borderRadius: '12px', padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+              Nenhum relatorio encontrado
+            </div>
+          )}
+          {entrevistaAberta ? (
+            <div style={{ background: 'white', borderRadius: '16px', padding: '32px', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                <div>
+                  <h2 style={{ color: '#1e293b', margin: '0 0 4px' }}>{entrevistaAberta.processo}</h2>
+                  <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>{entrevistaAberta.responsavel} • {diasAtras(entrevistaAberta.criado_em)}</p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => setEntrevistaAberta(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', color: '#475569', fontSize: '13px' }}>
+                    ← Voltar
+                  </button>
+                  <button onClick={() => deletarEntrevista(entrevistaAberta.id)} style={{ background: '#fef2f2', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', color: '#dc2626', fontSize: '13px' }}>
+                    🗑️ Deletar
+                  </button>
+                </div>
+              </div>
+              <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: '#334155' }}>
+                {entrevistaAberta.relatorio}
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {entrevistas.map(e => (
+                <div key={e.id} style={{ background: 'white', borderRadius: '12px', padding: '18px 20px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div onClick={() => setEntrevistaAberta(e)} style={{ cursor: 'pointer', flex: 1 }}>
+                    <p style={{ fontWeight: 'bold', color: '#1e293b', margin: '0 0 4px', fontSize: '15px' }}>{e.processo}</p>
+                    <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>{e.responsavel} • {diasAtras(e.criado_em)}</p>
+                  </div>
+                  <button
+                    onClick={() => deletarEntrevista(e.id)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#94a3b8', padding: '4px', marginLeft: '12px' }}
+                    title="Deletar"
+                  >🗑️</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     )
