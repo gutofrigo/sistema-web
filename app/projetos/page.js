@@ -1,23 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-
-export default function Projetos() {
-  const [tela, setTela] = useState('lista')
-  const [projetos, setProjetos] = useState([])
-  const [projetoAtivo, setProjetoAtivo] = useState(null)
-  const [tarefas, setTarefas] = useState([])
-  const [novoProj, setNovoProj] = useState({ titulo: '', responsavel: '', descricao: '' })
-  const [novaTarefa, setNovaTarefa] = useState({ titulo: '', responsavel: '', data_inicio: '', data_entrega: '', status: 'pendente', tarefa_pai_id: '' })
-  const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
-
-  useEffect(() => { buscarProjetos() }, [])
-
-  async function buscarProjetos() {
-    const res = await fetch('/api/projetos')
-    const data = await res.json()
-    if…
-[09:53, 29/05/2026] Gustavo Frigo: 'use client'
-import { useState, useEffect } from 'react'
 export default function Projetos() {
   const [tela, setTela] = useState('lista')
   const [projetos, setProjetos] = useState([])
