@@ -145,9 +145,14 @@ export default function Projetos() {
           <a href="/" style={{ color: '#6366f1', textDecoration: 'none', fontSize: '14px' }}>Inicio</a>
           <h1 style={{ color: '#1e293b', margin: 0 }}>Projetos</h1>
         </div>
-        <button onClick={() => setTela('novo')} style={{ background: '#6366f1', color: 'white', padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '15px' }}>
-          + Novo Projeto
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <a href="/gantt" style={{ padding: '10px 16px', background: '#f1f5f9', color: '#475569', borderRadius: '8px', border: '1px solid #e2e8f0', textDecoration: 'none', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            📊 Ver Gantt
+          </a>
+          <button onClick={() => setTela('novo')} style={{ background: '#6366f1', color: 'white', padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '15px' }}>
+            + Novo Projeto
+          </button>
+        </div>
       </div>
       {projetos.length === 0 && (
         <div style={{ textAlign: 'center', padding: '60px', background: '#f8fafc', borderRadius: '12px', color: '#64748b' }}>
@@ -199,6 +204,9 @@ export default function Projetos() {
           <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '14px' }}>Responsavel: {projetoAtivo.responsavel || 'Nao definido'}</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
+          <a href="/gantt" style={{ padding: '10px 16px', background: '#f1f5f9', color: '#475569', borderRadius: '8px', border: '1px solid #e2e8f0', textDecoration: 'none', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            📊 Gantt
+          </a>
           <button onClick={() => { setMostrarGerador(!mostrarGerador); setMostrarFormTarefa(false) }} style={{ background: '#EEEDFE', color: '#534AB7', padding: '10px 16px', borderRadius: '8px', border: '1px solid #CECBF6', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>
             ✨ Gerar com IA
           </button>
@@ -219,14 +227,9 @@ export default function Projetos() {
             rows={3}
             style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', marginBottom: '12px', boxSizing: 'border-box', resize: 'vertical', color: '#1e293b' }}
           />
-          <button
-            onClick={gerarTarefasIA}
-            disabled={gerandoIA}
-            style={{ padding: '10px 20px', background: gerandoIA ? '#a5b4fc' : '#534AB7', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', cursor: gerandoIA ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
-          >
+          <button onClick={gerarTarefasIA} disabled={gerandoIA} style={{ padding: '10px 20px', background: gerandoIA ? '#a5b4fc' : '#534AB7', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', cursor: gerandoIA ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
             {gerandoIA ? 'Gerando...' : '✨ Gerar tarefas'}
           </button>
- 
           {tarefasIA.length > 0 && (
             <div style={{ marginTop: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -252,14 +255,8 @@ export default function Projetos() {
                 })}
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button onClick={() => { setTarefasIA([]); setObjetivoIA('') }} style={{ padding: '10px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>
-                  Cancelar
-                </button>
-                <button
-                  onClick={adicionarTarefasSelecionadas}
-                  disabled={adicionando || selecionadas.length === 0}
-                  style={{ padding: '10px 20px', background: adicionando ? '#a5b4fc' : '#534AB7', color: 'white', border: 'none', borderRadius: '8px', cursor: adicionando ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 'bold' }}
-                >
+                <button onClick={() => { setTarefasIA([]); setObjetivoIA('') }} style={{ padding: '10px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>Cancelar</button>
+                <button onClick={adicionarTarefasSelecionadas} disabled={adicionando || selecionadas.length === 0} style={{ padding: '10px 20px', background: adicionando ? '#a5b4fc' : '#534AB7', color: 'white', border: 'none', borderRadius: '8px', cursor: adicionando ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 'bold' }}>
                   {adicionando ? 'Adicionando...' : 'Adicionar ' + selecionadas.length + ' tarefa(s) ao projeto'}
                 </button>
               </div>
