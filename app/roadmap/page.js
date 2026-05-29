@@ -63,7 +63,7 @@ export default function Roadmap() {
     buscarRoadmaps()
   }
   async function verRoadmap(id) {
-    const res = await fetch('/api/roadmap/' + id)
+    const res = await fetch('/api/roadmap?id=' + id)
     const data = await res.json()
     if (data && !data.erro) {
       setResultado(data)

@@ -1,8 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import Groq from 'groq-sdk'
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
-export async function GET() {
+export async function GET(req) {
   try {
+    const url = new URL(req.url)
+    const id = url.searchParams.get('id')
+    if (id) {
+      const { data } = await supabase.from('roadmaps').select('*').eq('id', id).single()
+      if (!data) return Response.json({ erro: 'Roadmap nao encontrado' })
+      return Response.json(data)
+    }
     const { data } = await supabase.from('roadmaps').select('id, titulo, area, porte, criado_em').order('criado_em', { ascending: false })
     return Response.json(data || [])
   } catch (e) {
