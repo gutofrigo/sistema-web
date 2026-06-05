@@ -1,10 +1,8 @@
 'use client'
 import { useState } from 'react'
-
 const CORES_PARTICIPANTE = ['#EEF2FF', '#F0FDF4', '#FFF7ED', '#FDF2F8', '#F0F9FF', '#FFFBEB']
 const BORDAS_PARTICIPANTE = ['#C7D2FE', '#BBF7D0', '#FED7AA', '#FBCFE8', '#BAE6FD', '#FDE68A']
 const TEXTO_PARTICIPANTE = ['#3730A3', '#166534', '#9A3412', '#9D174D', '#075985', '#92400E']
-
 function DiagramaBPMN({ dados }) {
   if (!dados || !dados.elementos) return null
   const participantes = dados.participantes || []
@@ -25,9 +23,14 @@ function DiagramaBPMN({ dados }) {
   })
   const posicoes = {}
   const colunaGlobal = {}
+  let colAtual = 0
   function getPosY(participante) {
     const idx = participantes.indexOf(participante)
     return PADDING_TOP + idx * RAIA_H + RAIA_H / 2
+  }
+  function getPosX(id) {
+    if (colunaGlobal[id] !== undefined) return PADDING_LEFT + 80 + colunaGlobal[id] * COL_W
+    return PADDING_LEFT + 80
   }
   const visitados = new Set()
   function calcColunas(id, col) {
@@ -35,7 +38,7 @@ function DiagramaBPMN({ dados }) {
     visitados.add(id)
     colunaGlobal[id] = Math.max(colunaGlobal[id] || 0, col)
     const saidas = conexoes.filter(c => c.de === id)
-    saidas.forEach((c) => calcColunas(c.para, col + 1))
+    saidas.forEach((c, i) => calcColunas(c.para, col + 1))
   }
   const inicio = elementos.find(e => e.tipo === 'inicio')
   if (inicio) calcColunas(inicio.id, 0)
@@ -48,7 +51,6 @@ function DiagramaBPMN({ dados }) {
   })
   const maxCol = Math.max(...Object.values(colunaGlobal))
   const totalW = Math.max(680, PADDING_LEFT + 80 + (maxCol + 1) * COL_W + 60)
-
   function renderElemento(el) {
     const pos = posicoes[el.id]
     if (!pos) return null
@@ -89,7 +91,6 @@ function DiagramaBPMN({ dados }) {
       </g>
     )
   }
-
   function renderConexao(c, idx) {
     const origem = posicoes[c.de]
     const destino = posicoes[c.para]
@@ -121,7 +122,6 @@ function DiagramaBPMN({ dados }) {
       </g>
     )
   }
-
   return (
     <div style={{ overflowX: 'auto', marginTop: '8px' }}>
       <svg viewBox={'0 0 ' + totalW + ' ' + totalH} xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', minWidth: totalW + 'px', display: 'block' }}>
@@ -154,13 +154,11 @@ function DiagramaBPMN({ dados }) {
     </div>
   )
 }
-
 export default function BPMN() {
   const [descricao, setDescricao] = useState('')
   const [gerando, setGerando] = useState(false)
   const [dados, setDados] = useState(null)
   const [erro, setErro] = useState('')
-
   async function gerarBPMN() {
     if (!descricao.trim()) return alert('Descreva o processo')
     setGerando(true)
@@ -179,70 +177,6 @@ export default function BPMN() {
     }
     setGerando(false)
   }
-
-  function exportarBizagi() {
-    if (!dados) return
-
-    const processId = 'processo_1'
-
-    // Monta lanes (raias) por participante
-    const lanes = dados.participantes.map((p, i) => {
-      const elementosDaLane = dados.elementos
-        .filter(el => el.participante === p)
-        .map(el => `        <flowNodeRef>${el.id}</flowNodeRef>`)
-        .join('\n')
-      return `      <lane id="lane_${i}" name="${p}">
-${elementosDaLane}
-      </lane>`
-    }).join('\n')
-
-    // Monta elementos BPMN
-    const elementos = dados.elementos.map(el => {
-      if (el.tipo === 'inicio') return `    <startEvent id="${el.id}" name="${el.nome}"/>`
-      if (el.tipo === 'fim') return `    <endEvent id="${el.id}" name="${el.nome}"/>`
-      if (el.tipo === 'gateway') return `    <exclusiveGateway id="${el.id}" name="${el.nome}" gatewayDirection="Diverging"/>`
-      return `    <task id="${el.id}" name="${el.nome}"/>`
-    }).join('\n')
-
-    // Monta conexoes (sequenceFlow)
-    const conexoes = dados.conexoes.map((c, i) => {
-      const label = c.label ? ` name="${c.label}"` : ''
-      return `    <sequenceFlow id="flow_${i}" sourceRef="${c.de}" targetRef="${c.para}"${label}/>`
-    }).join('\n')
-
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
-             typeLanguage="http://www.w3.org/2001/XMLSchema"
-             expressionLanguage="http://www.w3.org/1999/XPath"
-             targetNamespace="http://www.activiti.org/test">
-
-  <collaboration id="colaboracao_1">
-    <participant id="participante_1" name="${dados.nome}" processRef="${processId}"/>
-  </collaboration>
-
-  <process id="${processId}" name="${dados.nome}" isExecutable="true">
-    <laneSet id="laneSet_1">
-${lanes}
-    </laneSet>
-${elementos}
-${conexoes}
-  </process>
-
-</definitions>`
-
-    const blob = new Blob([xml], { type: 'application/xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = ${dados.nome.replace(/\s+/g, '_')}.bpmn
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
   return (
     <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', padding: '40px 20px' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -253,7 +187,7 @@ ${conexoes}
           </div>
           <a href="/" style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', textDecoration: 'none', color: '#475569', fontSize: '13px' }}>Inicio</a>
         </div>
-
+ 
         <div style={{ background: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
           <h2 style={{ color: '#1e293b', fontSize: '15px', margin: '0 0 6px' }}>Descreva o processo</h2>
           <p style={{ color: '#64748b', fontSize: '13px', margin: '0 0 14px' }}>Conte como o processo funciona — quem participa, quais etapas, quais decisoes. A IA vai criar o diagrama BPMN automaticamente.</p>
@@ -272,13 +206,13 @@ ${conexoes}
             {gerando ? 'Gerando diagrama...' : '✨ Gerar diagrama BPMN'}
           </button>
         </div>
-
+ 
         {erro && (
           <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
             <p style={{ color: '#dc2626', fontSize: '13px', margin: 0 }}>Erro: {erro}</p>
           </div>
         )}
-
+ 
         {dados && (
           <div style={{ background: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -290,29 +224,17 @@ ${conexoes}
               </div>
             </div>
             <DiagramaBPMN dados={dados} />
-            <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => { setDados(null); setDescricao('') }}
-                style={{ padding: '8px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
-              >
+            <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+              <button onClick={() => { setDados(null); setDescricao('') }} style={{ padding: '8px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>
                 Novo processo
               </button>
-              <button
-                onClick={gerarBPMN}
-                style={{ padding: '8px 16px', background: '#EEEDFE', color: '#534AB7', border: '1px solid #CECBF6', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
-              >
+              <button onClick={gerarBPMN} style={{ padding: '8px 16px', background: '#EEEDFE', color: '#534AB7', border: '1px solid #CECBF6', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>
                 ✨ Regerar
-              </button>
-              <button
-                onClick={exportarBizagi}
-                style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}
-              >
-                ⬇️ Exportar para Bizagi (.bpmn)
               </button>
             </div>
           </div>
         )}
-
+ 
         {!dados && !gerando && (
           <div style={{ background: 'white', borderRadius: '12px', padding: '32px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
             <div style={{ fontSize: '48px', marginBottom: '12px' }}>🔷</div>
