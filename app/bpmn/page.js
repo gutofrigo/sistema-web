@@ -238,7 +238,8 @@ ${conexoes}
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = ${dados.nome.replace(/\s+/g, '_')}.bpmn
+    const nomeArquivo = dados.nome.replace(/\s+/g, '_') + '.bpmn'
+    a.download = nomeArquivo
     a.click()
     URL.revokeObjectURL(url)
   }
