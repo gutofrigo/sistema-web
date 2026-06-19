@@ -57,9 +57,9 @@ function DiagramaBPMN({ dados }) {
     if (el.tipo === 'inicio') {
       return (
         <g key={el.id}>
-          <circle cx={x} cy={y} r={16} fill="white" stroke="#4338CA" strokeWidth="2"/>
-          <circle cx={x} cy={y} r={10} fill="#4338CA"/>
-          <text x={x} y={y + 28} fontSize="9" fill="#475569" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
+          <circle cx={x} cy={y} r={16} fill="white" stroke="#2e4a63" strokeWidth="2"/>
+          <circle cx={x} cy={y} r={10} fill="#2e4a63"/>
+          <text x={x} y={y + 28} fontSize="9" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
         </g>
       )
     }
@@ -68,24 +68,24 @@ function DiagramaBPMN({ dados }) {
         <g key={el.id}>
           <circle cx={x} cy={y} r={16} fill="white" stroke="#991b1b" strokeWidth="3"/>
           <circle cx={x} cy={y} r={10} fill="#991b1b"/>
-          <text x={x} y={y + 28} fontSize="9" fill="#475569" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
+          <text x={x} y={y + 28} fontSize="9" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
         </g>
       )
     }
     if (el.tipo === 'gateway') {
       return (
         <g key={el.id}>
-          <polygon points={x + ',' + (y - 18) + ' ' + (x + 20) + ',' + y + ' ' + x + ',' + (y + 18) + ' ' + (x - 20) + ',' + y} fill="white" stroke="#94a3b8" strokeWidth="1.5"/>
-          <text x={x} y={y + 4} fontSize="11" fill="#475569" textAnchor="middle" fontFamily="Arial" fontWeight="bold">?</text>
-          <text x={x} y={y + 32} fontSize="9" fill="#475569" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
+          <polygon points={x + ',' + (y - 18) + ' ' + (x + 20) + ',' + y + ' ' + x + ',' + (y + 18) + ' ' + (x - 20) + ',' + y} fill="white" stroke="#8fa3b1" strokeWidth="1.5"/>
+          <text x={x} y={y + 4} fontSize="11" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial" fontWeight="bold">?</text>
+          <text x={x} y={y + 32} fontSize="9" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
         </g>
       )
     }
     return (
       <g key={el.id}>
-        <rect x={x - ELEM_W / 2} y={y - ELEM_H / 2} width={ELEM_W} height={ELEM_H} rx="8" fill="white" stroke="#CBD5E1" strokeWidth="1.5"/>
-        <text x={x} y={y - 4} fontSize="9" fill="#1e293b" textAnchor="middle" fontFamily="Arial">{el.nome.length > 14 ? el.nome.substring(0, 14) + '...' : el.nome}</text>
-        <text x={x} y={y + 8} fontSize="8" fill="#94a3b8" textAnchor="middle" fontFamily="Arial">{el.participante}</text>
+        <rect x={x - ELEM_W / 2} y={y - ELEM_H / 2} width={ELEM_W} height={ELEM_H} rx="6" fill="white" stroke="#d6dbe0" strokeWidth="1.5"/>
+        <text x={x} y={y - 4} fontSize="9" fill="#1c2b3a" textAnchor="middle" fontFamily="Arial">{el.nome.length > 14 ? el.nome.substring(0, 14) + '...' : el.nome}</text>
+        <text x={x} y={y + 8} fontSize="8" fill="#8fa3b1" textAnchor="middle" fontFamily="Arial">{el.participante}</text>
       </g>
     )
   }
@@ -106,7 +106,7 @@ function DiagramaBPMN({ dados }) {
       x2 = destino.x
       y2 = destino.y + (origem.y < destino.y ? -ELEM_H / 2 : ELEM_H / 2)
     }
-    const corLinha = c.label === 'Sim' || c.label === 'sim' ? '#16a34a' : c.label === 'Nao' || c.label === 'nao' ? '#dc2626' : '#94a3b8'
+    const corLinha = c.label === 'Sim' || c.label === 'sim' ? '#16a34a' : c.label === 'Nao' || c.label === 'nao' ? '#dc2626' : '#8fa3b1'
     const mx = (x1 + x2) / 2
     const my = (y1 + y2) / 2
     return (
@@ -125,7 +125,7 @@ function DiagramaBPMN({ dados }) {
   return (
     <div style={{ overflowX: 'auto', marginTop: '8px' }}>
       <svg viewBox={'0 0 ' + totalW + ' ' + totalH} xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', minWidth: totalW + 'px', display: 'block' }}>
-        <rect x="0" y="0" width={totalW} height={totalH} fill="#f8fafc" rx="8"/>
+        <rect x="0" y="0" width={totalW} height={totalH} fill="#f4f5f7" rx="6"/>
         {participantes.map((p, idx) => {
           const corBg = CORES_PARTICIPANTE[idx % CORES_PARTICIPANTE.length]
           const corBorda = BORDAS_PARTICIPANTE[idx % BORDAS_PARTICIPANTE.length]
@@ -141,14 +141,14 @@ function DiagramaBPMN({ dados }) {
         {conexoes.map((c, i) => renderConexao(c, i))}
         {elementos.map(el => renderElemento(el))}
         <g transform={'translate(10, ' + (totalH - 22) + ')'}>
-          <circle cx="8" cy="8" r="6" fill="#4338CA"/>
-          <text x="18" y="12" fontSize="9" fill="#64748b" fontFamily="Arial">Inicio</text>
+          <circle cx="8" cy="8" r="6" fill="#2e4a63"/>
+          <text x="18" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Inicio</text>
           <circle cx="60" cy="8" r="6" fill="#991b1b"/>
-          <text x="70" y="12" fontSize="9" fill="#64748b" fontFamily="Arial">Fim</text>
-          <rect x="108" y="2" width="24" height="12" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="1"/>
-          <text x="136" y="12" fontSize="9" fill="#64748b" fontFamily="Arial">Atividade</text>
-          <polygon points="188,8 200,2 212,8 200,14" fill="white" stroke="#94a3b8" strokeWidth="1"/>
-          <text x="218" y="12" fontSize="9" fill="#64748b" fontFamily="Arial">Gateway</text>
+          <text x="70" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Fim</text>
+          <rect x="108" y="2" width="24" height="12" rx="3" fill="white" stroke="#d6dbe0" strokeWidth="1"/>
+          <text x="136" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Atividade</text>
+          <polygon points="188,8 200,2 212,8 200,14" fill="white" stroke="#8fa3b1" strokeWidth="1"/>
+          <text x="218" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Gateway</text>
         </g>
       </svg>
     </div>
@@ -185,7 +185,6 @@ export default function BPMN() {
 
     const processId = 'processo_1'
 
-    // Monta lanes (raias) por participante
     const lanes = dados.participantes.map((p, i) => {
       const elementosDaLane = dados.elementos
         .filter(el => el.participante === p)
@@ -196,7 +195,6 @@ ${elementosDaLane}
       </lane>`
     }).join('\n')
 
-    // Monta elementos BPMN
     const elementos = dados.elementos.map(el => {
       if (el.tipo === 'inicio') return `    <startEvent id="${el.id}" name="${el.nome}"/>`
       if (el.tipo === 'fim') return `    <endEvent id="${el.id}" name="${el.nome}"/>`
@@ -204,7 +202,6 @@ ${elementosDaLane}
       return `    <task id="${el.id}" name="${el.nome}"/>`
     }).join('\n')
 
-    // Monta conexoes (sequenceFlow)
     const conexoes = dados.conexoes.map((c, i) => {
       const label = c.label ? ` name="${c.label}"` : ''
       return `    <sequenceFlow id="flow_${i}" sourceRef="${c.de}" targetRef="${c.para}"${label}/>`
@@ -245,45 +242,45 @@ ${conexoes}
   }
 
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', padding: '40px 20px' }}>
+    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px 20px' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
-            <p style={{ color: '#64748b', fontSize: '13px', margin: '0 0 4px' }}>Sistema de Melhoria</p>
-            <h1 style={{ color: '#1e293b', margin: 0, fontSize: '24px' }}>🔷 Modelagem BPMN</h1>
+            <p style={{ color: '#5a6a7a', fontSize: '13px', margin: '0 0 4px' }}>Sistema de Melhoria</p>
+            <h1 style={{ color: '#1c2b3a', margin: 0, fontSize: '24px', fontWeight: 'bold' }}>🔷 Modelagem BPMN</h1>
           </div>
-          <a href="/" style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', textDecoration: 'none', color: '#475569', fontSize: '13px' }}>Inicio</a>
+          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', textDecoration: 'none', color: '#2e4a63', fontSize: '13px', fontWeight: 'bold' }}>← Voltar para Inicio</a>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
-          <h2 style={{ color: '#1e293b', fontSize: '15px', margin: '0 0 6px' }}>Descreva o processo</h2>
-          <p style={{ color: '#64748b', fontSize: '13px', margin: '0 0 14px' }}>Conte como o processo funciona — quem participa, quais etapas, quais decisoes. A IA vai criar o diagrama BPMN automaticamente.</p>
+        <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', marginBottom: '16px' }}>
+          <h2 style={{ color: '#1c2b3a', fontSize: '15px', margin: '0 0 6px', fontWeight: 'bold' }}>Descreva o processo</h2>
+          <p style={{ color: '#5a6a7a', fontSize: '13px', margin: '0 0 14px' }}>Conte como o processo funciona — quem participa, quais etapas, quais decisoes. A IA vai criar o diagrama BPMN automaticamente.</p>
           <textarea
             placeholder="Ex: O cliente envia uma solicitacao de compra. O financeiro verifica o limite de credito. Se aprovado, o estoque separa os itens e faz o envio. Se negado, o cliente e notificado por email e pode solicitar revisao..."
             value={descricao}
             onChange={e => setDescricao(e.target.value)}
             rows={5}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', marginBottom: '14px', boxSizing: 'border-box', resize: 'vertical', color: '#1e293b', fontFamily: 'Arial' }}
+            style={{ width: '100%', padding: '11px', border: '1px solid #d6dbe0', borderRadius: '6px', fontSize: '14px', marginBottom: '14px', boxSizing: 'border-box', resize: 'vertical', color: '#1c2b3a', fontFamily: 'Arial' }}
           />
           <button
             onClick={gerarBPMN}
             disabled={gerando}
-            style={{ padding: '12px 24px', background: gerando ? '#a5b4fc' : '#534AB7', color: 'white', border: 'none', borderRadius: '8px', fontSize: '15px', cursor: gerando ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+            style={{ padding: '11px 24px', background: gerando ? '#6b8fa3' : '#1c2b3a', color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: gerando ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
           >
             {gerando ? 'Gerando diagrama...' : '✨ Gerar diagrama BPMN'}
           </button>
         </div>
 
         {erro && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
+          <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', padding: '14px', marginBottom: '16px' }}>
             <p style={{ color: '#dc2626', fontSize: '13px', margin: 0 }}>Erro: {erro}</p>
           </div>
         )}
 
         {dados && (
-          <div style={{ background: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
+          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h2 style={{ color: '#1e293b', fontSize: '16px', margin: 0 }}>{dados.nome}</h2>
+              <h2 style={{ color: '#1c2b3a', fontSize: '15px', margin: 0, fontWeight: 'bold' }}>{dados.nome}</h2>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {dados.participantes && dados.participantes.map((p, i) => (
                   <span key={i} style={{ fontSize: '12px', background: CORES_PARTICIPANTE[i % CORES_PARTICIPANTE.length], color: TEXTO_PARTICIPANTE[i % TEXTO_PARTICIPANTE.length], padding: '3px 10px', borderRadius: '20px', border: '1px solid ' + BORDAS_PARTICIPANTE[i % BORDAS_PARTICIPANTE.length] }}>{p}</span>
@@ -294,19 +291,19 @@ ${conexoes}
             <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button
                 onClick={() => { setDados(null); setDescricao('') }}
-                style={{ padding: '8px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
+                style={{ padding: '8px 16px', background: '#f4f5f7', color: '#5a6a7a', border: '1px solid #d6dbe0', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
               >
                 Novo processo
               </button>
               <button
                 onClick={gerarBPMN}
-                style={{ padding: '8px 16px', background: '#EEEDFE', color: '#534AB7', border: '1px solid #CECBF6', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
+                style={{ padding: '8px 16px', background: '#e8edf2', color: '#2e4a63', border: '1px solid #d6dbe0', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}
               >
                 ✨ Regerar
               </button>
               <button
                 onClick={exportarBizagi}
-                style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
                 ⬇️ Exportar para Bizagi (.bpmn)
               </button>
@@ -315,13 +312,13 @@ ${conexoes}
         )}
 
         {!dados && !gerando && (
-          <div style={{ background: 'white', borderRadius: '12px', padding: '32px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-            <div style={{ fontSize: '48px', marginBottom: '12px' }}>🔷</div>
-            <p style={{ color: '#1e293b', fontSize: '16px', fontWeight: 'bold', margin: '0 0 6px' }}>Como usar</p>
-            <p style={{ color: '#64748b', fontSize: '13px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>Descreva o processo em linguagem natural. Mencione os participantes, as etapas e as decisoes. Quanto mais detalhado, melhor o diagrama.</p>
+          <div style={{ background: 'white', borderRadius: '8px', padding: '32px', border: '1px solid #d6dbe0', textAlign: 'center' }}>
+            <div style={{ fontSize: '44px', marginBottom: '12px' }}>🔷</div>
+            <p style={{ color: '#1c2b3a', fontSize: '15px', fontWeight: 'bold', margin: '0 0 6px' }}>Como usar</p>
+            <p style={{ color: '#5a6a7a', fontSize: '13px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>Descreva o processo em linguagem natural. Mencione os participantes, as etapas e as decisoes. Quanto mais detalhado, melhor o diagrama.</p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
               {['Processo de compras com aprovacao', 'Atendimento ao cliente com escalonamento', 'Processo de contratacao de funcionarios', 'Fluxo de aprovacao de mudancas de TI'].map((ex, i) => (
-                <button key={i} onClick={() => setDescricao(ex)} style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '20px', background: '#EEEDFE', color: '#534AB7', border: '1px solid #CECBF6', cursor: 'pointer' }}>
+                <button key={i} onClick={() => setDescricao(ex)} style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '20px', background: '#e8edf2', color: '#2e4a63', border: '1px solid #d6dbe0', cursor: 'pointer', fontWeight: 'bold' }}>
                   {ex}
                 </button>
               ))}

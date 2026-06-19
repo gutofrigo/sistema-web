@@ -71,53 +71,53 @@ export default function Home() {
   }
   if (tela === 'inicio') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center', maxWidth: '1200px', padding: '40px' }}>
-          <h1 style={{ fontSize: '32px', color: '#1e293b', marginBottom: '10px' }}>Sistema de Melhoria</h1>
-          <p style={{ color: '#64748b', marginBottom: '50px', fontSize: '16px' }}>Escolha o modulo que deseja usar</p>
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <h1 style={{ fontSize: '28px', color: '#1c2b3a', marginBottom: '8px', fontWeight: 'bold', letterSpacing: '-0.5px' }}>Sistema de Melhoria</h1>
+          <p style={{ color: '#5a6a7a', marginBottom: '40px', fontSize: '15px' }}>Escolha o modulo que deseja usar</p>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <div
               onClick={() => setTela('formulario')}
-              style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer' }}
-              onMouseOver={e => e.currentTarget.style.borderColor = '#6366f1'}
-              onMouseOut={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+              style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+              onMouseOver={e => { e.currentTarget.style.background = '#f0f4f8' }}
+              onMouseOut={e => { e.currentTarget.style.background = 'white' }}
             >
-              <div style={{ fontSize: '44px', marginBottom: '14px' }}>📋</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Analise de Processo</h2>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '13px' }}>Entrevista com IA e relatorio de melhorias</p>
+              <div style={{ fontSize: '40px', marginBottom: '14px' }}>📋</div>
+              <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Analise de Processo</h2>
+              <p style={{ color: '#5a6a7a', margin: 0, fontSize: '12px' }}>Entrevista com IA e relatorio de melhorias</p>
             </div>
-            <a href="/projetos" style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}>
-              <div style={{ fontSize: '44px', marginBottom: '14px' }}>📁</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Projetos</h2>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '13px' }}>Gerencie projetos e tarefas com prazos</p>
+            <a href="/projetos" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize: '40px', marginBottom: '14px' }}>📁</div>
+              <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Projetos</h2>
+              <p style={{ color: '#5a6a7a', margin: 0, fontSize: '12px' }}>Gerencie projetos e tarefas com prazos</p>
             </a>
-            <a href="/dashboard" style={{ background: 'white', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}>
-              <div style={{ fontSize: '44px', marginBottom: '14px' }}>📊</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Dashboard</h2>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '13px' }}>Visao geral do sistema</p>
+            <a href="/dashboard" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize: '40px', marginBottom: '14px' }}>📊</div>
+              <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Dashboard</h2>
+              <p style={{ color: '#5a6a7a', margin: 0, fontSize: '12px' }}>Visao geral do sistema</p>
             </a>
-            <a href="/roadmap" style={{ background: 'white', border: '2px solid #6366f1', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}>
-              <div style={{ fontSize: '44px', marginBottom: '14px' }}>🗺️</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Roadmap</h2>
-              <p style={{ color: '#64748b', margin: '0 0 8px', fontSize: '13px' }}>Gerar plano de projeto com IA</p>
-              <span style={{ background: '#EEEDFE', color: '#3C3489', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>Novo</span>
+            <a href="/roadmap" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #1c2b3a', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize: '40px', marginBottom: '14px' }}>🗺️</div>
+              <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Roadmap</h2>
+              <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Gerar plano de projeto com IA</p>
+              <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
             </a>
-            <a href="/assistente" style={{ background: 'white', border: '2px solid #CECBF6', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}>
-              <div style={{ fontSize: '44px', marginBottom: '14px' }}>✨</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Assistente IA</h2>
-              <p style={{ color: '#64748b', margin: '0 0 8px', fontSize: '13px' }}>Pergunte sobre seus projetos e tarefas</p>
-              <span style={{ background: '#EEEDFE', color: '#3C3489', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>Novo</span>
+            <a href="/assistente" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #3d5a73', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize: '40px', marginBottom: '14px' }}>✨</div>
+              <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Assistente IA</h2>
+              <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Pergunte sobre seus projetos e tarefas</p>
+              <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
             </a>
-            <a href="/bpmn" style={{ background: 'white', border: '2px solid #BAE6FD', borderRadius: '16px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block' }}>
-              <div style={{ fontSize: '44px', marginBottom: '14px' }}>🔷</div>
-              <h2 style={{ color: '#1e293b', margin: '0 0 8px 0', fontSize: '17px' }}>Modelagem BPMN</h2>
-              <p style={{ color: '#64748b', margin: '0 0 8px', fontSize: '13px' }}>Gerar diagrama de processo com IA</p>
-              <span style={{ background: '#E0F2FE', color: '#075985', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>Novo</span>
+            <a href="/bpmn" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize: '40px', marginBottom: '14px' }}>🔷</div>
+              <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Modelagem BPMN</h2>
+              <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Gerar diagrama de processo com IA</p>
+              <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
             </a>
           </div>
           <button
             onClick={abrirHistorico}
-            style={{ marginTop: '32px', background: 'none', border: 'none', color: '#94a3b8', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
+            style={{ marginTop: '28px', background: 'none', border: 'none', color: '#8fa3b1', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
           >
             Ver historico de relatorios
           </button>
@@ -127,44 +127,44 @@ export default function Home() {
   }
   if (tela === 'historico') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', padding: '40px' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
         <div style={{ maxWidth: '700px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '28px' }}>
-            <button onClick={() => { setTela('inicio'); setEntrevistaAberta(null) }} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', fontSize: '14px' }}>
+            <button onClick={() => { setTela('inicio'); setEntrevistaAberta(null) }} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#2e4a63', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold' }}>
               ← Voltar
             </button>
-            <h1 style={{ color: '#1e293b', margin: 0, fontSize: '22px' }}>📋 Historico de Relatorios</h1>
+            <h1 style={{ color: '#1c2b3a', margin: 0, fontSize: '20px', fontWeight: 'bold' }}>📋 Historico de Relatorios</h1>
           </div>
           {entrevistas.length === 0 && (
-            <div style={{ background: 'white', borderRadius: '12px', padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+            <div style={{ background: 'white', borderRadius: '8px', padding: '40px', textAlign: 'center', color: '#8fa3b1', border: '1px solid #d6dbe0' }}>
               Nenhum relatorio encontrado
             </div>
           )}
           {entrevistaAberta ? (
-            <div style={{ background: 'white', borderRadius: '16px', padding: '32px', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+            <div style={{ background: 'white', borderRadius: '8px', padding: '32px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div>
-                  <h2 style={{ color: '#1e293b', margin: '0 0 4px' }}>{entrevistaAberta.processo}</h2>
-                  <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>{entrevistaAberta.responsavel} • {diasAtras(entrevistaAberta.criado_em)}</p>
+                  <h2 style={{ color: '#1c2b3a', margin: '0 0 4px' }}>{entrevistaAberta.processo}</h2>
+                  <p style={{ color: '#8fa3b1', fontSize: '13px', margin: 0 }}>{entrevistaAberta.responsavel} • {diasAtras(entrevistaAberta.criado_em)}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => setEntrevistaAberta(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', color: '#475569', fontSize: '13px' }}>← Voltar</button>
-                  <button onClick={() => deletarEntrevista(entrevistaAberta.id)} style={{ background: '#fef2f2', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', color: '#dc2626', fontSize: '13px' }}>🗑️ Deletar</button>
+                  <button onClick={() => setEntrevistaAberta(null)} style={{ background: '#f4f5f7', border: '1px solid #d6dbe0', borderRadius: '6px', padding: '7px 14px', cursor: 'pointer', color: '#2e4a63', fontSize: '13px', fontWeight: 'bold' }}>← Voltar</button>
+                  <button onClick={() => deletarEntrevista(entrevistaAberta.id)} style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', padding: '7px 14px', cursor: 'pointer', color: '#dc2626', fontSize: '13px' }}>🗑️ Deletar</button>
                 </div>
               </div>
-              <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: '#334155' }}>
+              <div style={{ background: '#f4f5f7', borderRadius: '8px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: '#1c2b3a' }}>
                 {entrevistaAberta.relatorio}
               </div>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {entrevistas.map(e => (
-                <div key={e.id} style={{ background: 'white', borderRadius: '12px', padding: '18px 20px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div key={e.id} style={{ background: 'white', borderRadius: '8px', padding: '18px 20px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div onClick={() => setEntrevistaAberta(e)} style={{ cursor: 'pointer', flex: 1 }}>
-                    <p style={{ fontWeight: 'bold', color: '#1e293b', margin: '0 0 4px', fontSize: '15px' }}>{e.processo}</p>
-                    <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>{e.responsavel} • {diasAtras(e.criado_em)}</p>
+                    <p style={{ fontWeight: 'bold', color: '#1c2b3a', margin: '0 0 4px', fontSize: '15px' }}>{e.processo}</p>
+                    <p style={{ color: '#8fa3b1', fontSize: '13px', margin: 0 }}>{e.responsavel} • {diasAtras(e.criado_em)}</p>
                   </div>
-                  <button onClick={() => deletarEntrevista(e.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#94a3b8', padding: '4px', marginLeft: '12px' }} title="Deletar">🗑️</button>
+                  <button onClick={() => deletarEntrevista(e.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#8fa3b1', padding: '4px', marginLeft: '12px' }} title="Deletar">🗑️</button>
                 </div>
               ))}
             </div>
@@ -175,15 +175,15 @@ export default function Home() {
   }
   if (tela === 'formulario') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: 'white', borderRadius: '16px', padding: '40px', width: '500px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-          <button onClick={() => setTela('inicio')} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', marginBottom: '20px', fontSize: '14px' }}>Voltar</button>
-          <h2 style={{ color: '#1e293b', marginBottom: '24px' }}>Analise de Processo</h2>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: 'white', borderRadius: '8px', padding: '40px', width: '500px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+          <button onClick={() => setTela('inicio')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: '#f4f5f7', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#2e4a63', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold', marginBottom: '20px' }}>← Voltar</button>
+          <h2 style={{ color: '#1c2b3a', marginBottom: '24px', fontSize: '20px' }}>Analise de Processo</h2>
           <input placeholder="Nome do processo (ex: Compras)" value={processo} onChange={e => setProcesso(e.target.value)}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '12px', boxSizing: 'border-box', color: '#1e293b' }} />
+            style={{ width: '100%', padding: '11px', border: '1px solid #d6dbe0', borderRadius: '6px', fontSize: '14px', marginBottom: '12px', boxSizing: 'border-box', color: '#1c2b3a' }} />
           <input placeholder="Seu nome" value={nome} onChange={e => setNome(e.target.value)}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', marginBottom: '20px', boxSizing: 'border-box', color: '#1e293b' }} />
-          <button onClick={iniciarEntrevista} style={{ width: '100%', padding: '14px', background: '#6366f1', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: 'pointer' }}>
+            style={{ width: '100%', padding: '11px', border: '1px solid #d6dbe0', borderRadius: '6px', fontSize: '14px', marginBottom: '20px', boxSizing: 'border-box', color: '#1c2b3a' }} />
+          <button onClick={iniciarEntrevista} style={{ width: '100%', padding: '13px', background: '#1c2b3a', color: 'white', border: 'none', borderRadius: '6px', fontSize: '15px', cursor: 'pointer', fontWeight: 'bold' }}>
             Iniciar Entrevista
           </button>
         </div>
@@ -192,18 +192,18 @@ export default function Home() {
   }
   if (tela === 'entrevista') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: 'white', borderRadius: '16px', padding: '40px', width: '600px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: 'white', borderRadius: '8px', padding: '40px', width: '600px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <span style={{ color: '#6366f1', fontWeight: 'bold' }}>Pergunta {etapa + 1} de {perguntas.length}</span>
-            <span style={{ color: '#94a3b8' }}>{processo}</span>
+            <span style={{ color: '#2e4a63', fontWeight: 'bold', fontSize: '14px' }}>Pergunta {etapa + 1} de {perguntas.length}</span>
+            <span style={{ color: '#8fa3b1', fontSize: '14px' }}>{processo}</span>
           </div>
-          <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
-            <p style={{ color: '#1e293b', fontSize: '17px', margin: 0, lineHeight: '1.6' }}>{perguntas[etapa]}</p>
+          <div style={{ background: '#f4f5f7', borderRadius: '6px', padding: '20px', marginBottom: '20px', borderLeft: '3px solid #d6dbe0' }}>
+            <p style={{ color: '#1c2b3a', fontSize: '16px', margin: 0, lineHeight: '1.6' }}>{perguntas[etapa]}</p>
           </div>
           <textarea placeholder="Digite sua resposta..." value={resposta} onChange={e => setResposta(e.target.value)} rows={4}
-            style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '15px', resize: 'vertical', boxSizing: 'border-box', color: '#1e293b' }} />
-          <button onClick={responder} style={{ width: '100%', marginTop: '16px', padding: '14px', background: '#6366f1', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: 'pointer' }}>
+            style={{ width: '100%', padding: '11px', border: '1px solid #d6dbe0', borderRadius: '6px', fontSize: '14px', resize: 'vertical', boxSizing: 'border-box', color: '#1c2b3a' }} />
+          <button onClick={responder} style={{ width: '100%', marginTop: '16px', padding: '13px', background: '#1c2b3a', color: 'white', border: 'none', borderRadius: '6px', fontSize: '15px', cursor: 'pointer', fontWeight: 'bold' }}>
             {etapa < perguntas.length - 1 ? 'Proxima Pergunta' : 'Gerar Relatorio'}
           </button>
         </div>
@@ -212,33 +212,33 @@ export default function Home() {
   }
   if (tela === 'carregando') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '20px' }}>⏳</div>
-          <p style={{ color: '#1e293b', fontSize: '18px' }}>Analisando com IA...</p>
+          <p style={{ color: '#1c2b3a', fontSize: '18px', fontWeight: 'bold' }}>Analisando com IA...</p>
         </div>
       </div>
     )
   }
   if (tela === 'relatorio') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f1f5f9', padding: '40px' }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto', background: 'white', borderRadius: '16px', padding: '40px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-          <h2 style={{ color: '#1e293b', marginBottom: '8px' }}>Relatorio: {processo}</h2>
-          <p style={{ color: '#64748b', marginBottom: '24px' }}>Responsavel: {nome}</p>
-          <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: '#334155', marginBottom: '24px' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto', background: 'white', borderRadius: '8px', padding: '40px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+          <h2 style={{ color: '#1c2b3a', marginBottom: '8px', fontSize: '20px' }}>Relatorio: {processo}</h2>
+          <p style={{ color: '#5a6a7a', marginBottom: '24px', fontSize: '14px' }}>Responsavel: {nome}</p>
+          <div style={{ background: '#f4f5f7', borderRadius: '8px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: '#1c2b3a', marginBottom: '24px', border: '1px solid #d6dbe0' }}>
             {relatorio}
           </div>
           {projetosCriados > 0 && (
-            <div style={{ background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '8px', padding: '16px', marginBottom: '20px', color: '#065f46' }}>
+            <div style={{ background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px', padding: '16px', marginBottom: '20px', color: '#065f46' }}>
               {projetosCriados} projeto(s) criado(s) automaticamente!
             </div>
           )}
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button onClick={() => setTela('inicio')} style={{ flex: 1, padding: '12px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}>
+            <button onClick={() => setTela('inicio')} style={{ flex: 1, padding: '12px', background: '#f4f5f7', color: '#2e4a63', border: '1px solid #d6dbe0', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>
               Voltar ao Inicio
             </button>
-            <a href="/projetos" style={{ flex: 1, padding: '12px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', textAlign: 'center', textDecoration: 'none' }}>
+            <a href="/projetos" style={{ flex: 1, padding: '12px', background: '#1c2b3a', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', textAlign: 'center', textDecoration: 'none', fontWeight: 'bold' }}>
               Ver Projetos
             </a>
           </div>
