@@ -1,6 +1,19 @@
 'use client'
 import { useState } from 'react'
 
+const C = {
+  navy:      '#0B1F3A',
+  royal:     '#1E5BC6',
+  blue:      '#3B82F6',
+  fundo:     '#F1F4F8',
+  borda:     '#D1D9E6',
+  texto:     '#0B1F3A',
+  textoSec:  '#4A5568',
+  textoMudo: '#8FA3B1',
+  verde:     '#16A34A',
+  vermelho:  '#DC2626',
+}
+
 const CORES_PARTICIPANTE = ['#EEF2FF', '#F0FDF4', '#FFF7ED', '#FDF2F8', '#F0F9FF', '#FFFBEB']
 const BORDAS_PARTICIPANTE = ['#C7D2FE', '#BBF7D0', '#FED7AA', '#FBCFE8', '#BAE6FD', '#FDE68A']
 const TEXTO_PARTICIPANTE = ['#3730A3', '#166534', '#9A3412', '#9D174D', '#075985', '#92400E']
@@ -57,35 +70,35 @@ function DiagramaBPMN({ dados }) {
     if (el.tipo === 'inicio') {
       return (
         <g key={el.id}>
-          <circle cx={x} cy={y} r={16} fill="white" stroke="#2e4a63" strokeWidth="2"/>
-          <circle cx={x} cy={y} r={10} fill="#2e4a63"/>
-          <text x={x} y={y + 28} fontSize="9" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
+          <circle cx={x} cy={y} r={16} fill="white" stroke={C.royal} strokeWidth="2"/>
+          <circle cx={x} cy={y} r={10} fill={C.royal}/>
+          <text x={x} y={y + 28} fontSize="9" fill={C.textoMudo} textAnchor="middle" fontFamily="Arial">{el.nome}</text>
         </g>
       )
     }
     if (el.tipo === 'fim') {
       return (
         <g key={el.id}>
-          <circle cx={x} cy={y} r={16} fill="white" stroke="#991b1b" strokeWidth="3"/>
-          <circle cx={x} cy={y} r={10} fill="#991b1b"/>
-          <text x={x} y={y + 28} fontSize="9" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
+          <circle cx={x} cy={y} r={16} fill="white" stroke={C.vermelho} strokeWidth="3"/>
+          <circle cx={x} cy={y} r={10} fill={C.vermelho}/>
+          <text x={x} y={y + 28} fontSize="9" fill={C.textoMudo} textAnchor="middle" fontFamily="Arial">{el.nome}</text>
         </g>
       )
     }
     if (el.tipo === 'gateway') {
       return (
         <g key={el.id}>
-          <polygon points={x + ',' + (y - 18) + ' ' + (x + 20) + ',' + y + ' ' + x + ',' + (y + 18) + ' ' + (x - 20) + ',' + y} fill="white" stroke="#8fa3b1" strokeWidth="1.5"/>
-          <text x={x} y={y + 4} fontSize="11" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial" fontWeight="bold">?</text>
-          <text x={x} y={y + 32} fontSize="9" fill="#5a6a7a" textAnchor="middle" fontFamily="Arial">{el.nome}</text>
+          <polygon points={x + ',' + (y - 18) + ' ' + (x + 20) + ',' + y + ' ' + x + ',' + (y + 18) + ' ' + (x - 20) + ',' + y} fill="white" stroke={C.borda} strokeWidth="1.5"/>
+          <text x={x} y={y + 4} fontSize="11" fill={C.textoSec} textAnchor="middle" fontFamily="Arial" fontWeight="bold">?</text>
+          <text x={x} y={y + 32} fontSize="9" fill={C.textoMudo} textAnchor="middle" fontFamily="Arial">{el.nome}</text>
         </g>
       )
     }
     return (
       <g key={el.id}>
-        <rect x={x - ELEM_W / 2} y={y - ELEM_H / 2} width={ELEM_W} height={ELEM_H} rx="6" fill="white" stroke="#d6dbe0" strokeWidth="1.5"/>
-        <text x={x} y={y - 4} fontSize="9" fill="#1c2b3a" textAnchor="middle" fontFamily="Arial">{el.nome.length > 14 ? el.nome.substring(0, 14) + '...' : el.nome}</text>
-        <text x={x} y={y + 8} fontSize="8" fill="#8fa3b1" textAnchor="middle" fontFamily="Arial">{el.participante}</text>
+        <rect x={x - ELEM_W / 2} y={y - ELEM_H / 2} width={ELEM_W} height={ELEM_H} rx="6" fill="white" stroke={C.borda} strokeWidth="1.5"/>
+        <text x={x} y={y - 4} fontSize="9" fill={C.texto} textAnchor="middle" fontFamily="Arial">{el.nome.length > 14 ? el.nome.substring(0, 14) + '...' : el.nome}</text>
+        <text x={x} y={y + 8} fontSize="8" fill={C.textoMudo} textAnchor="middle" fontFamily="Arial">{el.participante}</text>
       </g>
     )
   }
@@ -106,7 +119,7 @@ function DiagramaBPMN({ dados }) {
       x2 = destino.x
       y2 = destino.y + (origem.y < destino.y ? -ELEM_H / 2 : ELEM_H / 2)
     }
-    const corLinha = c.label === 'Sim' || c.label === 'sim' ? '#16a34a' : c.label === 'Nao' || c.label === 'nao' ? '#dc2626' : '#8fa3b1'
+    const corLinha = c.label === 'Sim' || c.label === 'sim' ? C.verde : c.label === 'Nao' || c.label === 'nao' ? C.vermelho : C.borda
     const mx = (x1 + x2) / 2
     const my = (y1 + y2) / 2
     return (
@@ -125,7 +138,7 @@ function DiagramaBPMN({ dados }) {
   return (
     <div style={{ overflowX: 'auto', marginTop: '8px' }}>
       <svg viewBox={'0 0 ' + totalW + ' ' + totalH} xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', minWidth: totalW + 'px', display: 'block' }}>
-        <rect x="0" y="0" width={totalW} height={totalH} fill="#f4f5f7" rx="6"/>
+        <rect x="0" y="0" width={totalW} height={totalH} fill={C.fundo} rx="6"/>
         {participantes.map((p, idx) => {
           const corBg = CORES_PARTICIPANTE[idx % CORES_PARTICIPANTE.length]
           const corBorda = BORDAS_PARTICIPANTE[idx % BORDAS_PARTICIPANTE.length]
@@ -141,14 +154,14 @@ function DiagramaBPMN({ dados }) {
         {conexoes.map((c, i) => renderConexao(c, i))}
         {elementos.map(el => renderElemento(el))}
         <g transform={'translate(10, ' + (totalH - 22) + ')'}>
-          <circle cx="8" cy="8" r="6" fill="#2e4a63"/>
-          <text x="18" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Inicio</text>
-          <circle cx="60" cy="8" r="6" fill="#991b1b"/>
-          <text x="70" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Fim</text>
-          <rect x="108" y="2" width="24" height="12" rx="3" fill="white" stroke="#d6dbe0" strokeWidth="1"/>
-          <text x="136" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Atividade</text>
-          <polygon points="188,8 200,2 212,8 200,14" fill="white" stroke="#8fa3b1" strokeWidth="1"/>
-          <text x="218" y="12" fontSize="9" fill="#5a6a7a" fontFamily="Arial">Gateway</text>
+          <circle cx="8" cy="8" r="6" fill={C.royal}/>
+          <text x="18" y="12" fontSize="9" fill={C.textoMudo} fontFamily="Arial">Inicio</text>
+          <circle cx="60" cy="8" r="6" fill={C.vermelho}/>
+          <text x="70" y="12" fontSize="9" fill={C.textoMudo} fontFamily="Arial">Fim</text>
+          <rect x="108" y="2" width="24" height="12" rx="3" fill="white" stroke={C.borda} strokeWidth="1"/>
+          <text x="136" y="12" fontSize="9" fill={C.textoMudo} fontFamily="Arial">Atividade</text>
+          <polygon points="188,8 200,2 212,8 200,14" fill="white" stroke={C.borda} strokeWidth="1"/>
+          <text x="218" y="12" fontSize="9" fill={C.textoMudo} fontFamily="Arial">Gateway</text>
         </g>
       </svg>
     </div>
@@ -182,9 +195,7 @@ export default function BPMN() {
 
   function exportarBizagi() {
     if (!dados) return
-
     const processId = 'processo_1'
-
     const lanes = dados.participantes.map((p, i) => {
       const elementosDaLane = dados.elementos
         .filter(el => el.participante === p)
@@ -194,19 +205,16 @@ export default function BPMN() {
 ${elementosDaLane}
       </lane>`
     }).join('\n')
-
     const elementos = dados.elementos.map(el => {
       if (el.tipo === 'inicio') return `    <startEvent id="${el.id}" name="${el.nome}"/>`
       if (el.tipo === 'fim') return `    <endEvent id="${el.id}" name="${el.nome}"/>`
       if (el.tipo === 'gateway') return `    <exclusiveGateway id="${el.id}" name="${el.nome}" gatewayDirection="Diverging"/>`
       return `    <task id="${el.id}" name="${el.nome}"/>`
     }).join('\n')
-
     const conexoes = dados.conexoes.map((c, i) => {
       const label = c.label ? ` name="${c.label}"` : ''
       return `    <sequenceFlow id="flow_${i}" sourceRef="${c.de}" targetRef="${c.para}"${label}/>`
     }).join('\n')
-
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -230,57 +238,61 @@ ${conexoes}
   </process>
 
 </definitions>`
-
     const blob = new Blob([xml], { type: 'application/xml' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    const nomeArquivo = dados.nome.replace(/\s+/g, '_') + '.bpmn'
-    a.download = nomeArquivo
+    a.download = dados.nome.replace(/\s+/g, '_') + '.bpmn'
     a.click()
     URL.revokeObjectURL(url)
   }
 
-  return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px 20px' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <div>
-            <p style={{ color: '#5a6a7a', fontSize: '13px', margin: '0 0 4px' }}>Sistema de Melhoria</p>
-            <h1 style={{ color: '#1c2b3a', margin: 0, fontSize: '24px', fontWeight: 'bold' }}>🔷 Modelagem BPMN</h1>
-          </div>
-          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', textDecoration: 'none', color: '#2e4a63', fontSize: '13px', fontWeight: 'bold' }}>← Voltar para Inicio</a>
-        </div>
+  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '6px', color: 'white', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none' }
 
-        <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', marginBottom: '16px' }}>
-          <h2 style={{ color: '#1c2b3a', fontSize: '15px', margin: '0 0 6px', fontWeight: 'bold' }}>Descreva o processo</h2>
-          <p style={{ color: '#5a6a7a', fontSize: '13px', margin: '0 0 14px' }}>Conte como o processo funciona — quem participa, quais etapas, quais decisoes. A IA vai criar o diagrama BPMN automaticamente.</p>
+  return (
+    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
+
+      {/* Header */}
+      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        <div>
+          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Sistema de Melhoria</p>
+          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>🔷 Modelagem BPMN</h1>
+        </div>
+        <a href="/" style={btnHeader}>← Voltar para Inicio</a>
+      </div>
+
+      {/* Content */}
+      <div className="page-pad" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+
+        <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, marginBottom: '16px', boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
+          <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 6px', fontWeight: 'bold' }}>Descreva o processo</h2>
+          <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 14px' }}>Conte como o processo funciona — quem participa, quais etapas, quais decisoes. A IA vai criar o diagrama BPMN automaticamente.</p>
           <textarea
             placeholder="Ex: O cliente envia uma solicitacao de compra. O financeiro verifica o limite de credito. Se aprovado, o estoque separa os itens e faz o envio. Se negado, o cliente e notificado por email e pode solicitar revisao..."
             value={descricao}
             onChange={e => setDescricao(e.target.value)}
             rows={5}
-            style={{ width: '100%', padding: '11px', border: '1px solid #d6dbe0', borderRadius: '6px', fontSize: '14px', marginBottom: '14px', boxSizing: 'border-box', resize: 'vertical', color: '#1c2b3a', fontFamily: 'Arial' }}
+            style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', marginBottom: '14px', boxSizing: 'border-box', resize: 'vertical', color: C.texto, fontFamily: 'Arial' }}
           />
           <button
             onClick={gerarBPMN}
             disabled={gerando}
-            style={{ padding: '11px 24px', background: gerando ? '#6b8fa3' : '#1c2b3a', color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: gerando ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+            style={{ padding: '11px 24px', background: gerando ? C.textoMudo : C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: gerando ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
           >
             {gerando ? 'Gerando diagrama...' : '✨ Gerar diagrama BPMN'}
           </button>
         </div>
 
         {erro && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', padding: '14px', marginBottom: '16px' }}>
-            <p style={{ color: '#dc2626', fontSize: '13px', margin: 0 }}>Erro: {erro}</p>
+          <div style={{ background: '#fef2f2', border: `1px solid #fca5a5`, borderRadius: '6px', padding: '14px', marginBottom: '16px' }}>
+            <p style={{ color: C.vermelho, fontSize: '13px', margin: 0 }}>Erro: {erro}</p>
           </div>
         )}
 
         {dados && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h2 style={{ color: '#1c2b3a', fontSize: '15px', margin: 0, fontWeight: 'bold' }}>{dados.nome}</h2>
+          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+              <h2 style={{ color: C.texto, fontSize: '15px', margin: 0, fontWeight: 'bold' }}>{dados.nome}</h2>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {dados.participantes && dados.participantes.map((p, i) => (
                   <span key={i} style={{ fontSize: '12px', background: CORES_PARTICIPANTE[i % CORES_PARTICIPANTE.length], color: TEXTO_PARTICIPANTE[i % TEXTO_PARTICIPANTE.length], padding: '3px 10px', borderRadius: '20px', border: '1px solid ' + BORDAS_PARTICIPANTE[i % BORDAS_PARTICIPANTE.length] }}>{p}</span>
@@ -289,22 +301,13 @@ ${conexoes}
             </div>
             <DiagramaBPMN dados={dados} />
             <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => { setDados(null); setDescricao('') }}
-                style={{ padding: '8px 16px', background: '#f4f5f7', color: '#5a6a7a', border: '1px solid #d6dbe0', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
-              >
+              <button onClick={() => { setDados(null); setDescricao('') }} style={{ padding: '8px 16px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>
                 Novo processo
               </button>
-              <button
-                onClick={gerarBPMN}
-                style={{ padding: '8px 16px', background: '#e8edf2', color: '#2e4a63', border: '1px solid #d6dbe0', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}
-              >
+              <button onClick={gerarBPMN} style={{ padding: '8px 16px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}>
                 ✨ Regerar
               </button>
-              <button
-                onClick={exportarBizagi}
-                style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}
-              >
+              <button onClick={exportarBizagi} style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 ⬇️ Exportar para Bizagi (.bpmn)
               </button>
             </div>
@@ -312,19 +315,20 @@ ${conexoes}
         )}
 
         {!dados && !gerando && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '32px', border: '1px solid #d6dbe0', textAlign: 'center' }}>
+          <div style={{ background: 'white', borderRadius: '8px', padding: '32px', border: `1px solid ${C.borda}`, textAlign: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
             <div style={{ fontSize: '44px', marginBottom: '12px' }}>🔷</div>
-            <p style={{ color: '#1c2b3a', fontSize: '15px', fontWeight: 'bold', margin: '0 0 6px' }}>Como usar</p>
-            <p style={{ color: '#5a6a7a', fontSize: '13px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>Descreva o processo em linguagem natural. Mencione os participantes, as etapas e as decisoes. Quanto mais detalhado, melhor o diagrama.</p>
+            <p style={{ color: C.texto, fontSize: '15px', fontWeight: 'bold', margin: '0 0 6px' }}>Como usar</p>
+            <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>Descreva o processo em linguagem natural. Mencione os participantes, as etapas e as decisoes. Quanto mais detalhado, melhor o diagrama.</p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
               {['Processo de compras com aprovacao', 'Atendimento ao cliente com escalonamento', 'Processo de contratacao de funcionarios', 'Fluxo de aprovacao de mudancas de TI'].map((ex, i) => (
-                <button key={i} onClick={() => setDescricao(ex)} style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '20px', background: '#e8edf2', color: '#2e4a63', border: '1px solid #d6dbe0', cursor: 'pointer', fontWeight: 'bold' }}>
+                <button key={i} onClick={() => setDescricao(ex)} style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '20px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.borda}`, cursor: 'pointer', fontWeight: 'bold' }}>
                   {ex}
                 </button>
               ))}
             </div>
           </div>
         )}
+
       </div>
     </div>
   )
