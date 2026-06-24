@@ -114,6 +114,12 @@ export default function Home() {
               <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Gerar diagrama de processo com IA</p>
               <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
             </a>
+            <a href="/financeiro" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #10b981', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize: '40px', marginBottom: '14px' }}>💰</div>
+              <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Financeiro</h2>
+              <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Controle de lancamentos, calendario e saldos</p>
+              <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
+            </a>
           </div>
           <button
             onClick={abrirHistorico}
