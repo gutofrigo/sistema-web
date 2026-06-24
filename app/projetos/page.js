@@ -140,14 +140,14 @@ export default function Projetos() {
   const tarefasFilho = (paiId) => tarefas.filter(t => t.tarefa_pai_id === paiId)
 
   if (tela === 'lista') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
+    <div className="page-pad" style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', textDecoration: 'none', color: '#2e4a63', fontSize: '13px', fontWeight: 'bold' }}>← Inicio</a>
             <h1 style={{ color: '#1c2b3a', margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Projetos</h1>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <a href="/gantt" style={{ padding: '9px 16px', background: 'white', color: '#5a6a7a', borderRadius: '6px', border: '1px solid #d6dbe0', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               📊 Ver Gantt
             </a>
@@ -183,7 +183,7 @@ export default function Projetos() {
   )
 
   if (tela === 'novo') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
+    <div className="page-pad" style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7' }}>
       <div style={{ maxWidth: '600px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
           <button onClick={() => setTela('lista')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#2e4a63', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold' }}>← Voltar</button>
@@ -206,7 +206,7 @@ export default function Projetos() {
   )
 
   if (tela === 'projeto') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
+    <div className="page-pad" style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
           <div>

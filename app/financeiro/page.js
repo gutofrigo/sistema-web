@@ -200,7 +200,7 @@ export default function Financeiro() {
 
           {!carregandoTotais && totais && (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+              <div className="grid-3" style={{ marginBottom: '20px' }}>
                 <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: '1px solid #d6dbe0', borderLeft: '3px solid #10b981' }}>
                   <p style={{ color: '#5a6a7a', fontSize: '12px', margin: '0 0 6px' }}>Total recebido (todos os meses)</p>
                   <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#10b981', margin: 0 }}>{fmt(totais.totalGeral.entradas)}</p>
@@ -274,7 +274,7 @@ export default function Financeiro() {
             <p style={{ color: '#5a6a7a', fontSize: '13px', margin: '0 0 4px' }}>Sistema de Melhoria</p>
             <h1 style={{ color: '#1c2b3a', margin: 0, fontSize: '24px', fontWeight: 'bold' }}>💰 Financeiro</h1>
           </div>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '4px' }}>
             <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', textDecoration: 'none', color: '#2e4a63', fontSize: '13px', fontWeight: 'bold' }}>← Voltar para Inicio</a>
             <button onClick={abrirTotais} style={{ padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#5a6a7a', fontSize: '13px', cursor: 'pointer' }}>📊 Totais</button>
             <button onClick={() => setTela('novo')} style={{ padding: '7px 18px', background: '#1c2b3a', color: 'white', border: 'none', borderRadius: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold' }}>+ Novo</button>
@@ -289,7 +289,7 @@ export default function Financeiro() {
         </div>
 
         {/* Cards resumo mensal */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+        <div className="grid-3" style={{ marginBottom: '20px' }}>
           <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: '1px solid #d6dbe0', borderLeft: '3px solid #10b981' }}>
             <p style={{ color: '#5a6a7a', fontSize: '12px', margin: '0 0 6px' }}>Entradas no mes (pagas)</p>
             <p style={{ fontSize: '26px', fontWeight: 'bold', color: '#10b981', margin: 0 }}>{fmt(resumo.entradas)}</p>
@@ -305,7 +305,7 @@ export default function Financeiro() {
         </div>
 
         {/* Calendario + Proximos pagamentos */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+        <div className="grid-2" style={{ marginBottom: '16px' }}>
 
           {/* Calendario */}
           <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63' }}>
@@ -433,7 +433,8 @@ export default function Financeiro() {
             </div>
           )}
           {!carregando && lancamentos.length > 0 && (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '560px' }}>
               <thead>
                 <tr style={{ background: '#f4f5f7' }}>
                   {['Descricao', 'Categoria', 'Data', 'Status', 'Valor', ''].map(h => (
@@ -478,6 +479,7 @@ export default function Financeiro() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
 

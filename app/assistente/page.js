@@ -46,7 +46,7 @@ export default function Assistente() {
   }
   return (
     <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: '#1c2b3a', borderBottom: '1px solid #2e4a63', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ background: '#1c2b3a', borderBottom: '1px solid #2e4a63', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ width: '34px', height: '34px', borderRadius: '6px', background: '#2e4a63', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✨</div>
           <div>

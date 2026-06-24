@@ -89,8 +89,8 @@ export default function Roadmap() {
   }
   if (tela === 'novo') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: 'white', borderRadius: '8px', padding: '40px', width: '540px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}>
+        <div style={{ background: 'white', borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '540px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
             <button onClick={() => setTela('lista')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: '#f4f5f7', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#2e4a63', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold' }}>
               ← Voltar

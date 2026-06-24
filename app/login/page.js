@@ -29,11 +29,11 @@ export default function Login() {
     if (e.key === 'Enter') entrar()
   }
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '12px' }}>
+    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '12px', padding: '16px', boxSizing: 'border-box' }}>
       <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#2e4a63', fontSize: '13px', textDecoration: 'none', fontWeight: 'bold' }}>
         ← Voltar para Inicio
       </a>
-      <div style={{ background: 'white', borderRadius: '8px', padding: '48px 40px', width: '380px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+      <div style={{ background: 'white', borderRadius: '8px', padding: '40px 32px', width: '100%', maxWidth: '380px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔒</div>
           <h1 style={{ color: '#1c2b3a', fontSize: '20px', margin: '0 0 6px', fontWeight: 'bold' }}>Sistema de Melhoria</h1>

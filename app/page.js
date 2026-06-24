@@ -72,13 +72,14 @@ export default function Home() {
   if (tela === 'inicio') {
     return (
       <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', maxWidth: '1200px', padding: '40px' }}>
+        <div className="page-pad" style={{ textAlign: 'center', maxWidth: '1200px' }}>
           <h1 style={{ fontSize: '28px', color: '#1c2b3a', marginBottom: '8px', fontWeight: 'bold', letterSpacing: '-0.5px' }}>Sistema de Melhoria</h1>
           <p style={{ color: '#5a6a7a', marginBottom: '40px', fontSize: '15px' }}>Escolha o modulo que deseja usar</p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <div
               onClick={() => setTela('formulario')}
-              style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+              className="menu-card"
+              style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
               onMouseOver={e => { e.currentTarget.style.background = '#f0f4f8' }}
               onMouseOut={e => { e.currentTarget.style.background = 'white' }}
             >
@@ -86,35 +87,35 @@ export default function Home() {
               <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Analise de Processo</h2>
               <p style={{ color: '#5a6a7a', margin: 0, fontSize: '12px' }}>Entrevista com IA e relatorio de melhorias</p>
             </div>
-            <a href="/projetos" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <a href="/projetos" className="menu-card" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>📁</div>
               <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Projetos</h2>
               <p style={{ color: '#5a6a7a', margin: 0, fontSize: '12px' }}>Gerencie projetos e tarefas com prazos</p>
             </a>
-            <a href="/dashboard" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <a href="/dashboard" className="menu-card" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>📊</div>
               <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Dashboard</h2>
               <p style={{ color: '#5a6a7a', margin: 0, fontSize: '12px' }}>Visao geral do sistema</p>
             </a>
-            <a href="/roadmap" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #1c2b3a', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <a href="/roadmap" className="menu-card" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #1c2b3a', borderRadius: '8px', padding: '28px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>🗺️</div>
               <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Roadmap</h2>
               <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Gerar plano de projeto com IA</p>
               <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
             </a>
-            <a href="/assistente" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #3d5a73', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <a href="/assistente" className="menu-card" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #3d5a73', borderRadius: '8px', padding: '28px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>✨</div>
               <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Assistente IA</h2>
               <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Pergunte sobre seus projetos e tarefas</p>
               <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
             </a>
-            <a href="/bpmn" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <a href="/bpmn" className="menu-card" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', borderRadius: '8px', padding: '28px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>🔷</div>
               <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Modelagem BPMN</h2>
               <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Gerar diagrama de processo com IA</p>
               <span style={{ background: '#e8edf2', color: '#2e4a63', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: 'bold' }}>Novo</span>
             </a>
-            <a href="/financeiro" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #10b981', borderRadius: '8px', padding: '28px', width: '190px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <a href="/financeiro" className="menu-card" style={{ background: 'white', border: '1px solid #d6dbe0', borderLeft: '3px solid #10b981', borderRadius: '8px', padding: '28px', cursor: 'pointer', textDecoration: 'none', display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>💰</div>
               <h2 style={{ color: '#1c2b3a', margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold' }}>Financeiro</h2>
               <p style={{ color: '#5a6a7a', margin: '0 0 8px', fontSize: '12px' }}>Controle de lancamentos, calendario e saldos</p>
@@ -133,7 +134,7 @@ export default function Home() {
   }
   if (tela === 'historico') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
+      <div className="page-pad" style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7' }}>
         <div style={{ maxWidth: '700px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '28px' }}>
             <button onClick={() => { setTela('inicio'); setEntrevistaAberta(null) }} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#2e4a63', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold' }}>
@@ -181,8 +182,8 @@ export default function Home() {
   }
   if (tela === 'formulario') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: 'white', borderRadius: '8px', padding: '40px', width: '500px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}>
+        <div style={{ background: 'white', borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '500px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <button onClick={() => setTela('inicio')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: '#f4f5f7', border: '1px solid #d6dbe0', borderRadius: '6px', color: '#2e4a63', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold', marginBottom: '20px' }}>← Voltar</button>
           <h2 style={{ color: '#1c2b3a', marginBottom: '24px', fontSize: '20px' }}>Analise de Processo</h2>
           <input placeholder="Nome do processo (ex: Compras)" value={processo} onChange={e => setProcesso(e.target.value)}
@@ -198,8 +199,8 @@ export default function Home() {
   }
   if (tela === 'entrevista') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: 'white', borderRadius: '8px', padding: '40px', width: '600px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}>
+        <div style={{ background: 'white', borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '600px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
             <span style={{ color: '#2e4a63', fontWeight: 'bold', fontSize: '14px' }}>Pergunta {etapa + 1} de {perguntas.length}</span>
             <span style={{ color: '#8fa3b1', fontSize: '14px' }}>{processo}</span>
@@ -228,7 +229,7 @@ export default function Home() {
   }
   if (tela === 'relatorio') {
     return (
-      <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
+      <div className="page-pad" style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7' }}>
         <div style={{ maxWidth: '700px', margin: '0 auto', background: 'white', borderRadius: '8px', padding: '40px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <h2 style={{ color: '#1c2b3a', marginBottom: '8px', fontSize: '20px' }}>Relatorio: {processo}</h2>
           <p style={{ color: '#5a6a7a', marginBottom: '24px', fontSize: '14px' }}>Responsavel: {nome}</p>

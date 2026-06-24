@@ -73,10 +73,10 @@ export default function Dashboard() {
   const taxaConclusao = totalTarefas > 0 ? Math.round((contadores.concluidas / totalTarefas) * 100) : 0
 
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7', padding: '40px' }}>
+    <div className="page-pad" style={{ fontFamily: 'Arial', minHeight: '100vh', background: '#f4f5f7' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto' }}>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <p style={{ color: '#5a6a7a', margin: '0 0 4px', fontSize: '13px' }}>Sistema de Melhoria</p>
             <h1 style={{ color: '#1c2b3a', margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Dashboard</h1>
@@ -91,7 +91,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
+        <div className="grid-4" style={{ marginBottom: '24px' }}>
           <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63' }}>
             <p style={{ color: '#5a6a7a', fontSize: '12px', margin: '0 0 8px' }}>Total de projetos</p>
             <p style={{ fontSize: '30px', fontWeight: 'bold', color: '#1c2b3a', margin: '0 0 4px' }}>{contadores.totalProjetos}</p>
@@ -114,7 +114,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+        <div className="grid-2" style={{ marginBottom: '16px' }}>
 
           <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: '1px solid #d6dbe0', borderLeft: '3px solid #2e4a63' }}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: '#1c2b3a', margin: '0 0 16px' }}>Projetos recentes</h2>
@@ -171,7 +171,7 @@ export default function Dashboard() {
           {entrevistasRecentes.length === 0 && (
             <p style={{ color: '#8fa3b1', fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Nenhum relatorio ainda</p>
           )}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <div className="grid-3">
             {entrevistasRecentes.map(e => (
               <div key={e.id} style={{ border: '1px solid #d6dbe0', borderRadius: '6px', padding: '16px', background: '#f4f5f7' }}>
                 <p style={{ fontSize: '20px', margin: '0 0 8px' }}>📋</p>
