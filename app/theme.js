@@ -1,13 +1,18 @@
 export const theme = {
-  fundo: '#f4f5f7',
-  cabecalho: '#1c2b3a',
-  acento: '#2e4a63',
-  acentoClaro: '#3d5a73',
-  borda: '#d6dbe0',
-  texto: '#1c2b3a',
-  textoSec: '#5a6a7a',
-  textoMudo: '#8fa3b1',
-  branco: '#ffffff',
+  fundo: '#F1F4F8',
+  cabecalho: '#0B1F3A',
+  acento: '#1E5BC6',
+  acentoClaro: '#3B82F6',
+  borda: '#D1D9E6',
+  texto: '#0B1F3A',
+  textoSec: '#4A5568',
+  textoMudo: '#8FA3B1',
+  branco: '#FFFFFF',
+  // status
+  verde: '#16A34A',
+  ambar: '#F59E0B',
+  vermelho: '#DC2626',
+  roxo: '#7C3AED',
 }
 
 export const botaoVoltar = {
@@ -15,10 +20,10 @@ export const botaoVoltar = {
   alignItems: 'center',
   gap: '6px',
   padding: '7px 16px',
-  background: '#ffffff',
-  border: '1px solid #d6dbe0',
+  background: '#FFFFFF',
+  border: '1px solid #D1D9E6',
   borderRadius: '6px',
-  color: '#2e4a63',
+  color: '#1E5BC6',
   fontSize: '13px',
   textDecoration: 'none',
   fontWeight: 'bold',
@@ -27,17 +32,18 @@ export const botaoVoltar = {
 }
 
 export const estiloCard = {
-  background: '#ffffff',
-  border: '1px solid #d6dbe0',
-  borderLeft: '3px solid #2e4a63',
+  background: '#FFFFFF',
+  border: '1px solid #D1D9E6',
+  borderLeft: '3px solid #1E5BC6',
   borderRadius: '8px',
+  boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
 }
 
 export const botaoPrimario = {
-  background: '#1c2b3a',
-  color: '#ffffff',
+  background: '#1E5BC6',
+  color: '#FFFFFF',
   border: 'none',
-  borderRadius: '8px',
+  borderRadius: '6px',
   cursor: 'pointer',
   fontWeight: 'bold',
 }
