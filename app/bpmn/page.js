@@ -193,6 +193,184 @@ export default function BPMN() {
     setGerando(false)
   }
 
+  function exportarVisio() {
+    if (!dados) return
+
+    const RAIA_H = 110
+    const PADDING_TOP = 20
+    const PADDING_LEFT = 50
+    const ELEM_W = 100
+    const ELEM_H = 40
+    const COL_W = 140
+    const PX = 96
+
+    const participantes = dados.participantes || []
+    const elementos = dados.elementos || []
+    const conexoes = dados.conexoes || []
+
+    const colunaGlobal = {}
+    const vis = new Set()
+    function calcCols(id, col) {
+      if (vis.has(id)) return
+      vis.add(id)
+      colunaGlobal[id] = Math.max(colunaGlobal[id] || 0, col)
+      conexoes.filter(c => c.de === id).forEach(c => calcCols(c.para, col + 1))
+    }
+    const elInicio = elementos.find(e => e.tipo === 'inicio')
+    if (elInicio) calcCols(elInicio.id, 0)
+    elementos.forEach(el => { if (colunaGlobal[el.id] === undefined) colunaGlobal[el.id] = 0 })
+
+    const maxCol = Math.max(...Object.values(colunaGlobal), 0)
+    const totalW = Math.max(680, PADDING_LEFT + 80 + (maxCol + 1) * COL_W + 60)
+    const totalH = participantes.length * RAIA_H + PADDING_TOP
+
+    const posicoes = {}
+    elementos.forEach(el => {
+      const idx = participantes.indexOf(el.participante)
+      posicoes[el.id] = {
+        x: PADDING_LEFT + 80 + colunaGlobal[el.id] * COL_W,
+        y: PADDING_TOP + idx * RAIA_H + RAIA_H / 2
+      }
+    })
+
+    const f = v => (v / PX).toFixed(4)
+    const fy = y => ((totalH - y) / PX).toFixed(4)
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+    let nextId = 1
+    const shapeMap = {}
+
+    const lanesXml = participantes.map((p, idx) => {
+      const id = nextId++
+      const cx = totalW / 2
+      const cy = PADDING_TOP + idx * RAIA_H + RAIA_H / 2
+      const w = (totalW / PX).toFixed(4)
+      const h = (RAIA_H / PX).toFixed(4)
+      return `        <Shape ID="${id}" Type="Shape">
+          <XForm><PinX>${f(cx)}</PinX><PinY>${fy(cy)}</PinY><Width>${w}</Width><Height>${h}</Height><LocPinX>Width*0.5</LocPinX><LocPinY>Height*0.5</LocPinY></XForm>
+          <Fill><FillForegnd>#EEF2FF</FillForegnd></Fill>
+          <Line><LineColor>#C7D2FE</LineColor></Line>
+          <Geom IX="0">
+            <MoveTo IX="1"><X>0</X><Y>0</Y></MoveTo>
+            <LineTo IX="2"><X>${w}</X><Y>0</Y></LineTo>
+            <LineTo IX="3"><X>${w}</X><Y>${h}</Y></LineTo>
+            <LineTo IX="4"><X>0</X><Y>${h}</Y></LineTo>
+            <LineTo IX="5"><X>0</X><Y>0</Y></LineTo>
+          </Geom>
+          <Text>${esc(p)}</Text>
+        </Shape>`
+    }).join('\n')
+
+    const elementsXml = elementos.map(el => {
+      const id = nextId++
+      shapeMap[el.id] = id
+      const pos = posicoes[el.id]
+      const name = esc(el.nome)
+
+      if (el.tipo === 'inicio' || el.tipo === 'fim') {
+        const r = 16 / PX
+        const d = (r * 2).toFixed(4)
+        const color = el.tipo === 'inicio' ? '#1E5BC6' : '#DC2626'
+        const pts = Array.from({ length: 9 }, (_, i) => {
+          const a = (i / 8) * 2 * Math.PI
+          const px = (r + r * Math.cos(a)).toFixed(4)
+          const py = (r + r * Math.sin(a)).toFixed(4)
+          return i === 0
+            ? `<MoveTo IX="1"><X>${px}</X><Y>${py}</Y></MoveTo>`
+            : `<LineTo IX="${i + 1}"><X>${px}</X><Y>${py}</Y></LineTo>`
+        }).join('\n            ')
+        return `        <Shape ID="${id}" Type="Shape">
+          <XForm><PinX>${f(pos.x)}</PinX><PinY>${fy(pos.y)}</PinY><Width>${d}</Width><Height>${d}</Height><LocPinX>Width*0.5</LocPinX><LocPinY>Height*0.5</LocPinY></XForm>
+          <Fill><FillForegnd>${color}</FillForegnd></Fill>
+          <Geom IX="0">
+            ${pts}
+          </Geom>
+          <Text>${name}</Text>
+        </Shape>`
+      }
+
+      if (el.tipo === 'gateway') {
+        const w = (40 / PX).toFixed(4)
+        const h = (36 / PX).toFixed(4)
+        const hw = (20 / PX).toFixed(4)
+        const hh = (18 / PX).toFixed(4)
+        return `        <Shape ID="${id}" Type="Shape">
+          <XForm><PinX>${f(pos.x)}</PinX><PinY>${fy(pos.y)}</PinY><Width>${w}</Width><Height>${h}</Height><LocPinX>Width*0.5</LocPinX><LocPinY>Height*0.5</LocPinY></XForm>
+          <Geom IX="0">
+            <MoveTo IX="1"><X>${hw}</X><Y>0</Y></MoveTo>
+            <LineTo IX="2"><X>${w}</X><Y>${hh}</Y></LineTo>
+            <LineTo IX="3"><X>${hw}</X><Y>${h}</Y></LineTo>
+            <LineTo IX="4"><X>0</X><Y>${hh}</Y></LineTo>
+            <LineTo IX="5"><X>${hw}</X><Y>0</Y></LineTo>
+          </Geom>
+          <Text>${name}</Text>
+        </Shape>`
+      }
+
+      const w = (ELEM_W / PX).toFixed(4)
+      const h = (ELEM_H / PX).toFixed(4)
+      return `        <Shape ID="${id}" Type="Shape">
+          <XForm><PinX>${f(pos.x)}</PinX><PinY>${fy(pos.y)}</PinY><Width>${w}</Width><Height>${h}</Height><LocPinX>Width*0.5</LocPinX><LocPinY>Height*0.5</LocPinY></XForm>
+          <Geom IX="0">
+            <MoveTo IX="1"><X>0</X><Y>0</Y></MoveTo>
+            <LineTo IX="2"><X>${w}</X><Y>0</Y></LineTo>
+            <LineTo IX="3"><X>${w}</X><Y>${h}</Y></LineTo>
+            <LineTo IX="4"><X>0</X><Y>${h}</Y></LineTo>
+            <LineTo IX="5"><X>0</X><Y>0</Y></LineTo>
+          </Geom>
+          <Text>${name}</Text>
+        </Shape>`
+    }).join('\n')
+
+    const connShapes = []
+    const connConnects = []
+    conexoes.forEach(c => {
+      const fromId = shapeMap[c.de]
+      const toId = shapeMap[c.para]
+      if (!fromId || !toId) return
+      const connId = nextId++
+      connShapes.push(`        <Shape ID="${connId}" Type="Edge">${c.label ? `<Text>${esc(c.label)}</Text>` : ''}</Shape>`)
+      connConnects.push(`        <Connect FromSheet="${connId}" FromCell="BeginX" ToSheet="${fromId}" ToCell="PinX"/>`)
+      connConnects.push(`        <Connect FromSheet="${connId}" FromCell="EndX" ToSheet="${toId}" ToCell="PinX"/>`)
+    })
+
+    const vdx = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<VisioDocument xmlns="urn:schemas-microsoft-com:office:visio" xml:space="preserve">
+  <DocumentProperties>
+    <Title>${esc(dados.nome)}</Title>
+    <Creator>Sistema de Melhoria</Creator>
+  </DocumentProperties>
+  <Pages>
+    <Page ID="1" Name="${esc(dados.nome)}">
+      <PageSheet>
+        <PageProps>
+          <PageWidth>${(totalW / PX).toFixed(4)}</PageWidth>
+          <PageHeight>${(totalH / PX).toFixed(4)}</PageHeight>
+          <PageScale>1</PageScale>
+          <DrawingScale>1</DrawingScale>
+        </PageProps>
+      </PageSheet>
+      <Shapes>
+${lanesXml}
+${elementsXml}
+${connShapes.join('\n')}
+      </Shapes>
+      <Connects>
+${connConnects.join('\n')}
+      </Connects>
+    </Page>
+  </Pages>
+</VisioDocument>`
+
+    const blob = new Blob([vdx], { type: 'application/vnd.ms-visio.drawing' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = dados.nome.replace(/\s+/g, '_') + '.vdx'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   function exportarBizagi() {
     if (!dados) return
     const processId = 'processo_1'
@@ -309,6 +487,9 @@ ${conexoes}
               </button>
               <button onClick={exportarBizagi} style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 ⬇️ Exportar para Bizagi (.bpmn)
+              </button>
+              <button onClick={exportarVisio} style={{ padding: '8px 16px', background: '#1d4ed8', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                ⬇️ Exportar para Visio (.vdx)
               </button>
             </div>
           </div>
