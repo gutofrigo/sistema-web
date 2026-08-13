@@ -1,18 +1,8 @@
 'use client'
 import { useState } from 'react'
-
-const C = {
-  navy:      '#0B1F3A',
-  royal:     '#1E5BC6',
-  blue:      '#3B82F6',
-  fundo:     '#F1F4F8',
-  borda:     '#D1D9E6',
-  texto:     '#0B1F3A',
-  textoSec:  '#4A5568',
-  textoMudo: '#8FA3B1',
-  verde:     '#16A34A',
-  vermelho:  '#DC2626',
-}
+import { Workflow, Sparkles, Download } from 'lucide-react'
+import AppShell from '../components/AppShell'
+import { theme as C } from '../theme'
 
 const CORES_PARTICIPANTE = ['#EEF2FF', '#F0FDF4', '#FFF7ED', '#FDF2F8', '#F0F9FF', '#FFFBEB']
 const BORDAS_PARTICIPANTE = ['#C7D2FE', '#BBF7D0', '#FED7AA', '#FBCFE8', '#BAE6FD', '#FDE68A']
@@ -425,20 +415,8 @@ ${conexoes}
     URL.revokeObjectURL(url)
   }
 
-  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '6px', color: 'white', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none' }
-
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-
-      {/* Header */}
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Sistema de Melhoria</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>🔷 Modelagem BPMN</h1>
-        </div>
-        <a href="/" style={btnHeader}>← Voltar para Inicio</a>
-      </div>
-
+    <AppShell title="Modelagem BPMN" subtitle="Sistema de Melhoria">
       {/* Content */}
       <div className="page-pad" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
@@ -455,9 +433,9 @@ ${conexoes}
           <button
             onClick={gerarBPMN}
             disabled={gerando}
-            style={{ padding: '11px 24px', background: gerando ? C.textoMudo : C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: gerando ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+            style={{ padding: '11px 24px', background: gerando ? C.textoMudo : C.royal, color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', cursor: gerando ? 'not-allowed' : 'pointer', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
-            {gerando ? 'Gerando diagrama...' : '✨ Gerar diagrama BPMN'}
+            <Sparkles size={15} /> {gerando ? 'Gerando diagrama...' : 'Gerar diagrama BPMN'}
           </button>
         </div>
 
@@ -479,25 +457,25 @@ ${conexoes}
             </div>
             <DiagramaBPMN dados={dados} />
             <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button onClick={() => { setDados(null); setDescricao('') }} style={{ padding: '8px 16px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>
+              <button onClick={() => { setDados(null); setDescricao('') }} style={{ padding: '8px 16px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>
                 Novo processo
               </button>
-              <button onClick={gerarBPMN} style={{ padding: '8px 16px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}>
-                ✨ Regerar
+              <button onClick={gerarBPMN} style={{ padding: '8px 16px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.borda}`, borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Sparkles size={13} /> Regerar
               </button>
-              <button onClick={exportarBizagi} style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                ⬇️ Exportar para Bizagi (.bpmn)
+              <button onClick={exportarBizagi} style={{ padding: '8px 16px', background: '#0f766e', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Download size={13} /> Exportar para Bizagi (.bpmn)
               </button>
-              <button onClick={exportarVisio} style={{ padding: '8px 16px', background: '#1d4ed8', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                ⬇️ Exportar para Visio (.vdx)
+              <button onClick={exportarVisio} style={{ padding: '8px 16px', background: '#1d4ed8', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Download size={13} /> Exportar para Visio (.vdx)
               </button>
             </div>
           </div>
         )}
 
         {!dados && !gerando && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '32px', border: `1px solid ${C.borda}`, textAlign: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
-            <div style={{ fontSize: '44px', marginBottom: '12px' }}>🔷</div>
+          <div style={{ background: 'white', borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, textAlign: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <Workflow size={40} color={C.royal} style={{ marginBottom: '12px' }} />
             <p style={{ color: C.texto, fontSize: '15px', fontWeight: 'bold', margin: '0 0 6px' }}>Como usar</p>
             <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>Descreva o processo em linguagem natural. Mencione os participantes, as etapas e as decisoes. Quanto mais detalhado, melhor o diagrama.</p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -511,6 +489,6 @@ ${conexoes}
         )}
 
       </div>
-    </div>
+    </AppShell>
   )
 }

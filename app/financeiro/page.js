@@ -1,18 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-
-const C = {
-  navy:      '#0B1F3A',
-  royal:     '#1E5BC6',
-  fundo:     '#F1F4F8',
-  borda:     '#D1D9E6',
-  texto:     '#0B1F3A',
-  textoSec:  '#4A5568',
-  textoMudo: '#8FA3B1',
-  verde:     '#16A34A',
-  ambar:     '#F59E0B',
-  vermelho:  '#DC2626',
-}
+import { BarChart3, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
+import AppShell from '../components/AppShell'
+import { theme as C } from '../theme'
 
 const CATEGORIAS = ['moradia', 'alimentacao', 'saude', 'transporte', 'lazer', 'salario', 'outros']
 const NOMES_MES = ['Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
@@ -128,31 +118,20 @@ export default function Financeiro() {
     return lancamentos.filter(l => l.data_venc === dStr)
   }
 
-  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '6px', color: 'white', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none', cursor: 'pointer' }
+  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: C.fundo, border: `1px solid ${C.borda}`, borderRadius: '8px', color: C.texto, fontSize: '13px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }
 
   // ── TELA: Novo lancamento ──────────────────────────────────────────────────
   if (tela === 'novo') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Financeiro</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Novo Lancamento</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>
-          <a href="/" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Inicio</a>
-        </div>
-      </div>
-
+    <AppShell title="Novo Lancamento" subtitle="Financeiro" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-        <div style={{ background: 'white', borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '560px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+        <div style={{ background: 'white', borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '560px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-            <button onClick={() => setForm({ ...form, tipo: 'saida' })} style={{ flex: 1, padding: '11px', background: form.tipo === 'saida' ? C.vermelho : C.fundo, color: form.tipo === 'saida' ? 'white' : C.textoSec, border: `1px solid ${form.tipo === 'saida' ? C.vermelho : C.borda}`, borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>
-              ↑ Saida
+            <button onClick={() => setForm({ ...form, tipo: 'saida' })} style={{ flex: 1, padding: '11px', background: form.tipo === 'saida' ? C.vermelho : C.fundo, color: form.tipo === 'saida' ? 'white' : C.textoSec, border: `1px solid ${form.tipo === 'saida' ? C.vermelho : C.borda}`, borderRadius: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              <ArrowUp size={14} /> Saida
             </button>
-            <button onClick={() => setForm({ ...form, tipo: 'entrada' })} style={{ flex: 1, padding: '11px', background: form.tipo === 'entrada' ? C.verde : C.fundo, color: form.tipo === 'entrada' ? 'white' : C.textoSec, border: `1px solid ${form.tipo === 'entrada' ? C.verde : C.borda}`, borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>
-              ↓ Entrada
+            <button onClick={() => setForm({ ...form, tipo: 'entrada' })} style={{ flex: 1, padding: '11px', background: form.tipo === 'entrada' ? C.verde : C.fundo, color: form.tipo === 'entrada' ? 'white' : C.textoSec, border: `1px solid ${form.tipo === 'entrada' ? C.verde : C.borda}`, borderRadius: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              <ArrowDown size={14} /> Entrada
             </button>
           </div>
 
@@ -191,23 +170,12 @@ export default function Financeiro() {
           </button>
         </div>
       </div>
-    </div>
+    </AppShell>
   )
 
   // ── TELA: Totais por categoria ─────────────────────────────────────────────
   if (tela === 'totais') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Financeiro</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Totais por categoria</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>
-          <a href="/" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Inicio</a>
-        </div>
-      </div>
-
+    <AppShell title="Totais por categoria" subtitle="Financeiro" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div className="page-pad" style={{ maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         {carregandoTotais && <div style={{ textAlign: 'center', padding: '60px', color: C.textoMudo }}>Carregando totais...</div>}
 
@@ -260,7 +228,7 @@ export default function Financeiro() {
           </>
         )}
       </div>
-    </div>
+    </AppShell>
   )
 
   // ── TELA: Lista principal ──────────────────────────────────────────────────
@@ -273,19 +241,16 @@ export default function Financeiro() {
   const lancamentosDiaSel = diaSelecionado ? lancamentosNoDia(diaSelecionado) : []
 
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Sistema de Melhoria</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Financeiro</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <a href="/" style={btnHeader}>← Inicio</a>
-          <button onClick={abrirTotais} style={{ ...btnHeader, background: 'rgba(255,255,255,0.08)', fontWeight: 'normal', color: C.textoMudo }}>📊 Totais</button>
-          <button onClick={() => setTela('novo')} style={{ ...btnHeader, background: C.royal, border: 'none' }}>+ Novo</button>
-        </div>
-      </div>
-
+    <AppShell
+      title="Financeiro"
+      subtitle="Sistema de Melhoria"
+      actions={
+        <>
+          <button onClick={abrirTotais} className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><BarChart3 size={14} /> Totais</button>
+          <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}><Plus size={14} /> Novo</button>
+        </>
+      }
+    >
       <div className="page-pad" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         {/* Navegacao de mes */}
@@ -465,7 +430,7 @@ export default function Financeiro() {
                               {l.tipo === 'entrada' ? 'Receber' : 'Pagar'}
                             </button>
                           )}
-                          <button onClick={() => deletar(l.id)} style={{ fontSize: '13px', padding: '4px 6px', background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo }} title="Deletar">🗑️</button>
+                          <button onClick={() => deletar(l.id)} style={{ padding: '4px 6px', background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, display: 'inline-flex' }} title="Deletar"><Trash2 size={14} /></button>
                         </div>
                       </td>
                     </tr>
@@ -477,6 +442,6 @@ export default function Financeiro() {
         </div>
 
       </div>
-    </div>
+    </AppShell>
   )
 }

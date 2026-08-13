@@ -1,32 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { FolderKanban } from 'lucide-react'
+import AppShell from '../components/AppShell'
+import { GanttChart, fmt, parseData } from '../components/GanttChart'
+import { theme as C } from '../theme'
 
-const C = {
-  navy:      '#0B1F3A',
-  royal:     '#1E5BC6',
-  fundo:     '#F1F4F8',
-  borda:     '#D1D9E6',
-  texto:     '#0B1F3A',
-  textoSec:  '#4A5568',
-  textoMudo: '#8FA3B1',
-  verde:     '#16A34A',
-  ambar:     '#F59E0B',
-  vermelho:  '#DC2626',
-}
-
-const NOMES_MES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const CORES_STATUS = { concluido: C.verde, em_andamento: C.royal, pendente: C.ambar }
 const CORES_PROJETO = ['#1E5BC6','#16A34A','#F59E0B','#DC2626','#7C3AED','#0891B2']
-
-function fmt(d) {
-  if (!d) return ''
-  const dt = new Date(d + 'T12:00:00')
-  return dt.getDate().toString().padStart(2,'0') + '/' + (dt.getMonth()+1).toString().padStart(2,'0')
-}
-function parseData(s) {
-  if (!s) return null
-  return new Date(s + 'T12:00:00')
-}
 
 export default function Gantt() {
   const [modo, setModo] = useState('programa')
@@ -63,84 +43,12 @@ export default function Gantt() {
     }).filter(p => p.inicio && p.fim)
   }
 
-  function GanttTabela({ itens, colunaLabel, getCor, getLabel, getSubLabel, colNome }) {
-    const hoje = new Date()
-    hoje.setHours(12,0,0,0)
-    const datas = itens.flatMap(i => [i.inicio, i.fim]).filter(Boolean)
-    if (datas.length === 0) return (
-      <div style={{ textAlign: 'center', padding: '40px', color: C.textoMudo, fontSize: '14px' }}>
-        Nenhuma tarefa com data definida
-      </div>
-    )
-    const minDate = new Date(Math.min(...datas))
-    const maxDate = new Date(Math.max(...datas))
-    minDate.setDate(minDate.getDate() - 2)
-    maxDate.setDate(maxDate.getDate() + 3)
-    const totalDias = Math.ceil((maxDate - minDate) / 86400000)
-    const dias = []
-    for (let i = 0; i <= totalDias; i++) {
-      const d = new Date(minDate)
-      d.setDate(minDate.getDate() + i)
-      dias.push(d)
-    }
-    const colW = Math.max(Math.floor(480 / totalDias), 12)
-    const nomesCol = colNome || 160
-    return (
-      <div style={{ overflowX: 'auto' }}>
-        <div style={{ minWidth: nomesCol + dias.length * colW + 'px' }}>
-          <div style={{ display: 'flex', borderBottom: `1.5px solid ${C.borda}`, marginBottom: '4px' }}>
-            <div style={{ width: nomesCol + 'px', flexShrink: 0, fontSize: '12px', color: C.textoSec, paddingBottom: '4px' }}>{colunaLabel}</div>
-            <div style={{ display: 'flex' }}>
-              {dias.map((d, i) => {
-                const isHoje = d.toDateString() === hoje.toDateString()
-                const prevMes = i > 0 ? dias[i-1].getMonth() : -1
-                return (
-                  <div key={i} style={{ width: colW + 'px', textAlign: 'center', fontSize: '10px', color: isHoje ? C.vermelho : C.textoMudo, background: isHoje ? '#fef2f2' : '', borderLeft: isHoje ? `1.5px solid ${C.vermelho}` : `0.5px solid ${C.fundo}`, padding: '2px 0', boxSizing: 'border-box' }}>
-                    {d.getMonth() !== prevMes && <span style={{ fontWeight: 'bold', color: isHoje ? C.vermelho : C.royal, display: 'block', fontSize: '10px' }}>{NOMES_MES[d.getMonth()]}</span>}
-                    {d.getDate()}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          {itens.map((item, idx) => {
-            if (!item.inicio || !item.fim) return null
-            const startOffset = Math.max(0, Math.ceil((item.inicio - minDate) / 86400000))
-            const duracao = Math.max(1, Math.ceil((item.fim - item.inicio) / 86400000))
-            const cor = getCor(item, idx)
-            const label = getLabel(item)
-            const sub = getSubLabel(item)
-            return (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '5px 0', borderBottom: `0.5px solid ${C.fundo}` }}>
-                <div style={{ width: nomesCol + 'px', flexShrink: 0, paddingRight: '12px' }}>
-                  <p style={{ fontSize: '13px', margin: '0 0 1px', color: C.texto, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.titulo}</p>
-                  <p style={{ fontSize: '11px', color: C.textoMudo, margin: 0 }}>{sub}</p>
-                </div>
-                <div style={{ position: 'relative', flex: 1 }}>
-                  <div style={{ display: 'flex' }}>
-                    {dias.map((d, i) => {
-                      const isHoje = d.toDateString() === hoje.toDateString()
-                      return <div key={i} style={{ width: colW + 'px', height: '28px', borderLeft: isHoje ? `1.5px solid ${C.vermelho}` : `0.5px solid ${C.fundo}`, background: isHoje ? '#fff8f8' : '', boxSizing: 'border-box', flexShrink: 0 }}></div>
-                    })}
-                  </div>
-                  <div style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: (startOffset * colW) + 'px', width: (duracao * colW) + 'px', height: '20px', background: cor, borderRadius: '4px', display: 'flex', alignItems: 'center', padding: '0 8px', boxSizing: 'border-box', zIndex: 1, minWidth: '20px' }}>
-                    <span style={{ fontSize: '10px', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
-  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '6px', color: 'white', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none' }
-
   if (carregando) return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: C.textoSec }}>Carregando...</p>
-    </div>
+    <AppShell title="Gantt" subtitle="Sistema de Melhoria">
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: C.textoSec }}>Carregando...</p>
+      </div>
+    </AppShell>
   )
 
   const projetosComDatas = projetoComDatas()
@@ -152,20 +60,15 @@ export default function Gantt() {
   })).filter(t => t.fim) : []
 
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-
-      {/* Header */}
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Sistema de Melhoria</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Gantt</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <a href="/" style={btnHeader}>← Inicio</a>
-          <a href="/projetos" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Projetos</a>
-        </div>
-      </div>
-
+    <AppShell
+      title="Gantt"
+      subtitle="Sistema de Melhoria"
+      actions={
+        <a href="/projetos" className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', border: `1px solid ${C.borda}`, color: C.texto, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 }}>
+          <FolderKanban size={14} /> Projetos
+        </a>
+      }
+    >
       {/* Content */}
       <div className="page-pad" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
@@ -190,7 +93,7 @@ export default function Gantt() {
                 Nenhum projeto com tarefas com datas definidas
               </div>
             ) : (
-              <GanttTabela
+              <GanttChart
                 itens={projetosComDatas}
                 colunaLabel="Projeto"
                 getCor={(item) => item.cor}
@@ -232,7 +135,7 @@ export default function Gantt() {
                     Nenhuma tarefa com data de entrega definida
                   </div>
                 ) : (
-                  <GanttTabela
+                  <GanttChart
                     itens={tarefasAtuais}
                     colunaLabel="Tarefa"
                     getCor={(item) => CORES_STATUS[item.status] || C.textoMudo}
@@ -259,6 +162,6 @@ export default function Gantt() {
         )}
 
       </div>
-    </div>
+    </AppShell>
   )
 }

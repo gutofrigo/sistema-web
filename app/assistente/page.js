@@ -1,16 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-
-const C = {
-  navy:      '#0B1F3A',
-  royal:     '#1E5BC6',
-  blue:      '#3B82F6',
-  fundo:     '#F1F4F8',
-  borda:     '#D1D9E6',
-  texto:     '#0B1F3A',
-  textoSec:  '#4A5568',
-  textoMudo: '#8FA3B1',
-}
+import { Sparkles, LayoutDashboard } from 'lucide-react'
+import AppShell from '../components/AppShell'
+import { theme as C } from '../theme'
 
 const perguntasSugeridas = [
   'Quais projetos estao em risco de atraso?',
@@ -61,34 +53,16 @@ export default function Assistente() {
     }
   }
 
-  const btnHeader = {
-    padding: '7px 14px',
-    borderRadius: '6px',
-    textDecoration: 'none',
-    fontSize: '13px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    border: '1px solid rgba(255,255,255,0.25)',
-  }
-
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-
-      {/* Header */}
-      <div style={{ background: C.navy, borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '34px', height: '34px', borderRadius: '6px', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✨</div>
-          <div>
-            <p style={{ fontSize: '15px', fontWeight: 'bold', margin: 0, color: 'white' }}>Assistente IA</p>
-            <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>Pergunte sobre seus projetos e tarefas</p>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <a href="/" style={{ ...btnHeader, background: 'rgba(255,255,255,0.12)', color: 'white' }}>← Inicio</a>
-          <a href="/dashboard" style={{ ...btnHeader, background: 'transparent', color: C.textoMudo }}>Dashboard</a>
-        </div>
-      </div>
-
+    <AppShell
+      title="Assistente IA"
+      subtitle="Pergunte sobre seus projetos e tarefas"
+      actions={
+        <a href="/pmo" className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', border: `1px solid ${C.borda}`, color: C.texto, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 }}>
+          <LayoutDashboard size={14} /> PMO
+        </a>
+      }
+    >
       {/* Mensagens */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px', maxWidth: '800px', width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -96,7 +70,7 @@ export default function Assistente() {
             <div key={i} style={{ display: 'flex', justifyContent: m.tipo === 'usuario' ? 'flex-end' : 'flex-start' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', maxWidth: '80%' }}>
                 {m.tipo === 'assistente' && (
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>✨</div>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sparkles size={15} color="white" /></div>
                 )}
                 <div style={{
                   background: m.tipo === 'usuario' ? C.navy : 'white',
@@ -117,7 +91,7 @@ export default function Assistente() {
           {carregando && (
             <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>✨</div>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={15} color="white" /></div>
                 <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderRadius: '0 12px 12px 12px', padding: '12px 16px', color: C.textoMudo, fontSize: '14px' }}>
                   Analisando seus dados...
                 </div>
@@ -161,6 +135,6 @@ export default function Assistente() {
           </button>
         </div>
       </div>
-    </div>
+    </AppShell>
   )
 }

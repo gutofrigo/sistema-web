@@ -104,12 +104,13 @@ export async function GET() {
   try {
     const hoje = new Date()
 
-    const [{ data: projetos }, { data: tarefas }, { data: lancamentos }, { data: riscos }, { data: roadmaps }] = await Promise.all([
+    const [{ data: projetos }, { data: tarefas }, { data: lancamentos }, { data: riscos }, { data: roadmaps }, { data: entrevistas }] = await Promise.all([
       supabase.from('projetos').select('*').order('criado_em', { ascending: false }),
-      supabase.from('tarefas').select('id, projeto_id, status, data_entrega, concluido_em, criado_em'),
+      supabase.from('tarefas').select('id, projeto_id, titulo, responsavel, status, data_entrega, concluido_em, criado_em'),
       supabase.from('lancamentos').select('projeto_id, valor, tipo, status').eq('status', 'pago').not('projeto_id', 'is', null),
       supabase.from('riscos_projeto').select('*'),
-      supabase.from('roadmaps').select('id, projeto_id, titulo').not('projeto_id', 'is', null)
+      supabase.from('roadmaps').select('id, projeto_id, titulo').not('projeto_id', 'is', null),
+      supabase.from('entrevistas').select('id, processo, responsavel, criado_em').order('criado_em', { ascending: false }).limit(3)
     ])
 
     const tarefasPorProjeto = new Map()
@@ -200,7 +201,14 @@ export async function GET() {
     }
     const tendencia = mesesArr.map(mes => ({ mes, concluidas: contagemPorMes[mes] || 0 }))
 
-    return Response.json({ projetos: projetosOut, resumo, tendencia })
+    const em7dias = new Date(hoje)
+    em7dias.setDate(hoje.getDate() + 7)
+    const tarefasProximas = (tarefas || [])
+      .filter(t => t.data_entrega && t.status !== 'concluido' && new Date(t.data_entrega) <= em7dias)
+      .sort((a, b) => new Date(a.data_entrega) - new Date(b.data_entrega))
+      .slice(0, 5)
+
+    return Response.json({ projetos: projetosOut, resumo, tendencia, tarefasProximas, entrevistasRecentes: entrevistas || [] })
   } catch (e) {
     return Response.json({ erro: e.message })
   }

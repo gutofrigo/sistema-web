@@ -39,8 +39,29 @@ export async function POST(req) {
         data_inicio: body.data_inicio || null,
         data_entrega: body.data_entrega || null,
         status: body.status || 'pendente',
+        progresso: body.progresso || 0,
         concluido_em: body.status === 'concluido' ? new Date().toISOString() : null
       })
+      .select()
+    if (error) return Response.json({ erro: error.message })
+    return Response.json({ tarefa: data[0] })
+  } catch (e) {
+    return Response.json({ erro: e.message })
+  }
+}
+export async function PATCH(req) {
+  try {
+    const body = await req.json()
+    if (!body.id) return Response.json({ erro: 'id obrigatorio' })
+    const campos = ['titulo', 'responsavel', 'progresso', 'data_inicio', 'data_entrega', 'status']
+    const update = {}
+    for (const campo of campos) {
+      if (body[campo] !== undefined) update[campo] = body[campo]
+    }
+    const { data, error } = await supabase
+      .from('tarefas')
+      .update(update)
+      .eq('id', body.id)
       .select()
     if (error) return Response.json({ erro: error.message })
     return Response.json({ tarefa: data[0] })

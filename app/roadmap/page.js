@@ -1,18 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-
-const C = {
-  navy:      '#0B1F3A',
-  royal:     '#1E5BC6',
-  fundo:     '#F1F4F8',
-  borda:     '#D1D9E6',
-  texto:     '#0B1F3A',
-  textoSec:  '#4A5568',
-  textoMudo: '#8FA3B1',
-  verde:     '#16A34A',
-  ambar:     '#F59E0B',
-  vermelho:  '#DC2626',
-}
+import { Map, Lightbulb, CheckCircle2, Puzzle, Brain, AlertTriangle, BarChart3, Users, Trash2, LayoutDashboard, Loader2 } from 'lucide-react'
+import AppShell from '../components/AppShell'
+import { theme as C } from '../theme'
 
 const coresFase = {
   blue:   { borda: '#3b82f6', bg: '#eff6ff', icone: '🔵', texto: '#1e40af' },
@@ -89,15 +79,15 @@ export default function Roadmap() {
     else alert('Nao foi possivel carregar este roadmap')
   }
 
-  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '6px', color: 'white', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none', cursor: 'pointer' }
-  const inputStyle = { width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', marginBottom: '12px', boxSizing: 'border-box', color: C.texto }
+  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: C.fundo, border: `1px solid ${C.borda}`, borderRadius: '8px', color: C.texto, fontSize: '13px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }
+  const inputStyle = { width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '14px', marginBottom: '12px', boxSizing: 'border-box', color: C.texto }
 
   // ── TELA: Gerando ───────────────────────────────────────────────────────────
   if (tela === 'gerando') return (
     <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '56px', marginBottom: '20px' }}>🗺️</div>
-        <p style={{ color: C.texto, fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Gerando seu roadmap com IA...</p>
+        <Loader2 size={44} color={C.royal} className="spin" style={{ marginBottom: '20px' }} />
+        <p style={{ color: C.texto, fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>Gerando seu roadmap com IA...</p>
         <p style={{ color: C.textoSec, fontSize: '14px' }}>Identificando oportunidades e estruturando fases</p>
       </div>
     </div>
@@ -105,21 +95,10 @@ export default function Roadmap() {
 
   // ── TELA: Novo Roadmap ───────────────────────────────────────────────────────
   if (tela === 'novo') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Roadmaps</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Novo Roadmap</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>
-          <a href="/" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Inicio</a>
-        </div>
-      </div>
-
+    <AppShell title="Novo Roadmap" subtitle="Roadmaps" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-        <div style={{ background: 'white', borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '540px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-          <h2 style={{ color: C.texto, marginBottom: '6px', fontSize: '20px', fontWeight: 'bold' }}>🗺️ Novo Roadmap</h2>
+        <div style={{ background: 'white', borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '540px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+          <h2 style={{ color: C.texto, marginBottom: '6px', fontSize: '20px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}><Map size={20} color={C.royal} /> Novo Roadmap</h2>
           <p style={{ color: C.textoSec, fontSize: '13px', marginBottom: '24px' }}>A IA vai identificar oportunidades e criar um plano completo</p>
 
           <input placeholder="Titulo da iniciativa (ex: App de financas para freelancers)" value={form.titulo} onChange={e => setForm({ ...form, titulo: e.target.value })} style={inputStyle} />
@@ -139,35 +118,32 @@ export default function Roadmap() {
           </button>
         </div>
       </div>
-    </div>
+    </AppShell>
   )
 
   // ── TELA: Resultado ──────────────────────────────────────────────────────────
   if (tela === 'resultado' && resultado) return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Roadmaps</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>🗺️ Roadmap do Projeto</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+    <AppShell
+      title="Roadmap do Projeto"
+      subtitle="Roadmaps"
+      actions={
+        <>
           <button onClick={() => setTela('lista')} style={btnHeader}>← Lista</button>
-          <a href="/" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Inicio</a>
-          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} style={{ ...btnHeader, background: C.royal, border: 'none' }}>+ Novo Roadmap</button>
-        </div>
-      </div>
-
+          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}>+ Novo Roadmap</button>
+        </>
+      }
+    >
       <div className="page-pad" style={{ maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         {resultado.resumo && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', marginBottom: '16px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.navy}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: 'white', borderRadius: '10px', padding: '24px', marginBottom: '16px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.navy}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <p style={{ color: C.textoSec, fontSize: '15px', lineHeight: '1.6', margin: 0 }}>{resultado.resumo}</p>
           </div>
         )}
 
         {resultado.oportunidades && resultado.oportunidades.length > 0 && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', padding: '24px', marginBottom: '16px' }}>
-            <h2 style={{ color: '#166534', fontSize: '15px', margin: '0 0 14px', fontWeight: 'bold' }}>💡 Oportunidades identificadas pela IA</h2>
+          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '10px', padding: '24px', marginBottom: '16px' }}>
+            <h2 style={{ color: '#166534', fontSize: '15px', margin: '0 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Lightbulb size={16} /> Oportunidades identificadas pela IA</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {resultado.oportunidades.map((op, i) => (
                 <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
@@ -196,7 +172,7 @@ export default function Roadmap() {
               )}
               {fase.acoes && fase.acoes.length > 0 && (
                 <div style={{ marginBottom: '12px' }}>
-                  <p style={{ color: C.texto, fontSize: '13px', fontWeight: 'bold', margin: '0 0 6px' }}>✅ Acoes:</p>
+                  <p style={{ color: C.texto, fontSize: '13px', fontWeight: 'bold', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '6px' }}><CheckCircle2 size={13} /> Acoes:</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '12px' }}>
                     {fase.acoes.map((a, i) => (
                       <span key={i} style={{ color: C.textoSec, fontSize: '13px', lineHeight: '1.5' }}>• {a}</span>
@@ -206,7 +182,7 @@ export default function Roadmap() {
               )}
               {fase.tecnologias && fase.tecnologias.length > 0 && (
                 <div style={{ marginBottom: '12px' }}>
-                  <p style={{ color: C.texto, fontSize: '13px', fontWeight: 'bold', margin: '0 0 6px' }}>✅ Tecnologias sugeridas:</p>
+                  <p style={{ color: C.texto, fontSize: '13px', fontWeight: 'bold', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '6px' }}><CheckCircle2 size={13} /> Tecnologias sugeridas:</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {fase.tecnologias.map((t, i) => (
                       <span key={i} style={{ background: cf.bg, color: cf.texto, fontSize: '12px', padding: '3px 10px', borderRadius: '20px' }}>{t}</span>
@@ -215,8 +191,9 @@ export default function Roadmap() {
                 </div>
               )}
               {fase.resultado_esperado && (
-                <div style={{ background: cf.bg, borderRadius: '6px', padding: '10px 14px' }}>
-                  <span style={{ color: cf.texto, fontSize: '13px' }}>✅ Resultado esperado: {fase.resultado_esperado}</span>
+                <div style={{ background: cf.bg, borderRadius: '6px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={13} color={cf.texto} />
+                  <span style={{ color: cf.texto, fontSize: '13px' }}>Resultado esperado: {fase.resultado_esperado}</span>
                 </div>
               )}
             </div>
@@ -224,15 +201,15 @@ export default function Roadmap() {
         })}
 
         {resultado.estrutura_resumida && (
-          <div style={{ background: C.navy, borderRadius: '8px', padding: '20px 24px', marginBottom: '12px', textAlign: 'center' }}>
-            <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 8px' }}>🧩 Estrutura resumida</p>
+          <div style={{ background: C.navy, borderRadius: '10px', padding: '20px 24px', marginBottom: '12px', textAlign: 'center' }}>
+            <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Puzzle size={13} /> Estrutura resumida</p>
             <p style={{ color: 'white', fontSize: '15px', fontWeight: 'bold', margin: 0, letterSpacing: '0.5px' }}>{resultado.estrutura_resumida}</p>
           </div>
         )}
 
         {resultado.ideias_extras && resultado.ideias_extras.length > 0 && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 14px', fontWeight: 'bold' }}>🧠 Ideias extras de evolucao</h2>
+          <div style={{ background: 'white', borderRadius: '10px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Brain size={16} color={C.royal} /> Ideias extras de evolucao</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {resultado.ideias_extras.map((ideia, i) => (
                 <span key={i} style={{ color: C.textoSec, fontSize: '14px' }}>• {ideia}</span>
@@ -242,8 +219,8 @@ export default function Roadmap() {
         )}
 
         {resultado.por_que_bom && resultado.por_que_bom.length > 0 && (
-          <div style={{ background: '#fefce8', border: '1px solid #fde047', borderRadius: '8px', padding: '24px', marginBottom: '12px' }}>
-            <h2 style={{ color: '#854d0e', fontSize: '15px', margin: '0 0 14px', fontWeight: 'bold' }}>✅ Por que esse projeto e bom</h2>
+          <div style={{ background: '#fefce8', border: '1px solid #fde047', borderRadius: '10px', padding: '24px', marginBottom: '12px' }}>
+            <h2 style={{ color: '#854d0e', fontSize: '15px', margin: '0 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} /> Por que esse projeto e bom</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {resultado.por_que_bom.map((motivo, i) => (
                 <div key={i} style={{ display: 'flex', gap: '10px' }}>
@@ -256,8 +233,8 @@ export default function Roadmap() {
         )}
 
         {resultado.riscos && resultado.riscos.length > 0 && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 14px', fontWeight: 'bold' }}>⚠️ Riscos identificados</h2>
+          <div style={{ background: 'white', borderRadius: '10px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={16} color={C.ambar} /> Riscos identificados</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {resultado.riscos.map((r, i) => (
                 <div key={i} style={{ background: '#fef2f2', borderRadius: '6px', padding: '14px' }}>
@@ -275,8 +252,8 @@ export default function Roadmap() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
           {resultado.kpis && resultado.kpis.length > 0 && (
-            <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-              <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 12px', fontWeight: 'bold' }}>📊 KPIs</h2>
+            <div style={{ background: 'white', borderRadius: '10px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+              <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><BarChart3 size={16} color={C.royal} /> KPIs</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {resultado.kpis.map((k, i) => (
                   <span key={i} style={{ color: C.textoSec, fontSize: '13px' }}>• {k}</span>
@@ -285,8 +262,8 @@ export default function Roadmap() {
             </div>
           )}
           {resultado.stakeholders && resultado.stakeholders.length > 0 && (
-            <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-              <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 12px', fontWeight: 'bold' }}>👥 Stakeholders</h2>
+            <div style={{ background: 'white', borderRadius: '10px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+              <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Users size={16} color={C.royal} /> Stakeholders</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {resultado.stakeholders.map((s, i) => (
                   <span key={i} style={{ color: C.textoSec, fontSize: '13px' }}>• {s}</span>
@@ -297,32 +274,29 @@ export default function Roadmap() {
         </div>
 
       </div>
-    </div>
+    </AppShell>
   )
 
   // ── TELA: Lista ──────────────────────────────────────────────────────────────
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Sistema de Melhoria</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>🗺️ Roadmaps</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <a href="/" style={btnHeader}>← Inicio</a>
-          <a href="/dashboard" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Dashboard</a>
-          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} style={{ ...btnHeader, background: C.royal, border: 'none' }}>+ Novo Roadmap</button>
-        </div>
-      </div>
-
+    <AppShell
+      title="Roadmaps"
+      subtitle="Sistema de Melhoria"
+      actions={
+        <>
+          <a href="/pmo" className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><LayoutDashboard size={14} /> PMO</a>
+          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}>+ Novo Roadmap</button>
+        </>
+      }
+    >
       <div className="page-pad" style={{ maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         {roadmaps.length === 0 ? (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '60px', textAlign: 'center', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <div style={{ fontSize: '44px', marginBottom: '16px' }}>🗺️</div>
+          <div style={{ background: 'white', borderRadius: '10px', padding: '60px', textAlign: 'center', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <Map size={40} color={C.royal} style={{ marginBottom: '16px' }} />
             <p style={{ color: C.texto, fontSize: '17px', fontWeight: 'bold', marginBottom: '8px' }}>Nenhum roadmap ainda</p>
             <p style={{ color: C.textoMudo, fontSize: '14px', marginBottom: '24px' }}>Crie seu primeiro roadmap com IA</p>
             <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }}
-              style={{ padding: '11px 24px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }}>
+              className="btn-hover" style={{ padding: '11px 24px', background: C.royal, color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', cursor: 'pointer', fontWeight: 700 }}>
               Criar primeiro roadmap
             </button>
           </div>
@@ -330,7 +304,7 @@ export default function Roadmap() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {roadmaps.map(r => (
               <div key={r.id} onClick={() => verRoadmap(r.id)}
-                style={{ background: 'white', borderRadius: '8px', padding: '20px 24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                style={{ background: 'white', borderRadius: '10px', padding: '20px 24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
                 <div>
                   <p style={{ fontSize: '15px', fontWeight: 'bold', margin: '0 0 4px', color: C.texto }}>{r.titulo}</p>
                   <p style={{ fontSize: '13px', color: C.textoMudo, margin: 0 }}>{r.area || 'Sem area'} • {diasAtras(r.criado_em)}</p>
@@ -339,13 +313,13 @@ export default function Roadmap() {
                   <span style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '20px', background: '#EEF2FF', color: C.royal, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
                     {labelPorte(r.porte)}
                   </span>
-                  <button onClick={e => deletarRoadmap(e, r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '4px', color: C.textoMudo }} title="Deletar">🗑️</button>
+                  <button onClick={e => deletarRoadmap(e, r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: C.textoMudo }} title="Deletar"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </AppShell>
   )
 }

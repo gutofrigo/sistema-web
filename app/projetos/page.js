@@ -1,19 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react'
-
-const C = {
-  navy:      '#0B1F3A',
-  royal:     '#1E5BC6',
-  blue:      '#3B82F6',
-  fundo:     '#F1F4F8',
-  borda:     '#D1D9E6',
-  texto:     '#0B1F3A',
-  textoSec:  '#4A5568',
-  textoMudo: '#8FA3B1',
-  verde:     '#16A34A',
-  ambar:     '#F59E0B',
-  vermelho:  '#DC2626',
-}
+import { GanttChartSquare, AlertTriangle, Pencil, Sparkles, Plus, Trash2, User, Calendar, Paperclip, Wallet } from 'lucide-react'
+import AppShell from '../components/AppShell'
+import { GanttChart, fmt, parseData } from '../components/GanttChart'
+import { theme as C } from '../theme'
 
 const coresStatus = { pendente: C.ambar, em_andamento: C.royal, concluido: C.verde }
 const coresImpacto = { baixo: C.verde, medio: C.ambar, alto: C.vermelho }
@@ -157,6 +147,10 @@ export default function Projetos() {
     await fetch('/api/tarefas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) })
     buscarTarefas(projetoAtivo.id)
   }
+  async function atualizarTarefa(id, campos) {
+    await fetch('/api/tarefas', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...campos }) })
+    buscarTarefas(projetoAtivo.id)
+  }
   async function gerarTarefasIA() {
     if (!objetivoIA.trim()) return alert('Descreva o objetivo')
     setGerandoIA(true)
@@ -197,66 +191,58 @@ export default function Projetos() {
 
   const tarefasPai = tarefas.filter(t => !t.tarefa_pai_id)
   const tarefasFilho = (paiId) => tarefas.filter(t => t.tarefa_pai_id === paiId)
+  const tarefasComDatas = tarefas.filter(t => t.data_entrega).map(t => ({
+    ...t,
+    inicio: parseData(t.data_inicio) || parseData(t.data_entrega),
+    fim: parseData(t.data_entrega)
+  }))
+  const pctProjeto = tarefas.length > 0 ? Math.round(tarefas.reduce((s, t) => s + (t.progresso || 0), 0) / tarefas.length) : 0
 
-  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '6px', color: 'white', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none', cursor: 'pointer' }
-  const inputStyle = { width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box', color: C.texto }
+  const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: C.fundo, border: `1px solid ${C.borda}`, borderRadius: '8px', color: C.texto, fontSize: '13px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }
+  const inputStyle = { width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', color: C.texto }
 
   // ── TELA: Lista ─────────────────────────────────────────────────────────────
   if (tela === 'lista') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Sistema de Melhoria</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Projetos</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <a href="/" style={btnHeader}>← Inicio</a>
-          <a href="/gantt" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>📊 Gantt</a>
-          <button onClick={() => setTela('novo')} style={{ ...btnHeader, background: C.royal, border: 'none' }}>+ Novo Projeto</button>
-        </div>
-      </div>
-
+    <AppShell
+      title="Projetos"
+      subtitle="Sistema de Melhoria"
+      actions={
+        <>
+          <a href="/gantt" className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><GanttChartSquare size={14} /> Gantt</a>
+          <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}><Plus size={14} /> Novo Projeto</button>
+        </>
+      }
+    >
       <div className="page-pad" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         {projetos.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '8px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
+          <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '10px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
             <p style={{ fontSize: '17px' }}>Nenhum projeto ainda</p>
             <p style={{ fontSize: '14px' }}>Crie um projeto ou faca uma entrevista de processo</p>
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {projetos.map(p => (
-            <div key={p.id} onClick={() => abrirProjeto(p)} style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresStatus[p.status] || C.royal}`, borderRadius: '8px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div key={p.id} onClick={() => abrirProjeto(p)} style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresStatus[p.status] || C.royal}`, borderRadius: '10px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h3 style={{ margin: '0 0 6px 0', color: C.texto, fontSize: '15px' }}>{p.titulo}</h3>
                   <p style={{ margin: 0, color: C.textoMudo, fontSize: '13px' }}>{p.responsavel || 'Sem responsavel'} • {new Date(p.criado_em).toLocaleDateString('pt-BR')}</p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ background: coresStatus[p.status] || C.royal, color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>{p.status}</span>
-                  <button onClick={e => deletarProjeto(e, p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: C.textoMudo, padding: '4px' }} title="Deletar projeto">🗑️</button>
+                  <span style={{ background: coresStatus[p.status] || C.royal, color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>{p.status}</span>
+                  <button onClick={e => deletarProjeto(e, p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '4px' }} title="Deletar projeto"><Trash2 size={16} /></button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </AppShell>
   )
 
   // ── TELA: Novo Projeto ───────────────────────────────────────────────────────
   if (tela === 'novo') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>Projetos</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Novo Projeto</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>
-          <a href="/" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Inicio</a>
-        </div>
-      </div>
-
+    <AppShell title="Novo Projeto" subtitle="Projetos" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
         <div style={{ background: 'white', borderRadius: '8px', padding: '36px', width: '100%', maxWidth: '600px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <input placeholder="Titulo do projeto" value={novoProj.titulo} onChange={e => setNovoProj({ ...novoProj, titulo: e.target.value })}
@@ -286,36 +272,35 @@ export default function Projetos() {
               </select>
             </div>
           </div>
-          <button onClick={criarProjeto} style={{ width: '100%', padding: '13px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '15px', cursor: 'pointer', fontWeight: 'bold' }}>
+          <button onClick={criarProjeto} className="btn-hover" style={{ width: '100%', padding: '13px', background: C.royal, color: 'white', border: 'none', borderRadius: '8px', fontSize: '15px', cursor: 'pointer', fontWeight: 700 }}>
             Criar Projeto
           </button>
         </div>
       </div>
-    </div>
+    </AppShell>
   )
 
   // ── TELA: Projeto (tarefas) ──────────────────────────────────────────────────
   if (tela === 'projeto') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: C.navy, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>{projetoAtivo.responsavel || 'Projetos'}</p>
-          <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>{projetoAtivo.titulo}</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+    <AppShell
+      title={projetoAtivo.titulo}
+      subtitle={projetoAtivo.responsavel || 'Projetos'}
+      actions={
+        <>
           <button onClick={() => setTela('lista')} style={btnHeader}>← Projetos</button>
-          <a href="/" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Inicio</a>
-          <a href="/gantt" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>📊 Gantt</a>
-          <button onClick={() => { setMostrarRiscos(!mostrarRiscos); setMostrarGerador(false); setMostrarFormTarefa(false); setMostrarEditar(false) }} style={{ ...btnHeader, background: 'rgba(255,255,255,0.18)' }}>⚠️ Riscos{riscos.filter(r => r.status === 'aberto').length > 0 ? ' (' + riscos.filter(r => r.status === 'aberto').length + ')' : ''}</button>
-          <button onClick={abrirEditar} style={{ ...btnHeader, background: 'rgba(255,255,255,0.18)' }}>✏️ Editar</button>
-          <button onClick={() => { setMostrarGerador(!mostrarGerador); setMostrarFormTarefa(false); setMostrarRiscos(false); setMostrarEditar(false) }} style={{ ...btnHeader, background: 'rgba(255,255,255,0.18)' }}>✨ Gerar com IA</button>
-          <button onClick={() => { setMostrarFormTarefa(!mostrarFormTarefa); setMostrarGerador(false); setMostrarRiscos(false); setMostrarEditar(false) }} style={{ ...btnHeader, background: C.royal, border: 'none' }}>+ Nova Tarefa</button>
-        </div>
-      </div>
-
+          <a href="/gantt" className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><GanttChartSquare size={14} /> Gantt</a>
+          <button onClick={() => { setMostrarRiscos(!mostrarRiscos); setMostrarGerador(false); setMostrarFormTarefa(false); setMostrarEditar(false) }} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarRiscos ? '#FEF2F2' : 'white', color: mostrarRiscos ? C.vermelho : C.texto }}>
+            <AlertTriangle size={14} /> Riscos{riscos.filter(r => r.status === 'aberto').length > 0 ? ' (' + riscos.filter(r => r.status === 'aberto').length + ')' : ''}
+          </button>
+          <button onClick={abrirEditar} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarEditar ? '#EEF2FF' : 'white' }}><Pencil size={14} /> Editar</button>
+          <button onClick={() => { setMostrarGerador(!mostrarGerador); setMostrarFormTarefa(false); setMostrarRiscos(false); setMostrarEditar(false) }} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarGerador ? '#EEF2FF' : 'white' }}><Sparkles size={14} /> Gerar com IA</button>
+          <button onClick={() => { setMostrarFormTarefa(!mostrarFormTarefa); setMostrarGerador(false); setMostrarRiscos(false); setMostrarEditar(false) }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}><Plus size={14} /> Nova Tarefa</button>
+        </>
+      }
+    >
       <div className="page-pad" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
-        {(projetoAtivo.orcamento || projetoAtivo.data_prevista_fim || projetoAtivo.prioridade) && (
+        {(projetoAtivo.orcamento || projetoAtivo.data_prevista_fim || projetoAtivo.prioridade || tarefas.length > 0) && (
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '16px' }}>
             {projetoAtivo.prioridade && (
               <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: corPrioridade(projetoAtivo.prioridade).bg, color: corPrioridade(projetoAtivo.prioridade).color, fontWeight: 'bold' }}>
@@ -323,14 +308,41 @@ export default function Projetos() {
               </span>
             )}
             {projetoAtivo.data_prevista_fim && (
-              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: C.fundo, color: C.textoSec }}>
-                📅 Prazo: {new Date(projetoAtivo.data_prevista_fim + 'T12:00:00').toLocaleDateString('pt-BR')}
+              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: C.fundo, color: C.textoSec, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Calendar size={12} /> Prazo: {new Date(projetoAtivo.data_prevista_fim + 'T12:00:00').toLocaleDateString('pt-BR')}
               </span>
             )}
             {projetoAtivo.orcamento && (
-              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: C.fundo, color: C.textoSec }}>
-                💰 Orcamento: {formatarMoeda(projetoAtivo.orcamento)}
+              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: C.fundo, color: C.textoSec, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Wallet size={12} /> Orcamento: {formatarMoeda(projetoAtivo.orcamento)}
               </span>
+            )}
+            {tarefas.length > 0 && (
+              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: '#EEF2FF', color: C.royal, fontWeight: 'bold' }}>
+                Progresso geral: {pctProjeto}%
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Cronograma */}
+        {tarefas.length > 0 && (
+          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+              <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><GanttChartSquare size={16} color={C.royal} /> Cronograma</h3>
+              <span style={{ fontSize: '12px', color: C.textoSec }}>{tarefasComDatas.length} tarefa(s) com data</span>
+            </div>
+            {tarefasComDatas.length === 0 ? (
+              <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Defina uma data de entrega nas tarefas para ver o cronograma</p>
+            ) : (
+              <GanttChart
+                itens={tarefasComDatas}
+                colunaLabel="Tarefa"
+                getCor={(item) => coresStatus[item.status] || C.textoMudo}
+                getLabel={(item) => (item.progresso || 0) + '%'}
+                getSubLabel={(item) => item.status + ' • ate ' + fmt(item.fim)}
+                colNome={160}
+              />
             )}
           </div>
         )}
@@ -338,7 +350,7 @@ export default function Projetos() {
         {/* Editar projeto */}
         {mostrarEditar && (
           <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ margin: '0 0 16px 0', color: C.texto, fontSize: '15px', fontWeight: 'bold' }}>✏️ Editar projeto</h3>
+            <h3 style={{ margin: '0 0 16px 0', color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Pencil size={16} color={C.royal} /> Editar projeto</h3>
             <input placeholder="Titulo do projeto" value={editProj.titulo} onChange={e => setEditProj({ ...editProj, titulo: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
             <input placeholder="Responsavel" value={editProj.responsavel} onChange={e => setEditProj({ ...editProj, responsavel: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
             <textarea placeholder="Descricao" value={editProj.descricao} onChange={e => setEditProj({ ...editProj, descricao: e.target.value })} rows={2} style={{ ...inputStyle, marginBottom: '10px', resize: 'vertical' }} />
@@ -374,7 +386,7 @@ export default function Projetos() {
         {mostrarRiscos && (
           <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.ambar}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 'bold' }}>⚠️ Riscos do projeto</h3>
+              <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={16} color={C.ambar} /> Riscos do projeto</h3>
               {roadmapVinculado && roadmapVinculado.riscos && roadmapVinculado.riscos.length > 0 && (
                 <button onClick={importarRiscosRoadmap} style={{ padding: '7px 14px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.royal}`, borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
                   Importar sugestoes do roadmap ({roadmapVinculado.riscos.length})
@@ -394,7 +406,7 @@ export default function Projetos() {
                         {r.categoria && <span>{r.categoria}</span>}
                         <span>Probabilidade: {r.probabilidade}</span>
                         <span>Impacto: {r.impacto}</span>
-                        {r.responsavel && <span>👤 {r.responsavel}</span>}
+                        {r.responsavel && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><User size={11} /> {r.responsavel}</span>}
                       </div>
                       {r.mitigacao && <p style={{ margin: '6px 0 0', fontSize: '12px', color: C.textoSec }}>Mitigacao: {r.mitigacao}</p>}
                     </div>
@@ -405,7 +417,7 @@ export default function Projetos() {
                         <option value="mitigado">Mitigado</option>
                         <option value="fechado">Fechado</option>
                       </select>
-                      <button onClick={() => deletarRisco(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: C.textoMudo, padding: '2px' }}>🗑️</button>
+                      <button onClick={() => deletarRisco(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '2px' }}><Trash2 size={14} /></button>
                     </div>
                   </div>
                 </div>
@@ -441,7 +453,7 @@ export default function Projetos() {
         {/* Gerador IA */}
         {mostrarGerador && (
           <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ margin: '0 0 6px 0', color: C.texto, fontSize: '15px', fontWeight: 'bold' }}>✨ Gerar tarefas com IA</h3>
+            <h3 style={{ margin: '0 0 6px 0', color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Sparkles size={16} color={C.royal} /> Gerar tarefas com IA</h3>
             <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 14px' }}>Descreva o objetivo e a IA cria as tarefas automaticamente</p>
             <textarea
               placeholder="Ex: Precisamos migrar 3 servidores para AWS, incluindo testes de carga e treinamento da equipe..."
@@ -451,7 +463,7 @@ export default function Projetos() {
               style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', marginBottom: '12px', boxSizing: 'border-box', resize: 'vertical', color: C.texto }}
             />
             <button onClick={gerarTarefasIA} disabled={gerandoIA} style={{ padding: '9px 20px', background: gerandoIA ? C.textoMudo : C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: gerandoIA ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
-              {gerandoIA ? 'Gerando...' : '✨ Gerar tarefas'}
+              {gerandoIA ? 'Gerando...' : 'Gerar tarefas'}
             </button>
             {tarefasIA.length > 0 && (
               <div style={{ marginTop: '20px' }}>
@@ -468,8 +480,8 @@ export default function Projetos() {
                         <div style={{ flex: 1 }}>
                           <p style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px', color: C.texto }}>{t.titulo}</p>
                           <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: C.textoMudo }}>
-                            {t.responsavel && <span>👤 {t.responsavel}</span>}
-                            {t.prazo_dias && <span>📅 {t.prazo_dias} dias</span>}
+                            {t.responsavel && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><User size={11} /> {t.responsavel}</span>}
+                            {t.prazo_dias && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><Calendar size={11} /> {t.prazo_dias} dias</span>}
                           </div>
                         </div>
                         <span style={{ fontSize: '11px', background: cp.bg, color: cp.color, padding: '2px 8px', borderRadius: '20px', whiteSpace: 'nowrap', fontWeight: 'bold' }}>{t.prioridade}</span>
@@ -536,20 +548,30 @@ export default function Projetos() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <div>
                     <p style={{ margin: '0 0 4px 0', fontWeight: 'bold', color: C.texto, fontSize: '14px' }}>{tarefa.titulo}</p>
-                    <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: C.textoMudo, flexWrap: 'wrap' }}>
-                      {tarefa.responsavel && <span>👤 {tarefa.responsavel}</span>}
-                      {tarefa.data_entrega && <span>📅 {new Date(tarefa.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR')}</span>}
-                      {tarefasFilho(tarefa.id).length > 0 && <span>📎 {tarefasFilho(tarefa.id).length} subtarefa(s)</span>}
+                    <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: C.textoMudo, flexWrap: 'wrap', alignItems: 'center' }}>
+                      {tarefa.responsavel && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><User size={12} /> {tarefa.responsavel}</span>}
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <Calendar size={12} />
+                        <input type="date" defaultValue={tarefa.data_entrega || ''} onBlur={e => atualizarTarefa(tarefa.id, { data_entrega: e.target.value || null })}
+                          style={{ border: `1px solid ${C.borda}`, borderRadius: '4px', background: 'transparent', fontSize: '12px', color: C.textoSec, padding: '2px 4px' }} />
+                      </span>
+                      {tarefasFilho(tarefa.id).length > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><Paperclip size={12} /> {tarefasFilho(tarefa.id).length} subtarefa(s)</span>}
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <input type="number" min="0" max="100" defaultValue={tarefa.progresso || 0}
+                        onBlur={e => atualizarTarefa(tarefa.id, { progresso: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })}
+                        style={{ width: '44px', padding: '5px 4px', borderRadius: '6px', border: `1px solid ${C.borda}`, fontSize: '12px', textAlign: 'center' }} />
+                      <span style={{ fontSize: '11px', color: C.textoMudo }}>%</span>
+                    </div>
                     <select value={tarefa.status} onChange={e => mudarStatusTarefa(tarefa.id, e.target.value)}
-                      style={{ padding: '6px 10px', borderRadius: '6px', border: 'none', background: coresStatus[tarefa.status] || C.royal, color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+                      style={{ padding: '6px 10px', borderRadius: '6px', border: 'none', background: coresStatus[tarefa.status] || C.royal, color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>
                       <option value="pendente">Pendente</option>
                       <option value="em_andamento">Em andamento</option>
                       <option value="concluido">Concluido</option>
                     </select>
-                    <button onClick={() => deletarTarefa(tarefa.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '15px', color: C.textoMudo, padding: '4px' }}>🗑️</button>
+                    <button onClick={() => deletarTarefa(tarefa.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '4px' }}><Trash2 size={15} /></button>
                   </div>
                 </div>
               </div>
@@ -558,19 +580,29 @@ export default function Projetos() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                     <div>
                       <p style={{ margin: '0 0 4px 0', color: C.texto, fontSize: '13px' }}>{filho.titulo}</p>
-                      <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: C.textoMudo }}>
-                        {filho.responsavel && <span>👤 {filho.responsavel}</span>}
-                        {filho.data_entrega && <span>📅 {new Date(filho.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR')}</span>}
+                      <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: C.textoMudo, alignItems: 'center' }}>
+                        {filho.responsavel && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><User size={11} /> {filho.responsavel}</span>}
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          <Calendar size={11} />
+                          <input type="date" defaultValue={filho.data_entrega || ''} onBlur={e => atualizarTarefa(filho.id, { data_entrega: e.target.value || null })}
+                            style={{ border: `1px solid ${C.borda}`, borderRadius: '4px', background: 'transparent', fontSize: '11px', color: C.textoMudo, padding: '2px 4px' }} />
+                        </span>
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <input type="number" min="0" max="100" defaultValue={filho.progresso || 0}
+                          onBlur={e => atualizarTarefa(filho.id, { progresso: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })}
+                          style={{ width: '40px', padding: '4px', borderRadius: '6px', border: `1px solid ${C.borda}`, fontSize: '11px', textAlign: 'center' }} />
+                        <span style={{ fontSize: '10px', color: C.textoMudo }}>%</span>
+                      </div>
                       <select value={filho.status} onChange={e => mudarStatusTarefa(filho.id, e.target.value)}
-                        style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', background: coresStatus[filho.status] || C.textoMudo, color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+                        style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', background: coresStatus[filho.status] || C.textoMudo, color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>
                         <option value="pendente">Pendente</option>
                         <option value="em_andamento">Em andamento</option>
                         <option value="concluido">Concluido</option>
                       </select>
-                      <button onClick={() => deletarTarefa(filho.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: C.textoMudo, padding: '4px' }}>🗑️</button>
+                      <button onClick={() => deletarTarefa(filho.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '4px' }}><Trash2 size={13} /></button>
                     </div>
                   </div>
                 </div>
@@ -580,6 +612,6 @@ export default function Projetos() {
         </div>
 
       </div>
-    </div>
+    </AppShell>
   )
 }
