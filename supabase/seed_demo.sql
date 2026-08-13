@@ -7,7 +7,7 @@
 
 DO $$
 DECLARE
-  p1 bigint; p2 bigint; p3 bigint; p4 bigint; p5 bigint; r1 bigint;
+  p1 uuid; p2 uuid; p3 uuid; p4 uuid; p5 uuid; r1 uuid;
 BEGIN
 
   -- 1) Projeto com tarefa atrasada + risco alto => RAG vermelho
