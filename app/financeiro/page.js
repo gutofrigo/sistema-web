@@ -43,11 +43,19 @@ export default function Financeiro() {
   const [carregandoTotais, setCarregandoTotais] = useState(false)
   const [form, setForm] = useState({
     descricao: '', valor: '', tipo: 'saida', categoria: 'outros',
-    data_venc: hoje.toISOString().slice(0, 10), recorrente: false
+    data_venc: hoje.toISOString().slice(0, 10), recorrente: false, projeto_id: ''
   })
   const [salvando, setSalvando] = useState(false)
+  const [projetos, setProjetos] = useState([])
 
   useEffect(() => { buscarDados() }, [mes, ano])
+  useEffect(() => { buscarProjetos() }, [])
+
+  async function buscarProjetos() {
+    const res = await fetch('/api/projetos')
+    const data = await res.json()
+    if (data.projetos) setProjetos(data.projetos)
+  }
 
   async function buscarDados() {
     setCarregando(true)
@@ -81,7 +89,7 @@ export default function Financeiro() {
     })
     const data = await res.json()
     if (data.erro) { alert('Erro: ' + data.erro); setSalvando(false); return }
-    setForm({ descricao: '', valor: '', tipo: 'saida', categoria: 'outros', data_venc: new Date().toISOString().slice(0, 10), recorrente: false })
+    setForm({ descricao: '', valor: '', tipo: 'saida', categoria: 'outros', data_venc: new Date().toISOString().slice(0, 10), recorrente: false, projeto_id: '' })
     setTela('lista')
     buscarDados()
     setSalvando(false)
@@ -160,6 +168,14 @@ export default function Financeiro() {
             <label style={{ fontSize: '12px', color: C.textoSec, display: 'block', marginBottom: '4px' }}>Data de vencimento / recebimento</label>
             <input type="date" value={form.data_venc} onChange={e => setForm({ ...form, data_venc: e.target.value })}
               style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '12px', color: C.textoSec, display: 'block', marginBottom: '4px' }}>Projeto (opcional)</label>
+            <select value={form.projeto_id} onChange={e => setForm({ ...form, projeto_id: e.target.value })}
+              style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box', color: C.texto }}>
+              <option value="">Nenhum projeto vinculado</option>
+              {projetos.map(p => <option key={p.id} value={p.id}>{p.titulo}</option>)}
+            </select>
           </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: '24px', fontSize: '14px', color: C.texto, padding: '12px', background: form.recorrente ? '#EEF2FF' : C.fundo, borderRadius: '6px', border: `1px solid ${form.recorrente ? C.royal : C.borda}` }}>
             <input type="checkbox" checked={form.recorrente} onChange={e => setForm({ ...form, recorrente: e.target.checked })} style={{ width: '16px', height: '16px', accentColor: C.royal }} />

@@ -124,6 +124,7 @@ export default function Home() {
       { icone: '📋', titulo: 'Analise de Processo', desc: 'Entrevista com IA e relatorio de melhorias', onClick: () => setTela('formulario'), borda: C.royal },
       { icone: '📁', titulo: 'Projetos', desc: 'Gerencie projetos e tarefas com prazos', href: '/projetos', borda: C.royal },
       { icone: '📊', titulo: 'Dashboard', desc: 'Visao geral do sistema', href: '/dashboard', borda: C.royal },
+      { icone: '📈', titulo: 'PMO', desc: 'Visao de portfolio, orcamento e riscos', href: '/pmo', borda: C.navy, badge: 'Novo' },
       { icone: '🗺️', titulo: 'Roadmap', desc: 'Gerar plano de projeto com IA', href: '/roadmap', borda: C.navy, badge: 'Novo' },
       { icone: '✨', titulo: 'Assistente IA', desc: 'Pergunte sobre seus projetos e tarefas', href: '/assistente', borda: C.blue, badge: 'Novo' },
       { icone: '🔷', titulo: 'Modelagem BPMN', desc: 'Gerar diagrama de processo com IA', href: '/bpmn', borda: C.royal, badge: 'Novo' },

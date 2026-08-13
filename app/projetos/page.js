@@ -16,40 +16,117 @@ const C = {
 }
 
 const coresStatus = { pendente: C.ambar, em_andamento: C.royal, concluido: C.verde }
+const coresImpacto = { baixo: C.verde, medio: C.ambar, alto: C.vermelho }
+
+function formatarMoeda(v) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0)
+}
 
 export default function Projetos() {
   const [tela, setTela] = useState('lista')
   const [projetos, setProjetos] = useState([])
   const [projetoAtivo, setProjetoAtivo] = useState(null)
   const [tarefas, setTarefas] = useState([])
-  const [novoProj, setNovoProj] = useState({ titulo: '', responsavel: '', descricao: '' })
+  const [riscos, setRiscos] = useState([])
+  const [roadmapVinculado, setRoadmapVinculado] = useState(null)
+  const [novoProj, setNovoProj] = useState({ titulo: '', responsavel: '', descricao: '', orcamento: '', data_prevista_fim: '', prioridade: 'media' })
   const [novaTarefa, setNovaTarefa] = useState({ titulo: '', responsavel: '', data_inicio: '', data_entrega: '', status: 'pendente', tarefa_pai_id: '' })
+  const [novoRisco, setNovoRisco] = useState({ descricao: '', categoria: '', probabilidade: 'media', impacto: 'medio', mitigacao: '', responsavel: '' })
+  const [editProj, setEditProj] = useState({ titulo: '', descricao: '', responsavel: '', orcamento: '', data_prevista_fim: '', prioridade: 'media' })
   const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
   const [mostrarGerador, setMostrarGerador] = useState(false)
+  const [mostrarRiscos, setMostrarRiscos] = useState(false)
+  const [mostrarEditar, setMostrarEditar] = useState(false)
   const [objetivoIA, setObjetivoIA] = useState('')
   const [gerandoIA, setGerandoIA] = useState(false)
   const [tarefasIA, setTarefasIA] = useState([])
   const [selecionadas, setSelecionadas] = useState([])
   const [adicionando, setAdicionando] = useState(false)
 
-  useEffect(() => { buscarProjetos() }, [])
+  useEffect(() => { init() }, [])
 
+  async function init() {
+    const lista = await buscarProjetos()
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('id')
+    if (id && lista) {
+      const match = lista.find(p => String(p.id) === id)
+      if (match) abrirProjeto(match)
+    }
+  }
   async function buscarProjetos() {
     const res = await fetch('/api/projetos')
     const data = await res.json()
     if (data.projetos) setProjetos(data.projetos)
+    return data.projetos
   }
   async function buscarTarefas(projetoId) {
     const res = await fetch('/api/tarefas?projeto_id=' + projetoId)
     const data = await res.json()
     if (data.tarefas) setTarefas(data.tarefas)
   }
+  async function buscarRiscos(projetoId) {
+    const res = await fetch('/api/riscos?projeto_id=' + projetoId)
+    const data = await res.json()
+    if (data.riscos) setRiscos(data.riscos)
+  }
+  async function buscarRoadmapVinculado(projetoId) {
+    const res = await fetch('/api/roadmap?projeto_id=' + projetoId)
+    const data = await res.json()
+    setRoadmapVinculado(data && data.id ? data : null)
+  }
   async function criarProjeto() {
     if (!novoProj.titulo) return alert('Digite o titulo do projeto')
     await fetch('/api/projetos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novoProj) })
-    setNovoProj({ titulo: '', responsavel: '', descricao: '' })
+    setNovoProj({ titulo: '', responsavel: '', descricao: '', orcamento: '', data_prevista_fim: '', prioridade: 'media' })
     setTela('lista')
     buscarProjetos()
+  }
+  function abrirEditar() {
+    setEditProj({
+      titulo: projetoAtivo.titulo || '',
+      descricao: projetoAtivo.descricao || '',
+      responsavel: projetoAtivo.responsavel || '',
+      orcamento: projetoAtivo.orcamento || '',
+      data_prevista_fim: projetoAtivo.data_prevista_fim || '',
+      prioridade: projetoAtivo.prioridade || 'media'
+    })
+    setMostrarEditar(true)
+    setMostrarGerador(false)
+    setMostrarFormTarefa(false)
+    setMostrarRiscos(false)
+  }
+  async function salvarEdicaoProjeto() {
+    const res = await fetch('/api/projetos', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: projetoAtivo.id, ...editProj, orcamento: editProj.orcamento ? Number(editProj.orcamento) : null, data_prevista_fim: editProj.data_prevista_fim || null })
+    })
+    const data = await res.json()
+    if (data.projeto) {
+      setProjetoAtivo(data.projeto)
+      setMostrarEditar(false)
+      buscarProjetos()
+    }
+  }
+  async function criarRisco() {
+    if (!novoRisco.descricao) return alert('Descreva o risco')
+    await fetch('/api/riscos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...novoRisco, projeto_id: projetoAtivo.id }) })
+    setNovoRisco({ descricao: '', categoria: '', probabilidade: 'media', impacto: 'medio', mitigacao: '', responsavel: '' })
+    buscarRiscos(projetoAtivo.id)
+  }
+  async function atualizarRisco(id, campos) {
+    await fetch('/api/riscos', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...campos }) })
+    buscarRiscos(projetoAtivo.id)
+  }
+  async function deletarRisco(id) {
+    if (!confirm('Deletar este risco?')) return
+    await fetch('/api/riscos', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    buscarRiscos(projetoAtivo.id)
+  }
+  async function importarRiscosRoadmap() {
+    if (!roadmapVinculado) return
+    await fetch('/api/riscos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ importar_roadmap: true, projeto_id: projetoAtivo.id, roadmap_id: roadmapVinculado.id }) })
+    buscarRiscos(projetoAtivo.id)
   }
   async function deletarProjeto(e, id) {
     e.stopPropagation()
@@ -65,6 +142,8 @@ export default function Projetos() {
   async function abrirProjeto(projeto) {
     setProjetoAtivo(projeto)
     await buscarTarefas(projeto.id)
+    await buscarRiscos(projeto.id)
+    await buscarRoadmapVinculado(projeto.id)
     setTela('projeto')
   }
   async function criarTarefa() {
@@ -185,7 +264,28 @@ export default function Projetos() {
           <input placeholder="Responsavel" value={novoProj.responsavel} onChange={e => setNovoProj({ ...novoProj, responsavel: e.target.value })}
             style={{ ...inputStyle, marginBottom: '12px' }} />
           <textarea placeholder="Descricao (opcional)" value={novoProj.descricao} onChange={e => setNovoProj({ ...novoProj, descricao: e.target.value })} rows={3}
-            style={{ ...inputStyle, marginBottom: '20px', resize: 'vertical' }} />
+            style={{ ...inputStyle, marginBottom: '12px', resize: 'vertical' }} />
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '140px' }}>
+              <label style={{ fontSize: '12px', color: C.textoSec }}>Orcamento (R$, opcional)</label>
+              <input type="number" value={novoProj.orcamento} onChange={e => setNovoProj({ ...novoProj, orcamento: e.target.value })}
+                style={{ width: '100%', padding: '10px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ flex: 1, minWidth: '140px' }}>
+              <label style={{ fontSize: '12px', color: C.textoSec }}>Prazo previsto (opcional)</label>
+              <input type="date" value={novoProj.data_prevista_fim} onChange={e => setNovoProj({ ...novoProj, data_prevista_fim: e.target.value })}
+                style={{ width: '100%', padding: '10px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ flex: 1, minWidth: '140px' }}>
+              <label style={{ fontSize: '12px', color: C.textoSec }}>Prioridade</label>
+              <select value={novoProj.prioridade} onChange={e => setNovoProj({ ...novoProj, prioridade: e.target.value })}
+                style={{ width: '100%', padding: '10px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}>
+                <option value="baixa">Baixa</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+          </div>
           <button onClick={criarProjeto} style={{ width: '100%', padding: '13px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '15px', cursor: 'pointer', fontWeight: 'bold' }}>
             Criar Projeto
           </button>
@@ -206,12 +306,137 @@ export default function Projetos() {
           <button onClick={() => setTela('lista')} style={btnHeader}>← Projetos</button>
           <a href="/" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>Inicio</a>
           <a href="/gantt" style={{ ...btnHeader, background: 'transparent', fontWeight: 'normal', color: C.textoMudo }}>📊 Gantt</a>
-          <button onClick={() => { setMostrarGerador(!mostrarGerador); setMostrarFormTarefa(false) }} style={{ ...btnHeader, background: 'rgba(255,255,255,0.18)' }}>✨ Gerar com IA</button>
-          <button onClick={() => { setMostrarFormTarefa(!mostrarFormTarefa); setMostrarGerador(false) }} style={{ ...btnHeader, background: C.royal, border: 'none' }}>+ Nova Tarefa</button>
+          <button onClick={() => { setMostrarRiscos(!mostrarRiscos); setMostrarGerador(false); setMostrarFormTarefa(false); setMostrarEditar(false) }} style={{ ...btnHeader, background: 'rgba(255,255,255,0.18)' }}>⚠️ Riscos{riscos.filter(r => r.status === 'aberto').length > 0 ? ' (' + riscos.filter(r => r.status === 'aberto').length + ')' : ''}</button>
+          <button onClick={abrirEditar} style={{ ...btnHeader, background: 'rgba(255,255,255,0.18)' }}>✏️ Editar</button>
+          <button onClick={() => { setMostrarGerador(!mostrarGerador); setMostrarFormTarefa(false); setMostrarRiscos(false); setMostrarEditar(false) }} style={{ ...btnHeader, background: 'rgba(255,255,255,0.18)' }}>✨ Gerar com IA</button>
+          <button onClick={() => { setMostrarFormTarefa(!mostrarFormTarefa); setMostrarGerador(false); setMostrarRiscos(false); setMostrarEditar(false) }} style={{ ...btnHeader, background: C.royal, border: 'none' }}>+ Nova Tarefa</button>
         </div>
       </div>
 
       <div className="page-pad" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+
+        {(projetoAtivo.orcamento || projetoAtivo.data_prevista_fim || projetoAtivo.prioridade) && (
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '16px' }}>
+            {projetoAtivo.prioridade && (
+              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: corPrioridade(projetoAtivo.prioridade).bg, color: corPrioridade(projetoAtivo.prioridade).color, fontWeight: 'bold' }}>
+                Prioridade: {projetoAtivo.prioridade}
+              </span>
+            )}
+            {projetoAtivo.data_prevista_fim && (
+              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: C.fundo, color: C.textoSec }}>
+                📅 Prazo: {new Date(projetoAtivo.data_prevista_fim + 'T12:00:00').toLocaleDateString('pt-BR')}
+              </span>
+            )}
+            {projetoAtivo.orcamento && (
+              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: C.fundo, color: C.textoSec }}>
+                💰 Orcamento: {formatarMoeda(projetoAtivo.orcamento)}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Editar projeto */}
+        {mostrarEditar && (
+          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <h3 style={{ margin: '0 0 16px 0', color: C.texto, fontSize: '15px', fontWeight: 'bold' }}>✏️ Editar projeto</h3>
+            <input placeholder="Titulo do projeto" value={editProj.titulo} onChange={e => setEditProj({ ...editProj, titulo: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
+            <input placeholder="Responsavel" value={editProj.responsavel} onChange={e => setEditProj({ ...editProj, responsavel: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
+            <textarea placeholder="Descricao" value={editProj.descricao} onChange={e => setEditProj({ ...editProj, descricao: e.target.value })} rows={2} style={{ ...inputStyle, marginBottom: '10px', resize: 'vertical' }} />
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: '140px' }}>
+                <label style={{ fontSize: '12px', color: C.textoSec }}>Orcamento (R$)</label>
+                <input type="number" value={editProj.orcamento} onChange={e => setEditProj({ ...editProj, orcamento: e.target.value })}
+                  style={{ width: '100%', padding: '10px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: '140px' }}>
+                <label style={{ fontSize: '12px', color: C.textoSec }}>Prazo previsto</label>
+                <input type="date" value={editProj.data_prevista_fim} onChange={e => setEditProj({ ...editProj, data_prevista_fim: e.target.value })}
+                  style={{ width: '100%', padding: '10px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: '140px' }}>
+                <label style={{ fontSize: '12px', color: C.textoSec }}>Prioridade</label>
+                <select value={editProj.prioridade} onChange={e => setEditProj({ ...editProj, prioridade: e.target.value })}
+                  style={{ width: '100%', padding: '10px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}>
+                  <option value="baixa">Baixa</option>
+                  <option value="media">Media</option>
+                  <option value="alta">Alta</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setMostrarEditar(false)} style={{ flex: 1, padding: '10px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Cancelar</button>
+              <button onClick={salvarEdicaoProjeto} style={{ flex: 2, padding: '10px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>Salvar alteracoes</button>
+            </div>
+          </div>
+        )}
+
+        {/* Riscos */}
+        {mostrarRiscos && (
+          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.ambar}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 'bold' }}>⚠️ Riscos do projeto</h3>
+              {roadmapVinculado && roadmapVinculado.riscos && roadmapVinculado.riscos.length > 0 && (
+                <button onClick={importarRiscosRoadmap} style={{ padding: '7px 14px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.royal}`, borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+                  Importar sugestoes do roadmap ({roadmapVinculado.riscos.length})
+                </button>
+              )}
+            </div>
+
+            {riscos.length === 0 && <p style={{ color: C.textoMudo, fontSize: '13px', margin: '0 0 16px' }}>Nenhum risco registrado ainda</p>}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+              {riscos.map(r => (
+                <div key={r.id} style={{ border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresImpacto[r.impacto] || C.textoMudo}`, borderRadius: '8px', padding: '14px', opacity: r.status === 'fechado' ? 0.55 : 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '200px' }}>
+                      <p style={{ margin: '0 0 4px', fontSize: '13px', fontWeight: 'bold', color: C.texto }}>{r.descricao}</p>
+                      <div style={{ display: 'flex', gap: '10px', fontSize: '11px', color: C.textoMudo, flexWrap: 'wrap' }}>
+                        {r.categoria && <span>{r.categoria}</span>}
+                        <span>Probabilidade: {r.probabilidade}</span>
+                        <span>Impacto: {r.impacto}</span>
+                        {r.responsavel && <span>👤 {r.responsavel}</span>}
+                      </div>
+                      {r.mitigacao && <p style={{ margin: '6px 0 0', fontSize: '12px', color: C.textoSec }}>Mitigacao: {r.mitigacao}</p>}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                      <select value={r.status} onChange={e => atualizarRisco(r.id, { status: e.target.value })}
+                        style={{ fontSize: '11px', padding: '5px 8px', borderRadius: '6px', border: `1px solid ${C.borda}`, cursor: 'pointer' }}>
+                        <option value="aberto">Aberto</option>
+                        <option value="mitigado">Mitigado</option>
+                        <option value="fechado">Fechado</option>
+                      </select>
+                      <button onClick={() => deletarRisco(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: C.textoMudo, padding: '2px' }}>🗑️</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <textarea placeholder="Descreva o risco" value={novoRisco.descricao} onChange={e => setNovoRisco({ ...novoRisco, descricao: e.target.value })} rows={2}
+              style={{ ...inputStyle, marginBottom: '8px', resize: 'vertical' }} />
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              <input placeholder="Categoria (opcional)" value={novoRisco.categoria} onChange={e => setNovoRisco({ ...novoRisco, categoria: e.target.value })}
+                style={{ ...inputStyle, flex: 1, minWidth: '140px' }} />
+              <select value={novoRisco.probabilidade} onChange={e => setNovoRisco({ ...novoRisco, probabilidade: e.target.value })} style={{ ...inputStyle, flex: 1, minWidth: '130px' }}>
+                <option value="baixa">Probabilidade: baixa</option>
+                <option value="media">Probabilidade: media</option>
+                <option value="alta">Probabilidade: alta</option>
+              </select>
+              <select value={novoRisco.impacto} onChange={e => setNovoRisco({ ...novoRisco, impacto: e.target.value })} style={{ ...inputStyle, flex: 1, minWidth: '130px' }}>
+                <option value="baixo">Impacto: baixo</option>
+                <option value="medio">Impacto: medio</option>
+                <option value="alto">Impacto: alto</option>
+              </select>
+            </div>
+            <input placeholder="Responsavel (opcional)" value={novoRisco.responsavel} onChange={e => setNovoRisco({ ...novoRisco, responsavel: e.target.value })}
+              style={{ ...inputStyle, marginBottom: '8px' }} />
+            <textarea placeholder="Mitigacao (opcional)" value={novoRisco.mitigacao} onChange={e => setNovoRisco({ ...novoRisco, mitigacao: e.target.value })} rows={2}
+              style={{ ...inputStyle, marginBottom: '12px', resize: 'vertical' }} />
+            <button onClick={criarRisco} style={{ padding: '9px 20px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }}>
+              + Adicionar risco
+            </button>
+          </div>
+        )}
 
         {/* Gerador IA */}
         {mostrarGerador && (

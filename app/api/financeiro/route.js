@@ -61,7 +61,7 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     const body = await req.json()
-    const { descricao, valor, tipo, categoria, data_venc, recorrente, status } = body
+    const { descricao, valor, tipo, categoria, data_venc, recorrente, status, projeto_id } = body
     const entries = []
 
     if (recorrente) {
@@ -75,11 +75,12 @@ export async function POST(req) {
           categoria,
           data_venc: d.toISOString().slice(0, 10),
           recorrente: true,
-          status: 'pendente'
+          status: 'pendente',
+          projeto_id: projeto_id || null
         })
       }
     } else {
-      entries.push({ descricao, valor: Number(valor), tipo, categoria, data_venc, recorrente: false, status: status || 'pendente' })
+      entries.push({ descricao, valor: Number(valor), tipo, categoria, data_venc, recorrente: false, status: status || 'pendente', projeto_id: projeto_id || null })
     }
 
     const { data, error } = await supabase.from('lancamentos').insert(entries).select()

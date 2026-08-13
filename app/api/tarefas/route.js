@@ -24,7 +24,7 @@ export async function POST(req) {
     if (body.id && body.status) {
       const { error } = await supabase
         .from('tarefas')
-        .update({ status: body.status })
+        .update({ status: body.status, concluido_em: body.status === 'concluido' ? new Date().toISOString() : null })
         .eq('id', body.id)
       if (error) return Response.json({ erro: error.message })
       return Response.json({ ok: true })
@@ -38,7 +38,8 @@ export async function POST(req) {
         responsavel: body.responsavel || null,
         data_inicio: body.data_inicio || null,
         data_entrega: body.data_entrega || null,
-        status: body.status || 'pendente'
+        status: body.status || 'pendente',
+        concluido_em: body.status === 'concluido' ? new Date().toISOString() : null
       })
       .select()
     if (error) return Response.json({ erro: error.message })

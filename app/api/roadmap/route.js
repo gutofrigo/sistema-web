@@ -5,10 +5,15 @@ export async function GET(req) {
   try {
     const url = new URL(req.url)
     const id = url.searchParams.get('id')
+    const projetoId = url.searchParams.get('projeto_id')
     if (id) {
       const { data } = await supabase.from('roadmaps').select('*').eq('id', id).single()
       if (!data) return Response.json({ erro: 'Roadmap nao encontrado' })
       return Response.json(data)
+    }
+    if (projetoId) {
+      const { data } = await supabase.from('roadmaps').select('id, titulo, riscos, fases, kpis').eq('projeto_id', projetoId).maybeSingle()
+      return Response.json(data || null)
     }
     const { data } = await supabase.from('roadmaps').select('id, titulo, area, porte, criado_em').order('criado_em', { ascending: false })
     return Response.json(data || [])
