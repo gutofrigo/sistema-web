@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { BarChart3, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
 import AppShell from '../components/AppShell'
-import { theme as C } from '../theme'
+import { theme as C, estiloCard, estiloEyebrow, estiloStatNumero } from '../theme'
 
 const CATEGORIAS = ['moradia', 'alimentacao', 'saude', 'transporte', 'lazer', 'salario', 'outros']
 const NOMES_MES = ['Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
@@ -262,17 +262,17 @@ export default function Financeiro() {
 
         {/* Cards resumo mensal */}
         <div className="grid-3" style={{ marginBottom: '20px' }}>
-          <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.verde}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 6px' }}>Entradas no mes (pagas)</p>
-            <p style={{ fontSize: '26px', fontWeight: 'bold', color: C.verde, margin: 0 }}>{fmt(resumo.entradas)}</p>
+          <div className="card-elevate" style={{ ...estiloCard, padding: '22px', borderTop: `4px solid ${C.verde}` }}>
+            <p style={estiloEyebrow}>Entradas no mes (pagas)</p>
+            <p style={{ ...estiloStatNumero, fontSize: '26px', color: C.verde }}>{fmt(resumo.entradas)}</p>
           </div>
-          <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.vermelho}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 6px' }}>Saidas no mes (pagas)</p>
-            <p style={{ fontSize: '26px', fontWeight: 'bold', color: C.vermelho, margin: 0 }}>{fmt(resumo.saidas)}</p>
+          <div className="card-elevate" style={{ ...estiloCard, padding: '22px', borderTop: `4px solid ${C.vermelho}` }}>
+            <p style={estiloEyebrow}>Saidas no mes (pagas)</p>
+            <p style={{ ...estiloStatNumero, fontSize: '26px', color: C.vermelho }}>{fmt(resumo.saidas)}</p>
           </div>
-          <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${corSaldo}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 6px' }}>Saldo do mes</p>
-            <p style={{ fontSize: '26px', fontWeight: 'bold', color: corSaldo, margin: 0 }}>{fmt(resumo.saldo)}</p>
+          <div className="card-elevate" style={{ ...estiloCard, padding: '22px', borderTop: `4px solid ${corSaldo}` }}>
+            <p style={estiloEyebrow}>Saldo do mes</p>
+            <p style={{ ...estiloStatNumero, fontSize: '26px', color: corSaldo }}>{fmt(resumo.saldo)}</p>
           </div>
         </div>
 

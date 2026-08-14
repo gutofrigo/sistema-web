@@ -222,7 +222,7 @@ export default function Projetos() {
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {projetos.map(p => (
-            <div key={p.id} onClick={() => abrirProjeto(p)} style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresStatus[p.status] || C.royal}`, borderRadius: '10px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <div key={p.id} onClick={() => abrirProjeto(p)} className="card-elevate" style={{ background: 'white', border: `1px solid #E7ECF3`, borderLeft: `5px solid ${coresStatus[p.status] || C.royal}`, borderRadius: '14px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.04)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h3 style={{ margin: '0 0 6px 0', color: C.texto, fontSize: '15px' }}>{p.titulo}</h3>

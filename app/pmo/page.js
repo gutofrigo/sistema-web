@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from 'recharts'
 import { AlertTriangle, Map as MapIcon, Calendar, ClipboardList } from 'lucide-react'
 import AppShell from '../components/AppShell'
-import { theme as C, estiloCard } from '../theme'
+import { theme as C, estiloCard, estiloEyebrow, estiloStatNumero } from '../theme'
 
 const corRag = { verde: C.verde, ambar: C.ambar, vermelho: C.vermelho, cinza: C.textoMudo }
 const labelRag = { verde: 'No prazo', ambar: 'Atencao', vermelho: 'Critico', cinza: 'Sem dados' }
@@ -94,31 +94,31 @@ export default function PMO() {
 
         {/* Resumo */}
         <div className="grid-4" style={{ marginBottom: '20px' }}>
-          <div style={{ ...cardEstilo, borderLeft: `3px solid ${C.royal}` }}>
-            <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 8px' }}>Total de projetos</p>
-            <p style={{ fontSize: '30px', fontWeight: 'bold', color: C.texto, margin: '0 0 4px' }}>{resumo.totalProjetos}</p>
+          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.royal}` }}>
+            <p style={estiloEyebrow}>Total de projetos</p>
+            <p style={estiloStatNumero}>{resumo.totalProjetos}</p>
             <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>no portfolio</p>
           </div>
-          <div style={{ ...cardEstilo, borderLeft: `3px solid ${C.vermelho}` }}>
-            <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 8px' }}>Projetos em atencao</p>
-            <p style={{ fontSize: '30px', fontWeight: 'bold', color: C.vermelho, margin: '0 0 4px' }}>{resumo.emAtencao}</p>
+          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.vermelho}` }}>
+            <p style={estiloEyebrow}>Projetos em atencao</p>
+            <p style={{ ...estiloStatNumero, color: C.vermelho }}>{resumo.emAtencao}</p>
             <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>status amarelo ou vermelho</p>
           </div>
-          <div style={{ ...cardEstilo, borderLeft: `3px solid ${C.royal}` }}>
-            <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 8px' }}>Orcado x Realizado</p>
-            <p style={{ fontSize: '20px', fontWeight: 'bold', color: C.texto, margin: '0 0 4px' }}>{formatarMoeda(resumo.realizadoTotal)}</p>
+          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.royal}` }}>
+            <p style={estiloEyebrow}>Orcado x Realizado</p>
+            <p style={{ ...estiloStatNumero, fontSize: '22px' }}>{formatarMoeda(resumo.realizadoTotal)}</p>
             <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>de {formatarMoeda(resumo.orcamentoTotal)}{burnPctTotal !== null ? ' (' + burnPctTotal + '%)' : ''}</p>
           </div>
-          <div style={{ ...cardEstilo, borderLeft: `3px solid ${C.ambar}` }}>
-            <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 8px' }}>Riscos abertos</p>
-            <p style={{ fontSize: '30px', fontWeight: 'bold', color: C.ambar, margin: '0 0 4px' }}>{resumo.riscosAbertos.baixa + resumo.riscosAbertos.media + resumo.riscosAbertos.alta}</p>
+          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.ambar}` }}>
+            <p style={estiloEyebrow}>Riscos abertos</p>
+            <p style={{ ...estiloStatNumero, color: C.ambar }}>{resumo.riscosAbertos.baixa + resumo.riscosAbertos.media + resumo.riscosAbertos.alta}</p>
             <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>{resumo.riscosAbertos.alta} alto • {resumo.riscosAbertos.media} medio • {resumo.riscosAbertos.baixa} baixo</p>
           </div>
         </div>
 
         {/* Prazos + Relatorios */}
         <div className="grid-2" style={{ marginBottom: '16px' }}>
-          <div style={cardEstilo}>
+          <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Tarefas com prazo proximo</h2>
             {tarefasProximas.length === 0 ? (
               <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Nenhuma tarefa com prazo proximo</p>
@@ -142,7 +142,7 @@ export default function PMO() {
             )}
           </div>
 
-          <div style={cardEstilo}>
+          <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Relatorios recentes</h2>
             {entrevistasRecentes.length === 0 ? (
               <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Nenhum relatorio ainda</p>
@@ -166,7 +166,7 @@ export default function PMO() {
 
         {/* Graficos */}
         <div className="grid-2" style={{ marginBottom: '16px' }}>
-          <div style={cardEstilo}>
+          <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Projetos por status</h2>
             {dadosStatus.length === 0 ? (
               <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '40px 0' }}>Sem projetos ainda</p>
@@ -182,7 +182,7 @@ export default function PMO() {
             )}
           </div>
 
-          <div style={cardEstilo}>
+          <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Riscos abertos por severidade</h2>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={dadosRiscos}>
@@ -199,7 +199,7 @@ export default function PMO() {
         </div>
 
         <div className="grid-2" style={{ marginBottom: '16px' }}>
-          <div style={cardEstilo}>
+          <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Orcado x Realizado por projeto</h2>
             {dadosOrcamento.length === 0 ? (
               <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '40px 0' }}>Nenhum projeto com orcamento definido ainda</p>
@@ -219,7 +219,7 @@ export default function PMO() {
             )}
           </div>
 
-          <div style={cardEstilo}>
+          <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 4px' }}>Tendencia de conclusao de tarefas</h2>
             <p style={{ fontSize: '11px', color: C.textoMudo, margin: '0 0 16px' }}>Ultimos 6 meses — historico comeca a partir da ativacao do PMO</p>
             <ResponsiveContainer width="100%" height={200}>
@@ -235,9 +235,9 @@ export default function PMO() {
         </div>
 
         {/* Cards de portfolio */}
-        <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: C.texto, margin: '8px 0 12px' }}>Portfolio de projetos</h2>
+        <h2 style={{ fontSize: '16px', fontWeight: 800, color: C.texto, margin: '8px 0 14px', letterSpacing: '-0.01em' }}>Portfolio de projetos</h2>
         {projetos.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '8px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
+          <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '14px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
             <p style={{ fontSize: '15px' }}>Nenhum projeto cadastrado ainda</p>
           </div>
         )}
@@ -245,7 +245,7 @@ export default function PMO() {
           {projetos.map(p => {
             const burnPct = p.orcamento ? Math.min(Math.round((p.realizado / p.orcamento) * 100), 999) : null
             return (
-              <div key={p.id} style={{ ...cardEstilo, borderLeft: `4px solid ${corRag[p.rag.geral]}` }}>
+              <div key={p.id} className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderLeft: `5px solid ${corRag[p.rag.geral]}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '10px' }}>
                   <div>
                     <h3 style={{ margin: '0 0 4px', color: C.texto, fontSize: '15px' }}>{p.titulo}</h3>

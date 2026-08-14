@@ -46,9 +46,28 @@ export const botaoVoltar = {
 
 export const estiloCard = {
   background: '#FFFFFF',
-  border: '1px solid #E2E8F0',
-  borderRadius: '10px',
-  boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 1px 8px rgba(15,23,42,0.05)',
+  border: '1px solid #E7ECF3',
+  borderRadius: '14px',
+  boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.04), 0 12px 24px -12px rgba(15,23,42,0.12)',
+}
+
+export const estiloEyebrow = {
+  fontSize: '11px',
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  textTransform: 'uppercase',
+  color: '#7B8CA6',
+  margin: '0 0 10px',
+}
+
+export const estiloStatNumero = {
+  fontSize: '32px',
+  fontWeight: 800,
+  letterSpacing: '-0.02em',
+  color: '#0F1B2D',
+  margin: '0 0 4px',
+  fontVariantNumeric: 'tabular-nums',
+  lineHeight: 1.1,
 }
 
 export const botaoPrimario = {
