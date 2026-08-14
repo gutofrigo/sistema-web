@@ -156,7 +156,7 @@ export default function Iniciativas() {
         {carregando ? (
           <p style={{ color: C.textoSec, fontSize: '14px' }}>Carregando quadro...</p>
         ) : (
-          <div style={{ ...estiloCard, padding: 0, overflow: 'hidden' }}>
+          <div style={{ ...estiloCard, padding: 0, overflow: 'hidden', width: 'fit-content', maxWidth: '100%' }}>
             <div style={{ display: 'flex', overflowX: 'auto', alignItems: 'stretch' }}>
               {COLUNAS.map((coluna, idx) => {
                 const itens = iniciativas.filter(i => i.status === coluna.id).sort((a, b) => b.prioridade - a.prioridade)
