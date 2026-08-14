@@ -5,10 +5,10 @@ import AppShell from '../components/AppShell'
 import { theme as C, estiloCard } from '../theme'
 
 const COLUNAS = [
-  { id: 'backlog', label: 'Backlog' },
-  { id: 'em_analise', label: 'Em analise' },
-  { id: 'em_andamento', label: 'Em andamento' },
-  { id: 'concluido', label: 'Concluido' },
+  { id: 'backlog', label: 'Backlog', cor: C.textoMudo },
+  { id: 'em_analise', label: 'Em analise', cor: C.statusInfo },
+  { id: 'em_andamento', label: 'Em andamento', cor: C.ambar },
+  { id: 'concluido', label: 'Concluido', cor: C.verde },
 ]
 
 const CATEGORIAS = [
@@ -149,20 +149,26 @@ export default function Iniciativas() {
         {carregando ? (
           <p style={{ color: C.textoSec, fontSize: '14px' }}>Carregando quadro...</p>
         ) : (
-          <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '12px', alignItems: 'flex-start' }}>
-            {COLUNAS.map(coluna => {
-              const itens = iniciativas.filter(i => i.status === coluna.id).sort((a, b) => b.prioridade - a.prioridade)
-              return (
-                <div key={coluna.id}
-                  onDragOver={e => e.preventDefault()}
-                  onDrop={e => onDrop(e, coluna.id)}
-                  style={{ background: C.fundo, border: `1px solid ${C.borda}`, borderRadius: '12px', padding: '12px', width: '280px', flexShrink: 0, minHeight: '200px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', padding: '0 4px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: C.texto }}>{coluna.label}</span>
-                    <span style={{ fontSize: '11px', color: C.textoMudo, background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '20px', padding: '1px 8px' }}>{itens.length}</span>
-                  </div>
+          <div style={{ ...estiloCard, padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', overflowX: 'auto', alignItems: 'stretch' }}>
+              {COLUNAS.map((coluna, idx) => {
+                const itens = iniciativas.filter(i => i.status === coluna.id).sort((a, b) => b.prioridade - a.prioridade)
+                return (
+                  <div key={coluna.id}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={e => onDrop(e, coluna.id)}
+                    style={{ background: C.fundo, borderRight: idx < COLUNAS.length - 1 ? `1px solid ${C.borda}` : 'none', padding: '16px', width: '290px', flexShrink: 0, minHeight: '420px', boxSizing: 'border-box' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px', paddingBottom: '12px', borderBottom: `2px solid ${coluna.cor}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: C.texto, display: 'flex', alignItems: 'center', gap: '7px' }}>
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: coluna.cor, display: 'inline-block' }} />
+                          {coluna.label}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: C.textoSec, background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '20px', padding: '2px 9px' }}>{itens.length}</span>
+                      </div>
+                    </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {itens.map(item => (
                       <div key={item.id}
                         draggable
@@ -198,6 +204,7 @@ export default function Iniciativas() {
                 </div>
               )
             })}
+            </div>
           </div>
         )}
       </div>
