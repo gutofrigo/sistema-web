@@ -49,27 +49,34 @@ export default function Iniciativas() {
     const res = await fetch('/api/iniciativas')
     const data = await res.json()
     if (data.iniciativas) setIniciativas(data.iniciativas)
+    else if (data.erro) alert('Erro ao carregar iniciativas: ' + data.erro)
     setCarregando(false)
   }
 
   async function criarIniciativa() {
     if (!novaIniciativa.titulo.trim()) return alert('Digite o titulo da iniciativa')
     setSalvando(true)
-    await fetch('/api/iniciativas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaIniciativa) })
+    const res = await fetch('/api/iniciativas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaIniciativa) })
+    const data = await res.json()
+    setSalvando(false)
+    if (data.erro) return alert('Erro ao criar iniciativa: ' + data.erro)
     setNovaIniciativa(formInicial)
     setMostrarForm(false)
-    setSalvando(false)
     buscarIniciativas()
   }
 
   async function atualizarIniciativa(id, campos) {
-    await fetch('/api/iniciativas', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...campos }) })
+    const res = await fetch('/api/iniciativas', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...campos }) })
+    const data = await res.json()
+    if (data.erro) alert('Erro ao atualizar iniciativa: ' + data.erro)
     buscarIniciativas()
   }
 
   async function deletarIniciativa(id) {
     if (!confirm('Deletar esta iniciativa?')) return
-    await fetch('/api/iniciativas', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    const res = await fetch('/api/iniciativas', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    const data = await res.json()
+    if (data.erro) alert('Erro ao deletar iniciativa: ' + data.erro)
     buscarIniciativas()
   }
 
