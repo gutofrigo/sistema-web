@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F4F6F9;
+  --background: #E7EAF1;
   --foreground: #151A2E;
 }
 
@@ -73,7 +73,7 @@ body {
   filter: brightness(1.06);
 }
 .btn-ghost-hover:hover {
-  background: #F4F6F9;
+  background: #E7EAF1;
 }
 
 .spin { animation: girar 1s linear infinite; }

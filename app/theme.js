@@ -2,7 +2,7 @@ export const theme = {
   navy:      '#0f132e',
   royal:     '#A9762C',
   blue:      '#536d88',
-  fundo:     '#F4F6F9',
+  fundo:     '#E7EAF1',
   borda:     '#E4E9F1',
   bordaForte:'#C9D2DF',
   texto:     '#151A2E',
@@ -27,7 +27,7 @@ export const theme = {
   sidebarTextMuted: '#b49b85',
 
   // aliases usados por telas antigas
-  fundoLegado: '#F4F6F9',
+  fundoLegado: '#E7EAF1',
   cabecalho:   '#0f132e',
   acento:      '#A9762C',
   acentoClaro: '#C79A52',
@@ -53,7 +53,7 @@ export const estiloCard = {
   background: '#FFFFFF',
   border: '1px solid #E4E9F1',
   borderRadius: '14px',
-  boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.04), 0 12px 24px -12px rgba(15,23,42,0.12)',
+  boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)',
 }
 
 export const estiloEyebrow = {
