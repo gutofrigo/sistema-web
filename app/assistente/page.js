@@ -124,7 +124,7 @@ export default function Assistente() {
             onChange={e => setPergunta(e.target.value)}
             onKeyDown={teclaEnter}
             rows={2}
-            style={{ flex: 1, padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '14px', resize: 'none', boxSizing: 'border-box', color: C.texto, fontFamily: 'Arial' }}
+            style={{ flex: 1, padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '14px', resize: 'none', boxSizing: 'border-box', color: C.texto, fontFamily: 'var(--font-nunito), Arial, sans-serif' }}
           />
           <button
             onClick={() => enviar()}

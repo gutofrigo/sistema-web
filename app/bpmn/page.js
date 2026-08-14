@@ -428,7 +428,7 @@ ${conexoes}
             value={descricao}
             onChange={e => setDescricao(e.target.value)}
             rows={5}
-            style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', marginBottom: '14px', boxSizing: 'border-box', resize: 'vertical', color: C.texto, fontFamily: 'Arial' }}
+            style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', marginBottom: '14px', boxSizing: 'border-box', resize: 'vertical', color: C.texto, fontFamily: 'var(--font-nunito), Arial, sans-serif' }}
           />
           <button
             onClick={gerarBPMN}

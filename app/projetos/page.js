@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { GanttChartSquare, AlertTriangle, Pencil, Sparkles, Plus, Trash2, User, Calendar, Paperclip, Wallet } from 'lucide-react'
+import { GanttChartSquare, AlertTriangle, Pencil, Sparkles, Plus, Trash2, User, Calendar, Paperclip, Wallet, Upload, Download } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { GanttChart, fmt, parseData } from '../components/GanttChart'
 import { theme as C } from '../theme'
@@ -10,6 +10,39 @@ const coresImpacto = { baixo: C.verde, medio: C.ambar, alto: C.vermelho }
 
 function formatarMoeda(v) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0)
+}
+
+function parseCSV(texto) {
+  const linhas = texto.split(/\r\n|\n|\r/).filter(l => l.trim() !== '')
+  if (linhas.length < 2) return []
+  const qtdVirgulas = (linhas[0].match(/,/g) || []).length
+  const qtdPontoVirgulas = (linhas[0].match(/;/g) || []).length
+  const delimitador = qtdPontoVirgulas > qtdVirgulas ? ';' : ','
+  function parseLinha(linha) {
+    const campos = []
+    let atual = ''
+    let dentroAspas = false
+    for (let i = 0; i < linha.length; i++) {
+      const c = linha[i]
+      if (c === '"') {
+        if (dentroAspas && linha[i + 1] === '"') { atual += '"'; i++ }
+        else dentroAspas = !dentroAspas
+      } else if (c === delimitador && !dentroAspas) {
+        campos.push(atual); atual = ''
+      } else {
+        atual += c
+      }
+    }
+    campos.push(atual)
+    return campos.map(c => c.trim())
+  }
+  const cabecalho = parseLinha(linhas[0]).map(h => h.toLowerCase().trim())
+  return linhas.slice(1).map(linha => {
+    const valores = parseLinha(linha)
+    const obj = {}
+    cabecalho.forEach((h, i) => { obj[h] = valores[i] || '' })
+    return obj
+  })
 }
 
 export default function Projetos() {
@@ -32,6 +65,12 @@ export default function Projetos() {
   const [tarefasIA, setTarefasIA] = useState([])
   const [selecionadas, setSelecionadas] = useState([])
   const [adicionando, setAdicionando] = useState(false)
+  const [mostrarImportar, setMostrarImportar] = useState(false)
+  const [nomeArquivoCsv, setNomeArquivoCsv] = useState('')
+  const [csvPreview, setCsvPreview] = useState([])
+  const [csvErro, setCsvErro] = useState('')
+  const [importando, setImportando] = useState(false)
+  const [resultadoImportacao, setResultadoImportacao] = useState(null)
 
   useEffect(() => { init() }, [])
 
@@ -117,6 +156,53 @@ export default function Projetos() {
     if (!roadmapVinculado) return
     await fetch('/api/riscos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ importar_roadmap: true, projeto_id: projetoAtivo.id, roadmap_id: roadmapVinculado.id }) })
     buscarRiscos(projetoAtivo.id)
+  }
+  function lidarComArquivoCsv(e) {
+    const arquivo = e.target.files[0]
+    if (!arquivo) return
+    setResultadoImportacao(null)
+    setCsvErro('')
+    setNomeArquivoCsv(arquivo.name)
+    const leitor = new FileReader()
+    leitor.onload = () => {
+      const linhas = parseCSV(String(leitor.result))
+      if (linhas.length === 0) {
+        setCsvErro('Nao foi possivel ler linhas do arquivo. Confira se a primeira linha tem os cabecalhos (titulo, responsavel, etc).')
+        setCsvPreview([])
+        return
+      }
+      if (!('titulo' in linhas[0])) {
+        setCsvErro('O arquivo precisa ter uma coluna "titulo".')
+        setCsvPreview([])
+        return
+      }
+      setCsvPreview(linhas)
+    }
+    leitor.readAsText(arquivo, 'utf-8')
+  }
+  async function confirmarImportacaoCsv() {
+    setImportando(true)
+    const res = await fetch('/api/projetos', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ importar_csv: true, projetos: csvPreview })
+    })
+    const data = await res.json()
+    setResultadoImportacao(data)
+    setImportando(false)
+    setCsvPreview([])
+    setNomeArquivoCsv('')
+    buscarProjetos()
+  }
+  function baixarModeloCsv() {
+    const modelo = 'titulo,responsavel,descricao,orcamento,data_prevista_fim,prioridade,status\n' +
+      'Migracao para nuvem AWS,Carlos Mendes,Migrar infraestrutura para AWS,180000,2026-12-31,alta,em_andamento\n'
+    const blob = new Blob([modelo], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'modelo_projetos.csv'
+    a.click()
+    URL.revokeObjectURL(url)
   }
   async function deletarProjeto(e, id) {
     e.stopPropagation()
@@ -209,11 +295,76 @@ export default function Projetos() {
       actions={
         <>
           <a href="/gantt" className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><GanttChartSquare size={14} /> Gantt</a>
+          <button onClick={() => { setMostrarImportar(!mostrarImportar); setResultadoImportacao(null) }} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarImportar ? '#EEF2FF' : 'white' }}><Upload size={14} /> Importar CSV</button>
           <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}><Plus size={14} /> Novo Projeto</button>
         </>
       }
     >
       <div className="page-pad" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+
+        {mostrarImportar && (
+          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+              <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Upload size={16} color={C.royal} /> Importar projetos por CSV</h3>
+              <button onClick={baixarModeloCsv} style={{ padding: '7px 14px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Download size={13} /> Baixar modelo CSV
+              </button>
+            </div>
+            <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 16px' }}>
+              Colunas aceitas: <strong>titulo</strong> (obrigatorio), responsavel, descricao, orcamento, data_prevista_fim (AAAA-MM-DD), prioridade (baixa/media/alta), status (pendente/em_andamento/concluido).
+              Se o titulo ja existir em um projeto cadastrado, os dados dele sao atualizados; senao, um projeto novo e criado.
+            </p>
+            <input type="file" accept=".csv,text/csv" onChange={lidarComArquivoCsv}
+              style={{ display: 'block', marginBottom: '14px', fontSize: '13px', color: C.textoSec }} />
+
+            {csvErro && (
+              <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', padding: '10px 14px', marginBottom: '14px' }}>
+                <p style={{ color: C.vermelho, fontSize: '13px', margin: 0 }}>{csvErro}</p>
+              </div>
+            )}
+
+            {csvPreview.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <p style={{ fontSize: '13px', color: C.texto, fontWeight: 700, margin: '0 0 8px' }}>{nomeArquivoCsv} — {csvPreview.length} linha(s) encontrada(s)</p>
+                <div style={{ maxHeight: '220px', overflowY: 'auto', border: `1px solid ${C.borda}`, borderRadius: '6px' }}>
+                  {csvPreview.slice(0, 20).map((linha, i) => (
+                    <div key={i} style={{ padding: '8px 12px', borderBottom: i < Math.min(csvPreview.length, 20) - 1 ? `1px solid ${C.fundo}` : 'none', fontSize: '12px', color: C.textoSec }}>
+                      <strong style={{ color: C.texto }}>{linha.titulo || '(sem titulo)'}</strong>
+                      {linha.responsavel ? ' • ' + linha.responsavel : ''}
+                      {linha.orcamento ? ' • ' + formatarMoeda(Number(linha.orcamento)) : ''}
+                    </div>
+                  ))}
+                  {csvPreview.length > 20 && (
+                    <div style={{ padding: '8px 12px', fontSize: '12px', color: C.textoMudo }}>+ {csvPreview.length - 20} linha(s) a mais</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {resultadoImportacao && (
+              <div style={{ background: '#F0FDF4', border: `1px solid ${C.verde}`, borderRadius: '6px', padding: '14px', marginBottom: '14px' }}>
+                <p style={{ color: '#14532d', fontSize: '13px', margin: 0, fontWeight: 700 }}>
+                  {resultadoImportacao.criados || 0} projeto(s) criado(s), {resultadoImportacao.atualizados || 0} atualizado(s)
+                  {resultadoImportacao.erros && resultadoImportacao.erros.length > 0 ? ', ' + resultadoImportacao.erros.length + ' erro(s)' : ''}
+                </p>
+                {resultadoImportacao.erros && resultadoImportacao.erros.length > 0 && (
+                  <ul style={{ margin: '8px 0 0', paddingLeft: '18px', fontSize: '12px', color: C.vermelho }}>
+                    {resultadoImportacao.erros.map((e, i) => <li key={i}>{e}</li>)}
+                  </ul>
+                )}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => { setMostrarImportar(false); setCsvPreview([]); setCsvErro(''); setResultadoImportacao(null) }} style={{ flex: 1, padding: '10px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Fechar</button>
+              <button onClick={confirmarImportacaoCsv} disabled={csvPreview.length === 0 || importando}
+                style={{ flex: 2, padding: '10px', background: (csvPreview.length === 0 || importando) ? C.textoMudo : C.royal, color: 'white', border: 'none', borderRadius: '6px', cursor: (csvPreview.length === 0 || importando) ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 700 }}>
+                {importando ? 'Importando...' : 'Importar ' + csvPreview.length + ' projeto(s)'}
+              </button>
+            </div>
+          </div>
+        )}
+
         {projetos.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '10px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
             <p style={{ fontSize: '17px' }}>Nenhum projeto ainda</p>

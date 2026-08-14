@@ -84,7 +84,7 @@ export default function Roadmap() {
 
   // ── TELA: Gerando ───────────────────────────────────────────────────────────
   if (tela === 'gerando') return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ fontFamily: 'var(--font-nunito), Arial, sans-serif', minHeight: '100vh', background: C.fundo, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
         <Loader2 size={44} color={C.royal} className="spin" style={{ marginBottom: '20px' }} />
         <p style={{ color: C.texto, fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>Gerando seu roadmap com IA...</p>

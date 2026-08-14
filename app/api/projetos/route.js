@@ -20,6 +20,50 @@ export async function GET() {
 export async function POST(req) {
   try {
     const body = await req.json()
+
+    if (body.importar_csv && Array.isArray(body.projetos)) {
+      const prioridadesValidas = ['baixa', 'media', 'alta']
+      const statusValidos = ['pendente', 'em_andamento', 'concluido']
+      const resultado = { criados: 0, atualizados: 0, erros: [] }
+
+      for (const [i, linha] of body.projetos.entries()) {
+        const titulo = (linha.titulo || '').trim()
+        if (!titulo) {
+          resultado.erros.push('Linha ' + (i + 2) + ': titulo em branco, ignorada')
+          continue
+        }
+        const dados = {
+          titulo,
+          descricao: linha.descricao || null,
+          responsavel: linha.responsavel || null,
+          orcamento: linha.orcamento ? Number(linha.orcamento) : null,
+          data_prevista_fim: linha.data_prevista_fim || null,
+          prioridade: prioridadesValidas.includes(linha.prioridade) ? linha.prioridade : 'media',
+          status: statusValidos.includes(linha.status) ? linha.status : 'pendente'
+        }
+        const { data: existentes, error: erroBusca } = await supabase
+          .from('projetos')
+          .select('id')
+          .ilike('titulo', titulo)
+          .limit(1)
+        if (erroBusca) {
+          resultado.erros.push('Linha ' + (i + 2) + ' (' + titulo + '): ' + erroBusca.message)
+          continue
+        }
+        const existente = existentes && existentes[0]
+        if (existente) {
+          const { error } = await supabase.from('projetos').update(dados).eq('id', existente.id)
+          if (error) resultado.erros.push('Linha ' + (i + 2) + ' (' + titulo + '): ' + error.message)
+          else resultado.atualizados++
+        } else {
+          const { error } = await supabase.from('projetos').insert(dados)
+          if (error) resultado.erros.push('Linha ' + (i + 2) + ' (' + titulo + '): ' + error.message)
+          else resultado.criados++
+        }
+      }
+      return Response.json(resultado)
+    }
+
     const id = body.id
     const status = body.status
     if (id && status) {

@@ -41,7 +41,7 @@ export const botaoVoltar = {
   textDecoration: 'none',
   fontWeight: 600,
   cursor: 'pointer',
-  fontFamily: 'Arial',
+  fontFamily: 'var(--font-nunito), Arial, sans-serif',
 }
 
 export const estiloCard = {

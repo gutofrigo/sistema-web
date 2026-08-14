@@ -6,7 +6,7 @@ import { Home, FolderKanban, TrendingUp, Map, GanttChartSquare, Wallet, Sparkles
 import { theme as C } from '../theme'
 
 const MODULOS = [
-  { href: '/', label: 'Inicio', icon: Home },
+  { href: '/inicio', label: 'Inicio', icon: Home },
   { href: '/projetos', label: 'Projetos', icon: FolderKanban },
   { href: '/pmo', label: 'PMO / Dashboard', icon: TrendingUp },
   { href: '/roadmap', label: 'Roadmap', icon: Map },

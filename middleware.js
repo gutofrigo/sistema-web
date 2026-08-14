@@ -18,6 +18,9 @@ export function middleware(request) {
   if (!autenticado) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
+  if (url === '/') {
+    return NextResponse.redirect(new URL('/pmo', request.url))
+  }
   return NextResponse.next()
 }
 export const config = {

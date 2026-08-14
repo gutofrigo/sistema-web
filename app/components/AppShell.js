@@ -4,7 +4,7 @@ import { theme as C } from '../theme'
 
 export default function AppShell({ title, subtitle, actions, children }) {
   return (
-    <div style={{ fontFamily: 'Arial', minHeight: '100vh', background: C.fundo }}>
+    <div style={{ fontFamily: 'var(--font-nunito), Arial, sans-serif', minHeight: '100vh', background: C.fundo }}>
       <Sidebar />
       <div className="app-content">
         <div className="app-header" style={{ background: 'white', borderBottom: `1px solid ${C.borda}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
