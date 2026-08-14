@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f132e;
-  --foreground: #F2EFE9;
+  --background: #F4F6F9;
+  --foreground: #151A2E;
 }
 
 @theme inline {
@@ -73,7 +73,7 @@ body {
   filter: brightness(1.06);
 }
 .btn-ghost-hover:hover {
-  background: rgba(83,109,136,0.18);
+  background: #F4F6F9;
 }
 
 .spin { animation: girar 1s linear infinite; }
@@ -85,8 +85,8 @@ body {
 }
 .card-elevate:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.2), 0 0 0 1px rgba(234,193,149,0.25), 0 20px 32px -14px rgba(234,193,149,0.15);
-  border-color: rgba(234,193,149,0.4);
+  box-shadow: 0 2px 4px rgba(15,23,42,0.06), 0 4px 10px rgba(15,23,42,0.06), 0 20px 32px -14px rgba(15,23,42,0.18);
+  border-color: rgba(169,118,44,0.3);
 }
 
 @media (max-width: 900px) {

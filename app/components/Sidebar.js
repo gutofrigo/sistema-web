@@ -60,7 +60,7 @@ export default function Sidebar() {
                 href={m.href}
                 onClick={() => setAberta(false)}
                 className="nav-link"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', textDecoration: 'none', color: ativo ? C.textoSobreAccent : C.sidebarTextMuted, background: ativo ? C.sidebarActive : 'transparent', fontSize: '13px', fontWeight: ativo ? 700 : 500 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', textDecoration: 'none', color: ativo ? '#0f132e' : C.sidebarTextMuted, background: ativo ? C.sidebarActive : 'transparent', fontSize: '13px', fontWeight: ativo ? 700 : 500 }}
               >
                 <Icone size={17} />
                 {m.label}
