@@ -1,13 +1,21 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from 'recharts'
-import { AlertTriangle, Map as MapIcon, Calendar, ClipboardList } from 'lucide-react'
+import { AlertTriangle, Map as MapIcon, Calendar, ClipboardList, ArrowRight } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { theme as C, estiloCard, estiloEyebrow, estiloStatNumero } from '../theme'
 
 const corRag = { verde: C.verde, ambar: C.ambar, vermelho: C.vermelho, cinza: C.textoMudo }
 const labelRag = { verde: 'No prazo', ambar: 'Atencao', vermelho: 'Critico', cinza: 'Sem dados' }
 const labelStatus = { pendente: 'Pendente', em_andamento: 'Em andamento', concluido: 'Concluido' }
+
+const CATEGORIAS_INICIATIVA = {
+  ti: { label: 'TI / Tecnologia', cor: C.royal },
+  processos: { label: 'Processos / Melhoria', cor: C.roxo },
+  rh: { label: 'RH / Pessoas', cor: '#0891B2' },
+  financeiro: { label: 'Financeiro / Operacoes', cor: '#EA580C' },
+  outros: { label: 'Outros', cor: C.textoMudo },
+}
 
 function formatarMoeda(v) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0)
@@ -49,7 +57,7 @@ export default function PMO() {
     )
   }
 
-  const { projetos, resumo, tendencia, tarefasProximas, entrevistasRecentes } = dados
+  const { projetos, resumo, tendencia, tarefasProximas, entrevistasRecentes, iniciativasPorCategoria, iniciativasBacklog, iniciativasTotal } = dados
 
   function corPrazo(dataEntrega) {
     const hoje = new Date()
@@ -70,7 +78,7 @@ export default function PMO() {
 
   const dadosStatus = [
     { name: 'Pendente', value: resumo.porStatus.pendente, color: C.ambar },
-    { name: 'Em andamento', value: resumo.porStatus.em_andamento, color: C.royal },
+    { name: 'Em andamento', value: resumo.porStatus.em_andamento, color: C.statusInfo },
     { name: 'Concluido', value: resumo.porStatus.concluido, color: C.verde }
   ].filter(d => d.value > 0)
 
@@ -116,8 +124,8 @@ export default function PMO() {
           </div>
         </div>
 
-        {/* Prazos + Relatorios */}
-        <div className="grid-2" style={{ marginBottom: '16px' }}>
+        {/* Prazos + Relatorios + Iniciativas */}
+        <div className="grid-3" style={{ marginBottom: '16px' }}>
           <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Tarefas com prazo proximo</h2>
             {tarefasProximas.length === 0 ? (
@@ -162,6 +170,37 @@ export default function PMO() {
               </div>
             )}
           </div>
+
+          <div className="card-elevate" style={cardEstilo}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: 0 }}>Iniciativas por categoria</h2>
+              <span style={{ fontSize: '11px', background: '#EEF2FF', color: C.royal, padding: '3px 9px', borderRadius: '20px', fontWeight: 700 }}>{iniciativasBacklog} em backlog</span>
+            </div>
+            {(!iniciativasPorCategoria || iniciativasPorCategoria.length === 0) ? (
+              <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Nenhuma iniciativa ativa</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
+                {iniciativasPorCategoria.map(c => {
+                  const info = CATEGORIAS_INICIATIVA[c.categoria] || CATEGORIAS_INICIATIVA.outros
+                  const pct = iniciativasTotal > 0 ? Math.round((c.qtd / iniciativasTotal) * 100) : 0
+                  return (
+                    <div key={c.categoria}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: C.textoSec, marginBottom: '4px' }}>
+                        <span>{info.label}</span>
+                        <span style={{ fontWeight: 700, color: C.texto }}>{c.qtd}</span>
+                      </div>
+                      <div style={{ height: '6px', background: C.fundo, borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: pct + '%', background: info.cor }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+            <a href="/iniciativas" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', color: C.royal, textDecoration: 'none', fontWeight: 700, paddingTop: '10px', borderTop: `1px solid ${C.fundo}` }}>
+              Ver quadro completo <ArrowRight size={13} />
+            </a>
+          </div>
         </div>
 
         {/* Graficos */}
@@ -176,7 +215,7 @@ export default function PMO() {
                   <Pie data={dadosStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={d => d.name + ' (' + d.value + ')'}>
                     {dadosStatus.map((d, i) => <Cell key={i} fill={d.color} />)}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ background: C.branco, border: '1px solid rgba(83,109,136,0.35)', borderRadius: '8px', color: C.texto }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -189,7 +228,7 @@ export default function PMO() {
                 <CartesianGrid strokeDasharray="3 3" stroke={C.borda} />
                 <XAxis dataKey="severidade" tick={{ fontSize: 12, fill: C.textoSec }} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: C.textoSec }} />
-                <Tooltip />
+                <Tooltip contentStyle={{ background: C.branco, border: '1px solid rgba(83,109,136,0.35)', borderRadius: '8px', color: C.texto }} />
                 <Bar dataKey="qtd" radius={[4, 4, 0, 0]}>
                   {dadosRiscos.map((d, i) => <Cell key={i} fill={d.cor} />)}
                 </Bar>
@@ -209,7 +248,7 @@ export default function PMO() {
                   <CartesianGrid strokeDasharray="3 3" stroke={C.borda} />
                   <XAxis type="number" tick={{ fontSize: 11, fill: C.textoSec }} />
                   <YAxis type="category" dataKey="titulo" width={140} tick={{ fontSize: 11, fill: C.textoSec }} />
-                  <Tooltip formatter={v => formatarMoeda(v)} />
+                  <Tooltip formatter={v => formatarMoeda(v)} contentStyle={{ background: C.branco, border: '1px solid rgba(83,109,136,0.35)', borderRadius: '8px', color: C.texto }} />
                   <Bar dataKey="orcado" fill={C.borda} radius={[0, 4, 4, 0]} />
                   <Bar dataKey="realizado" radius={[0, 4, 4, 0]}>
                     {dadosOrcamento.map((d, i) => <Cell key={i} fill={d.cor} />)}
@@ -227,7 +266,7 @@ export default function PMO() {
                 <CartesianGrid strokeDasharray="3 3" stroke={C.borda} />
                 <XAxis dataKey="mes" tick={{ fontSize: 12, fill: C.textoSec }} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: C.textoSec }} />
-                <Tooltip />
+                <Tooltip contentStyle={{ background: C.branco, border: '1px solid rgba(83,109,136,0.35)', borderRadius: '8px', color: C.texto }} />
                 <Line type="monotone" dataKey="concluidas" stroke={C.royal} strokeWidth={2} dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
@@ -237,7 +276,7 @@ export default function PMO() {
         {/* Cards de portfolio */}
         <h2 style={{ fontSize: '16px', fontWeight: 800, color: C.texto, margin: '8px 0 14px', letterSpacing: '-0.01em' }}>Portfolio de projetos</h2>
         {projetos.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '14px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
+          <div style={{ textAlign: 'center', padding: '60px', background: C.branco, borderRadius: '14px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
             <p style={{ fontSize: '15px' }}>Nenhum projeto cadastrado ainda</p>
           </div>
         )}

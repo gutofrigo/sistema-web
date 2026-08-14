@@ -7,7 +7,7 @@ export default function AppShell({ title, subtitle, actions, children }) {
     <div style={{ fontFamily: 'var(--font-nunito), Arial, sans-serif', minHeight: '100vh', background: C.fundo }}>
       <Sidebar />
       <div className="app-content">
-        <div className="app-header" style={{ background: 'white', borderBottom: `1px solid ${C.borda}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        <div className="app-header" style={{ background: C.branco, borderBottom: `1px solid ${C.borda}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           <div>
             {subtitle && <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 2px' }}>{subtitle}</p>}
             <h1 style={{ color: C.texto, fontSize: '19px', fontWeight: 700, margin: 0 }}>{title}</h1>

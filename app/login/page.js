@@ -33,10 +33,10 @@ export default function Login() {
   }
   return (
     <div style={{ fontFamily: 'var(--font-nunito), Arial, sans-serif', minHeight: '100vh', background: C.fundo, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '12px', padding: '16px', boxSizing: 'border-box' }}>
-      <a href="/inicio" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: 'white', border: `1px solid ${C.borda}`, borderRadius: '8px', color: C.navy, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>
+      <a href="/inicio" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '8px', color: C.navy, fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>
         <ArrowLeft size={14} /> Voltar para Inicio
       </a>
-      <div style={{ background: 'white', borderRadius: '12px', padding: '40px 32px', width: '100%', maxWidth: '380px', border: `1px solid ${C.borda}`, borderTop: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.08)' }}>
+      <div style={{ background: C.branco, borderRadius: '12px', padding: '40px 32px', width: '100%', maxWidth: '380px', border: `1px solid ${C.borda}`, borderTop: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.08)' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <Lock size={22} color="white" />

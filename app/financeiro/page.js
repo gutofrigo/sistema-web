@@ -124,7 +124,7 @@ export default function Financeiro() {
   if (tela === 'novo') return (
     <AppShell title="Novo Lancamento" subtitle="Financeiro" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-        <div style={{ background: 'white', borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '560px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+        <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '560px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
             <button onClick={() => setForm({ ...form, tipo: 'saida' })} style={{ flex: 1, padding: '11px', background: form.tipo === 'saida' ? C.vermelho : C.fundo, color: form.tipo === 'saida' ? 'white' : C.textoSec, border: `1px solid ${form.tipo === 'saida' ? C.vermelho : C.borda}`, borderRadius: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
@@ -182,21 +182,21 @@ export default function Financeiro() {
         {!carregandoTotais && totais && (
           <>
             <div className="grid-3" style={{ marginBottom: '20px' }}>
-              <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.verde}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <div style={{ background: C.branco, borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.verde}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                 <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 6px' }}>Total recebido (todos os meses)</p>
                 <p style={{ fontSize: '22px', fontWeight: 'bold', color: C.verde, margin: 0 }}>{fmt(totais.totalGeral.entradas)}</p>
               </div>
-              <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.vermelho}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <div style={{ background: C.branco, borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.vermelho}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                 <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 6px' }}>Total gasto (todos os meses)</p>
                 <p style={{ fontSize: '22px', fontWeight: 'bold', color: C.vermelho, margin: 0 }}>{fmt(totais.totalGeral.saidas)}</p>
               </div>
-              <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <div style={{ background: C.branco, borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                 <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 6px' }}>Saldo acumulado</p>
                 <p style={{ fontSize: '22px', fontWeight: 'bold', color: totais.totalGeral.saldo >= 0 ? C.verde : C.vermelho, margin: 0 }}>{fmt(totais.totalGeral.saldo)}</p>
               </div>
             </div>
 
-            <div style={{ background: 'white', borderRadius: '8px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, overflow: 'hidden' }}>
+            <div style={{ background: C.branco, borderRadius: '8px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, overflow: 'hidden' }}>
               <div style={{ padding: '20px 24px', borderBottom: `1px solid ${C.borda}` }}>
                 <h2 style={{ color: C.texto, margin: 0, fontSize: '15px', fontWeight: 'bold' }}>Gasto acumulado por categoria</h2>
                 <p style={{ color: C.textoMudo, fontSize: '12px', margin: '4px 0 0' }}>Considera apenas lancamentos com status pago/recebido</p>
@@ -246,8 +246,8 @@ export default function Financeiro() {
       subtitle="Sistema de Melhoria"
       actions={
         <>
-          <button onClick={abrirTotais} className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><BarChart3 size={14} /> Totais</button>
-          <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}><Plus size={14} /> Novo</button>
+          <button onClick={abrirTotais} className="btn-ghost-hover" style={{ ...btnHeader, background: C.branco }}><BarChart3 size={14} /> Totais</button>
+          <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: C.textoSobreAccent, border: 'none' }}><Plus size={14} /> Novo</button>
         </>
       }
     >
@@ -255,9 +255,9 @@ export default function Financeiro() {
 
         {/* Navegacao de mes */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <button onClick={() => navMes(-1)} style={{ padding: '6px 14px', background: 'white', border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', color: C.royal, fontWeight: 'bold', fontSize: '18px', lineHeight: 1 }}>‹</button>
+          <button onClick={() => navMes(-1)} style={{ padding: '6px 14px', background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', color: C.royal, fontWeight: 'bold', fontSize: '18px', lineHeight: 1 }}>‹</button>
           <span style={{ fontSize: '16px', fontWeight: 'bold', color: C.texto, minWidth: '170px', textAlign: 'center' }}>{NOMES_MES[mes]} {ano}</span>
-          <button onClick={() => navMes(1)} style={{ padding: '6px 14px', background: 'white', border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', color: C.royal, fontWeight: 'bold', fontSize: '18px', lineHeight: 1 }}>›</button>
+          <button onClick={() => navMes(1)} style={{ padding: '6px 14px', background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', color: C.royal, fontWeight: 'bold', fontSize: '18px', lineHeight: 1 }}>›</button>
         </div>
 
         {/* Cards resumo mensal */}
@@ -280,7 +280,7 @@ export default function Financeiro() {
         <div className="grid-2" style={{ marginBottom: '16px' }}>
 
           {/* Calendario */}
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <h2 style={{ color: C.texto, fontSize: '15px', fontWeight: 'bold', margin: '0 0 16px' }}>Calendario</h2>
             {carregando ? (
               <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px' }}>Carregando...</p>
@@ -333,7 +333,7 @@ export default function Financeiro() {
                             {l.tipo === 'entrada' ? '+' : '-'}{fmt(l.valor)}
                           </span>
                           {l.status === 'pendente' && (
-                            <button onClick={() => marcarPago(l.id)} style={{ fontSize: '11px', padding: '3px 8px', background: C.royal, color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                            <button onClick={() => marcarPago(l.id)} style={{ fontSize: '11px', padding: '3px 8px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
                               {l.tipo === 'entrada' ? 'Receber' : 'Pagar'}
                             </button>
                           )}
@@ -356,7 +356,7 @@ export default function Financeiro() {
           </div>
 
           {/* Proximos pagamentos */}
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.ambar}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.ambar}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <h2 style={{ color: C.texto, fontSize: '15px', fontWeight: 'bold', margin: '0 0 16px' }}>Proximos pagamentos pendentes</h2>
             {proximosPagamentos.length === 0 && (
               <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>Nenhum pagamento pendente este mes 🎉</p>
@@ -372,7 +372,7 @@ export default function Financeiro() {
                     <span style={{ fontSize: '14px', fontWeight: 'bold', color: l.tipo === 'saida' ? C.vermelho : C.verde }}>
                       {l.tipo === 'entrada' ? '+' : ''}{fmt(l.valor)}
                     </span>
-                    <button onClick={() => marcarPago(l.id)} style={{ fontSize: '11px', padding: '4px 10px', background: C.royal, color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                    <button onClick={() => marcarPago(l.id)} style={{ fontSize: '11px', padding: '4px 10px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                       {l.tipo === 'entrada' ? 'Receber' : 'Pagar'}
                     </button>
                   </div>
@@ -383,7 +383,7 @@ export default function Financeiro() {
         </div>
 
         {/* Tabela de lancamentos */}
-        <div style={{ background: 'white', borderRadius: '8px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, overflow: 'hidden' }}>
+        <div style={{ background: C.branco, borderRadius: '8px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, overflow: 'hidden' }}>
           <div style={{ padding: '18px 24px', borderBottom: `1px solid ${C.borda}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ color: C.texto, margin: 0, fontSize: '15px', fontWeight: 'bold' }}>Lancamentos de {NOMES_MES[mes]}</h2>
             <span style={{ fontSize: '12px', color: C.textoMudo }}>{lancamentos.length} lancamento(s)</span>
@@ -426,7 +426,7 @@ export default function Financeiro() {
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                           {l.status === 'pendente' && (
-                            <button onClick={() => marcarPago(l.id)} style={{ fontSize: '11px', padding: '4px 10px', background: C.royal, color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                            <button onClick={() => marcarPago(l.id)} style={{ fontSize: '11px', padding: '4px 10px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                               {l.tipo === 'entrada' ? 'Receber' : 'Pagar'}
                             </button>
                           )}

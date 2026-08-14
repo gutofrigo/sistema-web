@@ -104,13 +104,14 @@ export async function GET() {
   try {
     const hoje = new Date()
 
-    const [{ data: projetos }, { data: tarefas }, { data: lancamentos }, { data: riscos }, { data: roadmaps }, { data: entrevistas }] = await Promise.all([
+    const [{ data: projetos }, { data: tarefas }, { data: lancamentos }, { data: riscos }, { data: roadmaps }, { data: entrevistas }, { data: iniciativas }] = await Promise.all([
       supabase.from('projetos').select('*').order('criado_em', { ascending: false }),
       supabase.from('tarefas').select('id, projeto_id, titulo, responsavel, status, data_entrega, concluido_em, criado_em'),
       supabase.from('lancamentos').select('projeto_id, valor, tipo, status').eq('status', 'pago').not('projeto_id', 'is', null),
       supabase.from('riscos_projeto').select('*'),
       supabase.from('roadmaps').select('id, projeto_id, titulo').not('projeto_id', 'is', null),
-      supabase.from('entrevistas').select('id, processo, responsavel, criado_em').order('criado_em', { ascending: false }).limit(3)
+      supabase.from('entrevistas').select('id, processo, responsavel, criado_em').order('criado_em', { ascending: false }).limit(3),
+      supabase.from('iniciativas').select('categoria, status')
     ])
 
     const tarefasPorProjeto = new Map()
@@ -208,7 +209,15 @@ export async function GET() {
       .sort((a, b) => new Date(a.data_entrega) - new Date(b.data_entrega))
       .slice(0, 5)
 
-    return Response.json({ projetos: projetosOut, resumo, tendencia, tarefasProximas, entrevistasRecentes: entrevistas || [] })
+    const iniciativasAtivas = (iniciativas || []).filter(i => i.status !== 'concluido')
+    const categoriasIniciativas = ['ti', 'processos', 'rh', 'financeiro', 'outros']
+    const iniciativasPorCategoria = categoriasIniciativas.map(cat => ({
+      categoria: cat,
+      qtd: iniciativasAtivas.filter(i => i.categoria === cat).length
+    })).filter(c => c.qtd > 0)
+    const iniciativasBacklog = iniciativasAtivas.filter(i => i.status === 'backlog').length
+
+    return Response.json({ projetos: projetosOut, resumo, tendencia, tarefasProximas, entrevistasRecentes: entrevistas || [], iniciativasPorCategoria, iniciativasBacklog, iniciativasTotal: iniciativasAtivas.length })
   } catch (e) {
     return Response.json({ erro: e.message })
   }

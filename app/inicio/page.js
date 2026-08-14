@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { ClipboardList, FolderKanban, TrendingUp, Map, Sparkles, Workflow, Wallet, History, ArrowLeft, Trash2, CheckCircle2, Loader2 } from 'lucide-react'
+import { ClipboardList, FolderKanban, Kanban, TrendingUp, Map, Sparkles, Workflow, Wallet, History, ArrowLeft, Trash2, CheckCircle2, Loader2 } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { theme as C, botaoVoltar, botaoPrimario } from '../theme'
 
@@ -94,6 +94,7 @@ export default function Inicio() {
     const modulos = [
       { icone: ClipboardList, titulo: 'Analise de Processo', desc: 'Entrevista com IA e relatorio de melhorias', onClick: () => setTela('formulario'), borda: C.royal },
       { icone: FolderKanban, titulo: 'Projetos', desc: 'Gerencie projetos e tarefas com prazos', href: '/projetos', borda: C.royal },
+      { icone: Kanban, titulo: 'Iniciativas', desc: 'Backlog de demandas e ideias em quadro Kanban', href: '/iniciativas', borda: C.roxo, badge: 'Novo' },
       { icone: TrendingUp, titulo: 'PMO / Dashboard', desc: 'Visao de portfolio, orcamento e riscos', href: '/pmo', borda: C.navy },
       { icone: Map, titulo: 'Roadmap', desc: 'Gerar plano de projeto com IA', href: '/roadmap', borda: C.navy, badge: 'Novo' },
       { icone: Sparkles, titulo: 'Assistente IA', desc: 'Pergunte sobre seus projetos e tarefas', href: '/assistente', borda: C.blue, badge: 'Novo' },
@@ -106,7 +107,7 @@ export default function Inicio() {
         title="Visao geral"
         subtitle="Sistema de Melhoria"
         actions={
-          <button onClick={abrirHistorico} className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', border: `1px solid ${C.borda}`, color: C.textoSec, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+          <button onClick={abrirHistorico} className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.branco, border: `1px solid ${C.borda}`, color: C.textoSec, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
             <History size={15} /> Historico de relatorios
           </button>
         }
@@ -117,7 +118,7 @@ export default function Inicio() {
             {modulos.map((m, i) => {
               const Icone = m.icone
               const cardStyle = {
-                background: 'white',
+                background: C.branco,
                 border: `1px solid ${C.borda}`,
                 borderTop: `3px solid ${m.borda}`,
                 borderRadius: '10px',
@@ -173,12 +174,12 @@ export default function Inicio() {
       >
         <div className="page-pad" style={{ maxWidth: '700px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
           {entrevistas.length === 0 && (
-            <div style={{ background: 'white', borderRadius: '10px', padding: '40px', textAlign: 'center', color: C.textoMudo, border: `1px solid ${C.borda}` }}>
+            <div style={{ background: C.branco, borderRadius: '10px', padding: '40px', textAlign: 'center', color: C.textoMudo, border: `1px solid ${C.borda}` }}>
               Nenhum relatorio encontrado
             </div>
           )}
           {entrevistaAberta ? (
-            <div style={{ background: 'white', borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+            <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
                   <h2 style={{ color: C.texto, margin: '0 0 4px' }}>{entrevistaAberta.processo}</h2>
@@ -196,7 +197,7 @@ export default function Inicio() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {entrevistas.map(e => (
-                <div key={e.id} style={{ background: 'white', borderRadius: '10px', padding: '18px 20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+                <div key={e.id} style={{ background: C.branco, borderRadius: '10px', padding: '18px 20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
                   <div onClick={() => setEntrevistaAberta(e)} style={{ cursor: 'pointer', flex: 1 }}>
                     <p style={{ fontWeight: 700, color: C.texto, margin: '0 0 4px', fontSize: '15px' }}>{e.processo}</p>
                     <p style={{ color: C.textoMudo, fontSize: '13px', margin: 0 }}>{e.responsavel} • {diasAtras(e.criado_em)}</p>
@@ -216,7 +217,7 @@ export default function Inicio() {
     return (
       <AppShell title="Analise de Processo" subtitle="Entrevista guiada por IA" actions={<BotaoAcao onClick={() => setTela('inicio')} label="Inicio" icone={ArrowLeft} />}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-          <div style={{ background: 'white', borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '500px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '500px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
             <h2 style={{ color: C.texto, marginBottom: '24px', fontSize: '20px' }}>Novo Processo</h2>
             <input placeholder="Nome do processo (ex: Compras)" value={processo} onChange={e => setProcesso(e.target.value)}
               style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '14px', marginBottom: '12px', boxSizing: 'border-box', color: C.texto }} />
@@ -236,7 +237,7 @@ export default function Inicio() {
     return (
       <AppShell title={processo} subtitle={`Pergunta ${etapa + 1} de ${perguntas.length}`} actions={<BotaoAcao onClick={() => setTela('inicio')} label="Cancelar" icone={ArrowLeft} />}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-          <div style={{ background: 'white', borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '600px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '600px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
               <span style={{ color: C.royal, fontWeight: 700, fontSize: '14px' }}>Pergunta {etapa + 1} de {perguntas.length}</span>
               <div style={{ display: 'flex', gap: '4px' }}>
@@ -277,7 +278,7 @@ export default function Inicio() {
     return (
       <AppShell title={`Relatorio: ${processo}`} subtitle={`Responsavel: ${nome}`} actions={<BotaoAcao onClick={() => setTela('inicio')} label="Inicio" icone={ArrowLeft} />}>
         <div className="page-pad" style={{ maxWidth: '700px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
-          <div style={{ background: 'white', borderRadius: '10px', padding: '36px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
             <div style={{ background: C.fundo, borderRadius: '8px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: C.texto, marginBottom: '24px', border: `1px solid ${C.borda}` }}>
               {relatorio}
             </div>
@@ -287,10 +288,10 @@ export default function Inicio() {
               </div>
             )}
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <button onClick={() => setTela('inicio')} className="btn-ghost-hover" style={{ flex: 1, minWidth: '140px', padding: '12px', background: 'white', color: C.royal, border: `1px solid ${C.borda}`, borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              <button onClick={() => setTela('inicio')} className="btn-ghost-hover" style={{ flex: 1, minWidth: '140px', padding: '12px', background: C.branco, color: C.royal, border: `1px solid ${C.borda}`, borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                 <ArrowLeft size={14} /> Voltar ao Inicio
               </button>
-              <a href="/projetos" className="btn-hover" style={{ flex: 1, minWidth: '140px', padding: '12px', background: C.royal, color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', textAlign: 'center', textDecoration: 'none', fontWeight: 700 }}>
+              <a href="/projetos" className="btn-hover" style={{ flex: 1, minWidth: '140px', padding: '12px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', textAlign: 'center', textDecoration: 'none', fontWeight: 700 }}>
                 Ver Projetos →
               </a>
             </div>

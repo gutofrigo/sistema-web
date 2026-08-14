@@ -2,12 +2,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Home, FolderKanban, TrendingUp, Map, GanttChartSquare, Wallet, Sparkles, Workflow, LogOut, Menu, X } from 'lucide-react'
+import { Home, FolderKanban, Kanban, TrendingUp, Map, GanttChartSquare, Wallet, Sparkles, Workflow, LogOut, Menu, X } from 'lucide-react'
 import { theme as C } from '../theme'
 
 const MODULOS = [
   { href: '/inicio', label: 'Inicio', icon: Home },
   { href: '/projetos', label: 'Projetos', icon: FolderKanban },
+  { href: '/iniciativas', label: 'Iniciativas', icon: Kanban },
   { href: '/pmo', label: 'PMO / Dashboard', icon: TrendingUp },
   { href: '/roadmap', label: 'Roadmap', icon: Map },
   { href: '/gantt', label: 'Gantt', icon: GanttChartSquare },
@@ -59,7 +60,7 @@ export default function Sidebar() {
                 href={m.href}
                 onClick={() => setAberta(false)}
                 className="nav-link"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', textDecoration: 'none', color: ativo ? 'white' : C.sidebarTextMuted, background: ativo ? C.sidebarActive : 'transparent', fontSize: '13px', fontWeight: ativo ? 600 : 500 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', textDecoration: 'none', color: ativo ? C.textoSobreAccent : C.sidebarTextMuted, background: ativo ? C.sidebarActive : 'transparent', fontSize: '13px', fontWeight: ativo ? 700 : 500 }}
               >
                 <Icone size={17} />
                 {m.label}

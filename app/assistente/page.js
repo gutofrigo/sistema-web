@@ -58,7 +58,7 @@ export default function Assistente() {
       title="Assistente IA"
       subtitle="Pergunte sobre seus projetos e tarefas"
       actions={
-        <a href="/pmo" className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', border: `1px solid ${C.borda}`, color: C.texto, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 }}>
+        <a href="/pmo" className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.branco, border: `1px solid ${C.borda}`, color: C.texto, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 }}>
           <LayoutDashboard size={14} /> PMO
         </a>
       }
@@ -70,11 +70,11 @@ export default function Assistente() {
             <div key={i} style={{ display: 'flex', justifyContent: m.tipo === 'usuario' ? 'flex-end' : 'flex-start' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', maxWidth: '80%' }}>
                 {m.tipo === 'assistente' && (
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sparkles size={15} color="white" /></div>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sparkles size={15} color={C.textoSobreAccent} /></div>
                 )}
                 <div style={{
-                  background: m.tipo === 'usuario' ? C.navy : 'white',
-                  color: m.tipo === 'usuario' ? 'white' : C.texto,
+                  background: m.tipo === 'usuario' ? C.royal : C.branco,
+                  color: m.tipo === 'usuario' ? C.textoSobreAccent : C.texto,
                   borderRadius: m.tipo === 'usuario' ? '12px 0 12px 12px' : '0 12px 12px 12px',
                   padding: '12px 16px',
                   fontSize: '14px',
@@ -91,8 +91,8 @@ export default function Assistente() {
           {carregando && (
             <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={15} color="white" /></div>
-                <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderRadius: '0 12px 12px 12px', padding: '12px 16px', color: C.textoMudo, fontSize: '14px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.royal, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={15} color={C.textoSobreAccent} /></div>
+                <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '0 12px 12px 12px', padding: '12px 16px', color: C.textoMudo, fontSize: '14px' }}>
                   Analisando seus dados...
                 </div>
               </div>
@@ -106,7 +106,7 @@ export default function Assistente() {
             <p style={{ fontSize: '13px', color: C.textoMudo, marginBottom: '10px' }}>Sugestoes de perguntas:</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {perguntasSugeridas.map((s, i) => (
-                <button key={i} onClick={() => enviar(s)} style={{ fontSize: '13px', padding: '7px 14px', borderRadius: '20px', background: 'white', color: C.royal, border: `1px solid ${C.borda}`, cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <button key={i} onClick={() => enviar(s)} style={{ fontSize: '13px', padding: '7px 14px', borderRadius: '20px', background: C.branco, color: C.royal, border: `1px solid ${C.borda}`, cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                   {s}
                 </button>
               ))}
@@ -116,7 +116,7 @@ export default function Assistente() {
       </div>
 
       {/* Input */}
-      <div style={{ background: 'white', borderTop: `1px solid ${C.borda}`, padding: '16px 24px' }}>
+      <div style={{ background: C.branco, borderTop: `1px solid ${C.borda}`, padding: '16px 24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', gap: '10px' }}>
           <textarea
             placeholder="Pergunte sobre seus projetos, tarefas ou roadmaps... (Enter para enviar)"

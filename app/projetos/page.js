@@ -5,7 +5,7 @@ import AppShell from '../components/AppShell'
 import { GanttChart, fmt, parseData } from '../components/GanttChart'
 import { theme as C } from '../theme'
 
-const coresStatus = { pendente: C.ambar, em_andamento: C.royal, concluido: C.verde }
+const coresStatus = { pendente: C.ambar, em_andamento: C.statusInfo, concluido: C.verde }
 const coresImpacto = { baixo: C.verde, medio: C.ambar, alto: C.vermelho }
 
 function formatarMoeda(v) {
@@ -294,16 +294,16 @@ export default function Projetos() {
       subtitle="Sistema de Melhoria"
       actions={
         <>
-          <a href="/gantt" className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><GanttChartSquare size={14} /> Gantt</a>
+          <a href="/gantt" className="btn-ghost-hover" style={{ ...btnHeader, background: C.branco }}><GanttChartSquare size={14} /> Gantt</a>
           <button onClick={() => { setMostrarImportar(!mostrarImportar); setResultadoImportacao(null) }} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarImportar ? '#EEF2FF' : 'white' }}><Upload size={14} /> Importar CSV</button>
-          <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}><Plus size={14} /> Novo Projeto</button>
+          <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: C.textoSobreAccent, border: 'none' }}><Plus size={14} /> Novo Projeto</button>
         </>
       }
     >
       <div className="page-pad" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         {mostrarImportar && (
-          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
               <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Upload size={16} color={C.royal} /> Importar projetos por CSV</h3>
               <button onClick={baixarModeloCsv} style={{ padding: '7px 14px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -366,14 +366,14 @@ export default function Projetos() {
         )}
 
         {projetos.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '10px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
+          <div style={{ textAlign: 'center', padding: '60px', background: C.branco, borderRadius: '10px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
             <p style={{ fontSize: '17px' }}>Nenhum projeto ainda</p>
             <p style={{ fontSize: '14px' }}>Crie um projeto ou faca uma entrevista de processo</p>
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {projetos.map(p => (
-            <div key={p.id} onClick={() => abrirProjeto(p)} className="card-elevate" style={{ background: 'white', border: `1px solid #E7ECF3`, borderLeft: `5px solid ${coresStatus[p.status] || C.royal}`, borderRadius: '14px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.04)' }}>
+            <div key={p.id} onClick={() => abrirProjeto(p)} className="card-elevate" style={{ background: C.branco, border: `1px solid #E7ECF3`, borderLeft: `5px solid ${coresStatus[p.status] || C.royal}`, borderRadius: '14px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.04)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h3 style={{ margin: '0 0 6px 0', color: C.texto, fontSize: '15px' }}>{p.titulo}</h3>
@@ -395,7 +395,7 @@ export default function Projetos() {
   if (tela === 'novo') return (
     <AppShell title="Novo Projeto" subtitle="Projetos" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-        <div style={{ background: 'white', borderRadius: '8px', padding: '36px', width: '100%', maxWidth: '600px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+        <div style={{ background: C.branco, borderRadius: '8px', padding: '36px', width: '100%', maxWidth: '600px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <input placeholder="Titulo do projeto" value={novoProj.titulo} onChange={e => setNovoProj({ ...novoProj, titulo: e.target.value })}
             style={{ ...inputStyle, marginBottom: '12px' }} />
           <input placeholder="Responsavel" value={novoProj.responsavel} onChange={e => setNovoProj({ ...novoProj, responsavel: e.target.value })}
@@ -423,7 +423,7 @@ export default function Projetos() {
               </select>
             </div>
           </div>
-          <button onClick={criarProjeto} className="btn-hover" style={{ width: '100%', padding: '13px', background: C.royal, color: 'white', border: 'none', borderRadius: '8px', fontSize: '15px', cursor: 'pointer', fontWeight: 700 }}>
+          <button onClick={criarProjeto} className="btn-hover" style={{ width: '100%', padding: '13px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '8px', fontSize: '15px', cursor: 'pointer', fontWeight: 700 }}>
             Criar Projeto
           </button>
         </div>
@@ -439,13 +439,13 @@ export default function Projetos() {
       actions={
         <>
           <button onClick={() => setTela('lista')} style={btnHeader}>← Projetos</button>
-          <a href="/gantt" className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><GanttChartSquare size={14} /> Gantt</a>
+          <a href="/gantt" className="btn-ghost-hover" style={{ ...btnHeader, background: C.branco }}><GanttChartSquare size={14} /> Gantt</a>
           <button onClick={() => { setMostrarRiscos(!mostrarRiscos); setMostrarGerador(false); setMostrarFormTarefa(false); setMostrarEditar(false) }} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarRiscos ? '#FEF2F2' : 'white', color: mostrarRiscos ? C.vermelho : C.texto }}>
             <AlertTriangle size={14} /> Riscos{riscos.filter(r => r.status === 'aberto').length > 0 ? ' (' + riscos.filter(r => r.status === 'aberto').length + ')' : ''}
           </button>
           <button onClick={abrirEditar} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarEditar ? '#EEF2FF' : 'white' }}><Pencil size={14} /> Editar</button>
           <button onClick={() => { setMostrarGerador(!mostrarGerador); setMostrarFormTarefa(false); setMostrarRiscos(false); setMostrarEditar(false) }} className="btn-ghost-hover" style={{ ...btnHeader, background: mostrarGerador ? '#EEF2FF' : 'white' }}><Sparkles size={14} /> Gerar com IA</button>
-          <button onClick={() => { setMostrarFormTarefa(!mostrarFormTarefa); setMostrarGerador(false); setMostrarRiscos(false); setMostrarEditar(false) }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}><Plus size={14} /> Nova Tarefa</button>
+          <button onClick={() => { setMostrarFormTarefa(!mostrarFormTarefa); setMostrarGerador(false); setMostrarRiscos(false); setMostrarEditar(false) }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: C.textoSobreAccent, border: 'none' }}><Plus size={14} /> Nova Tarefa</button>
         </>
       }
     >
@@ -478,7 +478,7 @@ export default function Projetos() {
 
         {/* Cronograma */}
         {tarefas.length > 0 && (
-          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
               <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><GanttChartSquare size={16} color={C.royal} /> Cronograma</h3>
               <span style={{ fontSize: '12px', color: C.textoSec }}>{tarefasComDatas.length} tarefa(s) com data</span>
@@ -500,7 +500,7 @@ export default function Projetos() {
 
         {/* Editar projeto */}
         {mostrarEditar && (
-          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <h3 style={{ margin: '0 0 16px 0', color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Pencil size={16} color={C.royal} /> Editar projeto</h3>
             <input placeholder="Titulo do projeto" value={editProj.titulo} onChange={e => setEditProj({ ...editProj, titulo: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
             <input placeholder="Responsavel" value={editProj.responsavel} onChange={e => setEditProj({ ...editProj, responsavel: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
@@ -528,14 +528,14 @@ export default function Projetos() {
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setMostrarEditar(false)} style={{ flex: 1, padding: '10px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Cancelar</button>
-              <button onClick={salvarEdicaoProjeto} style={{ flex: 2, padding: '10px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>Salvar alteracoes</button>
+              <button onClick={salvarEdicaoProjeto} style={{ flex: 2, padding: '10px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>Salvar alteracoes</button>
             </div>
           </div>
         )}
 
         {/* Riscos */}
         {mostrarRiscos && (
-          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.ambar}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.ambar}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={16} color={C.ambar} /> Riscos do projeto</h3>
               {roadmapVinculado && roadmapVinculado.riscos && roadmapVinculado.riscos.length > 0 && (
@@ -595,7 +595,7 @@ export default function Projetos() {
               style={{ ...inputStyle, marginBottom: '8px' }} />
             <textarea placeholder="Mitigacao (opcional)" value={novoRisco.mitigacao} onChange={e => setNovoRisco({ ...novoRisco, mitigacao: e.target.value })} rows={2}
               style={{ ...inputStyle, marginBottom: '12px', resize: 'vertical' }} />
-            <button onClick={criarRisco} style={{ padding: '9px 20px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }}>
+            <button onClick={criarRisco} style={{ padding: '9px 20px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '6px', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }}>
               + Adicionar risco
             </button>
           </div>
@@ -603,7 +603,7 @@ export default function Projetos() {
 
         {/* Gerador IA */}
         {mostrarGerador && (
-          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <h3 style={{ margin: '0 0 6px 0', color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Sparkles size={16} color={C.royal} /> Gerar tarefas com IA</h3>
             <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 14px' }}>Descreva o objetivo e a IA cria as tarefas automaticamente</p>
             <textarea
@@ -653,7 +653,7 @@ export default function Projetos() {
 
         {/* Form nova tarefa */}
         {mostrarFormTarefa && (
-          <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <h3 style={{ margin: '0 0 16px 0', color: C.texto, fontSize: '15px', fontWeight: 'bold' }}>Nova Tarefa</h3>
             <input placeholder="Titulo da tarefa" value={novaTarefa.titulo} onChange={e => setNovaTarefa({ ...novaTarefa, titulo: e.target.value })}
               style={{ ...inputStyle, marginBottom: '10px' }} />
@@ -681,13 +681,13 @@ export default function Projetos() {
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setMostrarFormTarefa(false)} style={{ flex: 1, padding: '10px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Cancelar</button>
-              <button onClick={criarTarefa} style={{ flex: 2, padding: '10px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>Criar Tarefa</button>
+              <button onClick={criarTarefa} style={{ flex: 2, padding: '10px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}>Criar Tarefa</button>
             </div>
           </div>
         )}
 
         {tarefas.length === 0 && !mostrarFormTarefa && !mostrarGerador && (
-          <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '8px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
+          <div style={{ textAlign: 'center', padding: '60px', background: C.branco, borderRadius: '8px', color: C.textoSec, border: `1px solid ${C.borda}` }}>
             <p style={{ fontSize: '15px' }}>Nenhuma tarefa. Clique em "Nova Tarefa" ou "Gerar com IA" para comecar.</p>
           </div>
         )}
@@ -695,7 +695,7 @@ export default function Projetos() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {tarefasPai.map(tarefa => (
             <div key={tarefa.id}>
-              <div style={{ background: 'white', border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresStatus[tarefa.status] || C.royal}`, borderRadius: '8px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+              <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresStatus[tarefa.status] || C.royal}`, borderRadius: '8px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <div>
                     <p style={{ margin: '0 0 4px 0', fontWeight: 'bold', color: C.texto, fontSize: '14px' }}>{tarefa.titulo}</p>

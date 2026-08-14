@@ -5,7 +5,7 @@ import AppShell from '../components/AppShell'
 import { GanttChart, fmt, parseData } from '../components/GanttChart'
 import { theme as C } from '../theme'
 
-const CORES_STATUS = { concluido: C.verde, em_andamento: C.royal, pendente: C.ambar }
+const CORES_STATUS = { concluido: C.verde, em_andamento: C.statusInfo, pendente: C.ambar }
 const CORES_PROJETO = ['#1E5BC6','#16A34A','#F59E0B','#DC2626','#7C3AED','#0891B2']
 
 export default function Gantt() {
@@ -64,7 +64,7 @@ export default function Gantt() {
       title="Gantt"
       subtitle="Sistema de Melhoria"
       actions={
-        <a href="/projetos" className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', border: `1px solid ${C.borda}`, color: C.texto, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 }}>
+        <a href="/projetos" className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.branco, border: `1px solid ${C.borda}`, color: C.texto, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 }}>
           <FolderKanban size={14} /> Projetos
         </a>
       }
@@ -83,7 +83,7 @@ export default function Gantt() {
         </div>
 
         {modo === 'programa' && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h2 style={{ color: C.texto, margin: 0, fontSize: '15px', fontWeight: 'bold' }}>Todos os projetos</h2>
               <span style={{ fontSize: '12px', background: '#EEF2FF', color: C.royal, padding: '3px 10px', borderRadius: '20px', fontWeight: 'bold' }}>{projetosComDatas.length} projetos com datas</span>
@@ -113,7 +113,7 @@ export default function Gantt() {
 
         {modo === 'projeto' && (
           <div>
-            <div style={{ background: 'white', borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ background: C.branco, borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <p style={{ fontSize: '13px', color: C.textoSec, margin: '0 0 10px' }}>Selecione um projeto:</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {projetos.map(p => (
@@ -125,7 +125,7 @@ export default function Gantt() {
             </div>
 
             {projetoAtual && (
-              <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <div style={{ background: C.branco, borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h2 style={{ color: C.texto, margin: 0, fontSize: '15px', fontWeight: 'bold' }}>{projetoAtual.titulo}</h2>
                   <span style={{ fontSize: '12px', color: C.textoSec }}>{tarefasAtuais.length} tarefa(s) com data</span>

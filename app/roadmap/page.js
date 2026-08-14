@@ -97,7 +97,7 @@ export default function Roadmap() {
   if (tela === 'novo') return (
     <AppShell title="Novo Roadmap" subtitle="Roadmaps" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-        <div style={{ background: 'white', borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '540px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+        <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '540px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
           <h2 style={{ color: C.texto, marginBottom: '6px', fontSize: '20px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}><Map size={20} color={C.royal} /> Novo Roadmap</h2>
           <p style={{ color: C.textoSec, fontSize: '13px', marginBottom: '24px' }}>A IA vai identificar oportunidades e criar um plano completo</p>
 
@@ -113,7 +113,7 @@ export default function Roadmap() {
             <option value="grande">Grande (6+ meses)</option>
           </select>
           <button onClick={gerarRoadmap}
-            style={{ width: '100%', padding: '13px', background: C.royal, color: 'white', border: 'none', borderRadius: '6px', fontSize: '15px', cursor: 'pointer', fontWeight: 'bold' }}>
+            style={{ width: '100%', padding: '13px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '6px', fontSize: '15px', cursor: 'pointer', fontWeight: 'bold' }}>
             Gerar Roadmap com IA
           </button>
         </div>
@@ -129,14 +129,14 @@ export default function Roadmap() {
       actions={
         <>
           <button onClick={() => setTela('lista')} style={btnHeader}>← Lista</button>
-          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}>+ Novo Roadmap</button>
+          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: C.textoSobreAccent, border: 'none' }}>+ Novo Roadmap</button>
         </>
       }
     >
       <div className="page-pad" style={{ maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         {resultado.resumo && (
-          <div style={{ background: 'white', borderRadius: '10px', padding: '24px', marginBottom: '16px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.navy}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '24px', marginBottom: '16px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.navy}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <p style={{ color: C.textoSec, fontSize: '15px', lineHeight: '1.6', margin: 0 }}>{resultado.resumo}</p>
           </div>
         )}
@@ -158,7 +158,7 @@ export default function Roadmap() {
         {resultado.fases && resultado.fases.map((fase, idx) => {
           const cf = corFase(fase.cor, idx)
           return (
-            <div key={idx} style={{ background: 'white', borderRadius: '8px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, borderLeft: `4px solid ${cf.borda}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div key={idx} style={{ background: C.branco, borderRadius: '8px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, borderLeft: `4px solid ${cf.borda}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
                 <h2 style={{ color: C.texto, fontSize: '16px', margin: 0, fontWeight: 'bold' }}>
                   {cf.icone} Fase {fase.numero} — {fase.nome}
@@ -208,7 +208,7 @@ export default function Roadmap() {
         )}
 
         {resultado.ideias_extras && resultado.ideias_extras.length > 0 && (
-          <div style={{ background: 'white', borderRadius: '10px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Brain size={16} color={C.royal} /> Ideias extras de evolucao</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {resultado.ideias_extras.map((ideia, i) => (
@@ -233,7 +233,7 @@ export default function Roadmap() {
         )}
 
         {resultado.riscos && resultado.riscos.length > 0 && (
-          <div style={{ background: 'white', borderRadius: '10px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '24px', marginBottom: '12px', border: `1px solid ${C.borda}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={16} color={C.ambar} /> Riscos identificados</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {resultado.riscos.map((r, i) => (
@@ -252,7 +252,7 @@ export default function Roadmap() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
           {resultado.kpis && resultado.kpis.length > 0 && (
-            <div style={{ background: 'white', borderRadius: '10px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <div style={{ background: C.branco, borderRadius: '10px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
               <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><BarChart3 size={16} color={C.royal} /> KPIs</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {resultado.kpis.map((k, i) => (
@@ -262,7 +262,7 @@ export default function Roadmap() {
             </div>
           )}
           {resultado.stakeholders && resultado.stakeholders.length > 0 && (
-            <div style={{ background: 'white', borderRadius: '10px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+            <div style={{ background: C.branco, borderRadius: '10px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
               <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Users size={16} color={C.royal} /> Stakeholders</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {resultado.stakeholders.map((s, i) => (
@@ -284,19 +284,19 @@ export default function Roadmap() {
       subtitle="Sistema de Melhoria"
       actions={
         <>
-          <a href="/pmo" className="btn-ghost-hover" style={{ ...btnHeader, background: 'white' }}><LayoutDashboard size={14} /> PMO</a>
-          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: 'white', border: 'none' }}>+ Novo Roadmap</button>
+          <a href="/pmo" className="btn-ghost-hover" style={{ ...btnHeader, background: C.branco }}><LayoutDashboard size={14} /> PMO</a>
+          <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: C.textoSobreAccent, border: 'none' }}>+ Novo Roadmap</button>
         </>
       }
     >
       <div className="page-pad" style={{ maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         {roadmaps.length === 0 ? (
-          <div style={{ background: 'white', borderRadius: '10px', padding: '60px', textAlign: 'center', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '60px', textAlign: 'center', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <Map size={40} color={C.royal} style={{ marginBottom: '16px' }} />
             <p style={{ color: C.texto, fontSize: '17px', fontWeight: 'bold', marginBottom: '8px' }}>Nenhum roadmap ainda</p>
             <p style={{ color: C.textoMudo, fontSize: '14px', marginBottom: '24px' }}>Crie seu primeiro roadmap com IA</p>
             <button onClick={() => { setForm({ titulo: '', descricao: '', responsavel: '', porte: 'medio', area: '' }); setTela('novo') }}
-              className="btn-hover" style={{ padding: '11px 24px', background: C.royal, color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', cursor: 'pointer', fontWeight: 700 }}>
+              className="btn-hover" style={{ padding: '11px 24px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '8px', fontSize: '14px', cursor: 'pointer', fontWeight: 700 }}>
               Criar primeiro roadmap
             </button>
           </div>
@@ -304,7 +304,7 @@ export default function Roadmap() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {roadmaps.map(r => (
               <div key={r.id} onClick={() => verRoadmap(r.id)}
-                style={{ background: 'white', borderRadius: '10px', padding: '20px 24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+                style={{ background: C.branco, borderRadius: '10px', padding: '20px 24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
                 <div>
                   <p style={{ fontSize: '15px', fontWeight: 'bold', margin: '0 0 4px', color: C.texto }}>{r.titulo}</p>
                   <p style={{ fontSize: '13px', color: C.textoMudo, margin: 0 }}>{r.area || 'Sem area'} • {diasAtras(r.criado_em)}</p>

@@ -1,31 +1,36 @@
 export const theme = {
-  navy:      '#0B1F3A',
-  royal:     '#1E5BC6',
-  blue:      '#3B82F6',
-  fundo:     '#F1F4F8',
-  borda:     '#E2E8F0',
-  bordaForte:'#CBD5E1',
-  texto:     '#0F1B2D',
-  textoSec:  '#48607A',
-  textoMudo: '#94A3B8',
-  branco:    '#FFFFFF',
+  navy:      '#0f132e',
+  royal:     '#eac195',
+  blue:      '#536d88',
+  fundo:     '#0f132e',
+  borda:     'rgba(83,109,136,0.35)',
+  bordaForte:'#536d88',
+  texto:     '#F2EFE9',
+  textoSec:  '#b49b85',
+  textoMudo: '#536d88',
+  branco:    '#19274e',
   verde:     '#16A34A',
   ambar:     '#F59E0B',
   vermelho:  '#DC2626',
   roxo:      '#7C3AED',
 
+  // texto legivel sobre o dourado (botoes/badges com fundo "royal")
+  textoSobreAccent: '#0f132e',
+  // azul de status estavel, independente da cor de marca (usado em "em andamento")
+  statusInfo: '#1E5BC6',
+
   // sidebar / shell
-  sidebarBg:        '#0B1F3A',
-  sidebarBgHover:   'rgba(255,255,255,0.06)',
-  sidebarActive:    '#1E5BC6',
-  sidebarText:      '#E7ECF3',
-  sidebarTextMuted: '#8FA3B1',
+  sidebarBg:        '#0f132e',
+  sidebarBgHover:   'rgba(234,193,149,0.08)',
+  sidebarActive:    '#eac195',
+  sidebarText:      '#F2EFE9',
+  sidebarTextMuted: '#b49b85',
 
   // aliases usados por telas antigas
-  fundoLegado: '#F1F4F8',
-  cabecalho:   '#0B1F3A',
-  acento:      '#1E5BC6',
-  acentoClaro: '#3B82F6',
+  fundoLegado: '#0f132e',
+  cabecalho:   '#0f132e',
+  acento:      '#eac195',
+  acentoClaro: '#f2d2a6',
 }
 
 export const botaoVoltar = {
@@ -33,10 +38,10 @@ export const botaoVoltar = {
   alignItems: 'center',
   gap: '6px',
   padding: '7px 16px',
-  background: '#FFFFFF',
-  border: '1px solid #E2E8F0',
+  background: '#19274e',
+  border: '1px solid rgba(83,109,136,0.35)',
   borderRadius: '8px',
-  color: '#1E5BC6',
+  color: '#eac195',
   fontSize: '13px',
   textDecoration: 'none',
   fontWeight: 600,
@@ -45,10 +50,10 @@ export const botaoVoltar = {
 }
 
 export const estiloCard = {
-  background: '#FFFFFF',
-  border: '1px solid #E7ECF3',
+  background: '#19274e',
+  border: '1px solid rgba(83,109,136,0.35)',
   borderRadius: '14px',
-  boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.04), 0 12px 24px -12px rgba(15,23,42,0.12)',
+  boxShadow: '0 1px 2px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.18), 0 12px 24px -12px rgba(0,0,0,0.35)',
 }
 
 export const estiloEyebrow = {
@@ -56,7 +61,7 @@ export const estiloEyebrow = {
   fontWeight: 700,
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
-  color: '#7B8CA6',
+  color: '#b49b85',
   margin: '0 0 10px',
 }
 
@@ -64,19 +69,19 @@ export const estiloStatNumero = {
   fontSize: '32px',
   fontWeight: 800,
   letterSpacing: '-0.02em',
-  color: '#0F1B2D',
+  color: '#F2EFE9',
   margin: '0 0 4px',
   fontVariantNumeric: 'tabular-nums',
   lineHeight: 1.1,
 }
 
 export const botaoPrimario = {
-  background: '#1E5BC6',
-  color: '#FFFFFF',
+  background: '#eac195',
+  color: '#0f132e',
   border: 'none',
   borderRadius: '8px',
   cursor: 'pointer',
-  fontWeight: 600,
+  fontWeight: 700,
 }
 
 export const SIDEBAR_WIDTH = 232

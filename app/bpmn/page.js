@@ -420,7 +420,7 @@ ${conexoes}
       {/* Content */}
       <div className="page-pad" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
-        <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, marginBottom: '16px', boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: C.branco, borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, marginBottom: '16px', boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
           <h2 style={{ color: C.texto, fontSize: '15px', margin: '0 0 6px', fontWeight: 'bold' }}>Descreva o processo</h2>
           <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 14px' }}>Conte como o processo funciona — quem participa, quais etapas, quais decisoes. A IA vai criar o diagrama BPMN automaticamente.</p>
           <textarea
@@ -446,7 +446,7 @@ ${conexoes}
         )}
 
         {dados && (
-          <div style={{ background: 'white', borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: C.branco, borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
               <h2 style={{ color: C.texto, fontSize: '15px', margin: 0, fontWeight: 'bold' }}>{dados.nome}</h2>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -474,7 +474,7 @@ ${conexoes}
         )}
 
         {!dados && !gerando && (
-          <div style={{ background: 'white', borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, textAlign: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, textAlign: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
             <Workflow size={40} color={C.royal} style={{ marginBottom: '12px' }} />
             <p style={{ color: C.texto, fontSize: '15px', fontWeight: 'bold', margin: '0 0 6px' }}>Como usar</p>
             <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>Descreva o processo em linguagem natural. Mencione os participantes, as etapas e as decisoes. Quanto mais detalhado, melhor o diagrama.</p>
