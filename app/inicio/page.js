@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { ClipboardList, FolderKanban, Kanban, TrendingUp, Map, Sparkles, Workflow, Wallet, History, ArrowLeft, Trash2, CheckCircle2, Loader2 } from 'lucide-react'
+import { ClipboardList, FolderKanban, Kanban, FileText, TrendingUp, Map, Sparkles, Workflow, Wallet, History, ArrowLeft, Trash2, CheckCircle2, Loader2 } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { theme as C, botaoVoltar, botaoPrimario } from '../theme'
 
@@ -95,6 +95,7 @@ export default function Inicio() {
       { icone: ClipboardList, titulo: 'Analise de Processo', desc: 'Entrevista com IA e relatorio de melhorias', onClick: () => setTela('formulario'), borda: C.royal },
       { icone: FolderKanban, titulo: 'Projetos', desc: 'Gerencie projetos e tarefas com prazos', href: '/projetos', borda: C.royal },
       { icone: Kanban, titulo: 'Iniciativas', desc: 'Backlog de demandas e ideias em quadro Kanban', href: '/iniciativas', borda: C.roxo, badge: 'Novo' },
+      { icone: FileText, titulo: 'Notas', desc: 'Informacoes e arquivos livres, com markdown', href: '/notas', borda: C.blue, badge: 'Novo' },
       { icone: TrendingUp, titulo: 'PMO / Dashboard', desc: 'Visao de portfolio, orcamento e riscos', href: '/pmo', borda: C.navy },
       { icone: Map, titulo: 'Roadmap', desc: 'Gerar plano de projeto com IA', href: '/roadmap', borda: C.navy, badge: 'Novo' },
       { icone: Sparkles, titulo: 'Assistente IA', desc: 'Pergunte sobre seus projetos e tarefas', href: '/assistente', borda: C.blue, badge: 'Novo' },

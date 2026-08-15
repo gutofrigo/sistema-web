@@ -2,13 +2,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Home, FolderKanban, Kanban, TrendingUp, Map, GanttChartSquare, Wallet, Sparkles, Workflow, LogOut, Menu, X } from 'lucide-react'
+import { Home, FolderKanban, Kanban, FileText, TrendingUp, Map, GanttChartSquare, Wallet, Sparkles, Workflow, LogOut, Menu, X } from 'lucide-react'
 import { theme as C } from '../theme'
 
 const MODULOS = [
   { href: '/inicio', label: 'Inicio', icon: Home },
   { href: '/projetos', label: 'Projetos', icon: FolderKanban },
   { href: '/iniciativas', label: 'Iniciativas', icon: Kanban },
+  { href: '/notas', label: 'Notas', icon: FileText },
   { href: '/pmo', label: 'PMO / Dashboard', icon: TrendingUp },
   { href: '/roadmap', label: 'Roadmap', icon: Map },
   { href: '/gantt', label: 'Gantt', icon: GanttChartSquare },
