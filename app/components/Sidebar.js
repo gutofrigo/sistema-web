@@ -61,7 +61,13 @@ export default function Sidebar() {
                 href={m.href}
                 onClick={() => setAberta(false)}
                 className="nav-link"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', textDecoration: 'none', color: ativo ? '#0f132e' : C.sidebarTextMuted, background: ativo ? C.sidebarActive : 'transparent', fontSize: '13px', fontWeight: ativo ? 700 : 500 }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px 9px 10px', borderRadius: '8px', textDecoration: 'none',
+                  color: ativo ? '#0f132e' : C.sidebarTextMuted,
+                  background: ativo ? C.sidebarActive : 'transparent',
+                  fontSize: '13px', fontWeight: ativo ? 700 : 500,
+                  boxShadow: ativo ? 'inset 3px 0 0 0 #0f132e, 0 2px 6px rgba(0,0,0,0.18)' : 'none',
+                }}
               >
                 <Icone size={17} />
                 {m.label}
