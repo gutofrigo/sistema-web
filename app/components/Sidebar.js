@@ -41,7 +41,7 @@ export default function Sidebar() {
       {aberta && <div className="app-sidebar-overlay" onClick={() => setAberta(false)} />}
 
       <aside className={'app-sidebar' + (aberta ? ' aberta' : '')} style={{ background: C.sidebarBg, display: 'flex', flexDirection: 'column', padding: '20px 14px', boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px', padding: '0 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '0 8px 20px', marginBottom: '20px', borderBottom: '1px solid rgba(234,193,149,0.14)' }}>
           <div>
             <p style={{ color: C.sidebarTextMuted, fontSize: '11px', margin: '0 0 2px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Sistema de Melhoria</p>
             <p style={{ color: 'white', fontSize: '15px', fontWeight: 700, margin: 0 }}>Gestao de Projetos</p>
@@ -73,7 +73,7 @@ export default function Sidebar() {
         <button
           onClick={sair}
           className="nav-link"
-          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', border: 'none', background: 'transparent', color: C.sidebarTextMuted, fontSize: '13px', cursor: 'pointer', marginTop: '12px', textAlign: 'left' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', border: 'none', background: 'transparent', color: C.sidebarTextMuted, fontSize: '13px', cursor: 'pointer', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid rgba(234,193,149,0.14)', textAlign: 'left' }}
         >
           <LogOut size={17} />
           Sair
