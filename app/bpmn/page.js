@@ -474,7 +474,7 @@ ${conexoes}
         )}
 
         {!dados && !gerando && (
-          <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, textAlign: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, textAlign: 'center', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
             <Workflow size={40} color={C.royal} style={{ marginBottom: '12px' }} />
             <p style={{ color: C.texto, fontSize: '15px', fontWeight: 'bold', margin: '0 0 6px' }}>Como usar</p>
             <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>Descreva o processo em linguagem natural. Mencione os participantes, as etapas e as decisoes. Quanto mais detalhado, melhor o diagrama.</p>

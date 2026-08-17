@@ -17,8 +17,8 @@ export default function Inicio() {
     fetch('/api/pmo').then(r => r.json()).then(setDados)
   }, [])
 
-  const cardStyle = { background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '16px 18px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }
-  const painelStyle = { background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)', overflow: 'hidden' }
+  const cardStyle = { background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '16px 18px', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }
+  const painelStyle = { background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)', overflow: 'hidden' }
 
   if (!dados) {
     return (

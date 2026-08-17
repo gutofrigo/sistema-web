@@ -364,7 +364,7 @@ export default function Projetos() {
       <div className="page-pad" style={{ maxWidth: '1180px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         {mostrarImportar && (
-          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
               <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Upload size={16} color={C.royal} /> Importar projetos por CSV</h3>
               <button onClick={baixarModeloCsv} style={{ padding: '7px 14px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -471,14 +471,14 @@ export default function Projetos() {
             <>
               <div className="grid-6" style={{ marginBottom: '18px' }}>
                 {statCards.map(c => (
-                  <div key={c.label} style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '16px 18px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+                  <div key={c.label} style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '16px 18px', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
                     <p style={{ margin: '0 0 6px', fontSize: '11px', color: C.textoMudo, fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase' }}>{c.label}</p>
                     <p style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: c.cor }}>{c.valor}</p>
                   </div>
                 ))}
               </div>
 
-              <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '20px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+              <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '20px', marginBottom: '20px', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
                 <p style={{ margin: '0 0 12px', fontSize: '12px', color: C.textoMudo, fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase' }}>Avanco medio do portfolio</p>
                 <div style={{ display: 'flex', width: '100%', height: '10px', borderRadius: '6px', overflow: 'hidden', background: C.fundo, marginBottom: '12px' }}>
                   {barSegmentos.map(seg => contagem[seg.chave] > 0 && (
@@ -501,7 +501,7 @@ export default function Projetos() {
                   const emRiscoArea = itens.filter(p => statusPortfolio(p).chave === 'em_risco').length
                   const avancoArea = itens.length > 0 ? Math.round(itens.reduce((s, p) => s + (p.progresso || 0), 0) / itens.length) : 0
                   return (
-                    <div key={area} style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)', overflow: 'hidden' }}>
+                    <div key={area} style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)', overflow: 'hidden' }}>
                       <div style={{ padding: '18px 20px', borderBottom: `1px solid ${C.borda}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
                         <div>
                           <h3 style={{ margin: '0 0 3px', color: C.texto, fontSize: '15px', fontWeight: 800 }}>{area}</h3>
@@ -653,7 +653,7 @@ export default function Projetos() {
 
         {/* Cronograma — EDT */}
         {tarefas.length > 0 && (
-          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+          <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', flexWrap: 'wrap', gap: '8px' }}>
               <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><GanttChartSquare size={16} color={C.royal} /> Visao de projeto (EDT)</h3>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>

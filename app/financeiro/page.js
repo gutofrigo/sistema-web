@@ -124,7 +124,7 @@ export default function Financeiro() {
   if (tela === 'novo') return (
     <AppShell title="Novo Lancamento" subtitle="Financeiro" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-        <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '560px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+        <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', width: '100%', maxWidth: '560px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
             <button onClick={() => setForm({ ...form, tipo: 'saida' })} style={{ flex: 1, padding: '11px', background: form.tipo === 'saida' ? C.vermelho : C.fundo, color: form.tipo === 'saida' ? 'white' : C.textoSec, border: `1px solid ${form.tipo === 'saida' ? C.vermelho : C.borda}`, borderRadius: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>

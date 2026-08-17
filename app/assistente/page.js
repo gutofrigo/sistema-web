@@ -243,7 +243,7 @@ export default function Assistente() {
             </div>
           )}
           {entrevistaAberta ? (
-            <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+            <div style={{ background: C.branco, borderRadius: '10px', padding: '32px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
                   <h2 style={{ color: C.texto, margin: '0 0 4px' }}>{entrevistaAberta.processo}</h2>
@@ -261,7 +261,7 @@ export default function Assistente() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {entrevistas.map(e => (
-                <div key={e.id} style={{ background: C.branco, borderRadius: '10px', padding: '18px 20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+                <div key={e.id} style={{ background: C.branco, borderRadius: '10px', padding: '18px 20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
                   <div onClick={() => setEntrevistaAberta(e)} style={{ cursor: 'pointer', flex: 1 }}>
                     <p style={{ fontWeight: 700, color: C.texto, margin: '0 0 4px', fontSize: '15px' }}>{e.processo}</p>
                     <p style={{ color: C.textoMudo, fontSize: '13px', margin: 0 }}>{e.responsavel} • {diasAtras(e.criado_em)}</p>
@@ -281,7 +281,7 @@ export default function Assistente() {
     return (
       <AppShell title="Analise de Processo" subtitle="Entrevista guiada por IA" actions={<>{tabs}<BotaoAcao onClick={abrirHistorico} label="Historico" icone={History} /></>}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '500px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '500px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
             <h2 style={{ color: C.texto, marginBottom: '24px', fontSize: '20px' }}>Novo Processo</h2>
             <input placeholder="Nome do processo (ex: Compras)" value={processo} onChange={e => setProcesso(e.target.value)}
               style={{ width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '14px', marginBottom: '12px', boxSizing: 'border-box', color: C.texto }} />
@@ -301,7 +301,7 @@ export default function Assistente() {
     return (
       <AppShell title={processo} subtitle={`Pergunta ${etapa + 1} de ${perguntasEntrevista.length}`} actions={<BotaoAcao onClick={novaEntrevista} label="Cancelar" icone={ArrowLeft} />}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', boxSizing: 'border-box' }}>
-          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '600px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', width: '100%', maxWidth: '600px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
               <span style={{ color: C.royal, fontWeight: 700, fontSize: '14px' }}>Pergunta {etapa + 1} de {perguntasEntrevista.length}</span>
               <div style={{ display: 'flex', gap: '4px' }}>
@@ -342,7 +342,7 @@ export default function Assistente() {
     return (
       <AppShell title={`Relatorio: ${processo}`} subtitle={`Responsavel: ${nome}`} actions={<BotaoAcao onClick={novaEntrevista} label="Nova entrevista" icone={ArrowLeft} />}>
         <div className="page-pad" style={{ maxWidth: '700px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
-          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06)' }}>
+          <div style={{ background: C.branco, borderRadius: '10px', padding: '36px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
             <div style={{ background: C.fundo, borderRadius: '8px', padding: '24px', whiteSpace: 'pre-wrap', lineHeight: '1.7', color: C.texto, marginBottom: '24px', border: `1px solid ${C.borda}` }}>
               {relatorio}
             </div>

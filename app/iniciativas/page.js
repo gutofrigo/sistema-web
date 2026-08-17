@@ -181,7 +181,7 @@ export default function Iniciativas() {
                         draggable
                         onDragStart={e => onDragStart(e, item.id)}
                         className="card-elevate"
-                        style={{ background: C.branco, border: `1px solid #E7ECF3`, borderLeft: `4px solid ${corPrioridade(item.prioridade)}`, borderRadius: '10px', padding: '12px', cursor: 'grab', opacity: arrastando === item.id ? 0.5 : 1, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+                        style={{ background: C.branco, border: `1px solid #E7ECF3`, borderLeft: `4px solid ${corPrioridade(item.prioridade)}`, borderRadius: '10px', padding: '12px', cursor: 'grab', opacity: arrastando === item.id ? 0.5 : 1, boxShadow: '0 1px 3px rgba(15,23,42,0.07), 0 4px 10px rgba(15,23,42,0.07), 0 18px 32px -12px rgba(15,23,42,0.18)' }}>
                         <p style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 700, color: C.texto }}>{item.titulo}</p>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
                           <span style={{ fontSize: '10px', fontWeight: 700, color: 'white', background: corCategoria(item.categoria), padding: '2px 8px', borderRadius: '20px' }}>{labelCategoria(item.categoria)}</span>
