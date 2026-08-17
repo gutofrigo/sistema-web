@@ -22,6 +22,7 @@ body {
 .page-pad { padding: 40px; }
 
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
@@ -32,11 +33,13 @@ body {
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
+  .grid-6 { grid-template-columns: repeat(3, 1fr); }
   .menu-card { width: calc(50% - 8px); min-width: 150px; }
 }
 
 @media (max-width: 480px) {
   .grid-4 { grid-template-columns: 1fr; }
+  .grid-6 { grid-template-columns: repeat(2, 1fr); }
   .menu-card { width: 100%; }
 }
 

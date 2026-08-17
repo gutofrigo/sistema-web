@@ -1,12 +1,21 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { GanttChartSquare, AlertTriangle, Pencil, Sparkles, Plus, Trash2, User, Calendar, Paperclip, Wallet, Upload, Download } from 'lucide-react'
+import { GanttChartSquare, AlertTriangle, Pencil, Sparkles, Plus, Trash2, User, Wallet, Upload, Download, ChevronRight, ChevronDown, ListChecks, Calendar } from 'lucide-react'
 import AppShell from '../components/AppShell'
-import { GanttChart, fmt, parseData } from '../components/GanttChart'
 import { theme as C } from '../theme'
 
 const coresStatus = { pendente: C.ambar, em_andamento: C.statusInfo, concluido: C.verde }
 const coresImpacto = { baixo: C.verde, medio: C.ambar, alto: C.vermelho }
+
+function statusPortfolio(p) {
+  const hoje = new Date()
+  const atrasado = !!p.data_prevista_fim && p.status !== 'concluido' && new Date(p.data_prevista_fim + 'T23:59:59') < hoje
+  if (p.status === 'concluido') return { chave: 'concluido', label: 'Concluido', cor: C.verde, bg: '#F0FDF4' }
+  if (atrasado) return { chave: 'atrasado', label: 'Atrasado', cor: C.vermelho, bg: '#FEF2F2' }
+  if (p.em_risco) return { chave: 'em_risco', label: 'Em risco', cor: C.ambar, bg: '#FFFBEB' }
+  if (p.status === 'em_andamento') return { chave: 'no_prazo', label: 'No prazo', cor: C.statusInfo, bg: '#EFF6FF' }
+  return { chave: 'planejado', label: 'Planejado', cor: C.textoMudo, bg: '#F3F4F6' }
+}
 
 function formatarMoeda(v) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0)
@@ -52,10 +61,10 @@ export default function Projetos() {
   const [tarefas, setTarefas] = useState([])
   const [riscos, setRiscos] = useState([])
   const [roadmapVinculado, setRoadmapVinculado] = useState(null)
-  const [novoProj, setNovoProj] = useState({ titulo: '', responsavel: '', descricao: '', orcamento: '', data_prevista_fim: '', prioridade: 'media' })
+  const [novoProj, setNovoProj] = useState({ titulo: '', responsavel: '', descricao: '', orcamento: '', data_prevista_fim: '', prioridade: 'media', area: '' })
   const [novaTarefa, setNovaTarefa] = useState({ titulo: '', responsavel: '', data_inicio: '', data_entrega: '', status: 'pendente', tarefa_pai_id: '' })
   const [novoRisco, setNovoRisco] = useState({ descricao: '', categoria: '', probabilidade: 'media', impacto: 'medio', mitigacao: '', responsavel: '' })
-  const [editProj, setEditProj] = useState({ titulo: '', descricao: '', responsavel: '', orcamento: '', data_prevista_fim: '', prioridade: 'media' })
+  const [editProj, setEditProj] = useState({ titulo: '', descricao: '', responsavel: '', orcamento: '', data_prevista_fim: '', prioridade: 'media', area: '', progresso: 0, em_risco: false })
   const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
   const [mostrarGerador, setMostrarGerador] = useState(false)
   const [mostrarRiscos, setMostrarRiscos] = useState(false)
@@ -71,6 +80,10 @@ export default function Projetos() {
   const [csvErro, setCsvErro] = useState('')
   const [importando, setImportando] = useState(false)
   const [resultadoImportacao, setResultadoImportacao] = useState(null)
+  const [colapsados, setColapsados] = useState(new Set())
+  const [mostrarEditarTarefas, setMostrarEditarTarefas] = useState(false)
+  const [edicoesTarefas, setEdicoesTarefas] = useState({})
+  const [salvandoEdicoes, setSalvandoEdicoes] = useState(false)
 
   useEffect(() => { init() }, [])
 
@@ -107,7 +120,7 @@ export default function Projetos() {
   async function criarProjeto() {
     if (!novoProj.titulo) return alert('Digite o titulo do projeto')
     await fetch('/api/projetos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novoProj) })
-    setNovoProj({ titulo: '', responsavel: '', descricao: '', orcamento: '', data_prevista_fim: '', prioridade: 'media' })
+    setNovoProj({ titulo: '', responsavel: '', descricao: '', orcamento: '', data_prevista_fim: '', prioridade: 'media', area: '' })
     setTela('lista')
     buscarProjetos()
   }
@@ -118,7 +131,10 @@ export default function Projetos() {
       responsavel: projetoAtivo.responsavel || '',
       orcamento: projetoAtivo.orcamento || '',
       data_prevista_fim: projetoAtivo.data_prevista_fim || '',
-      prioridade: projetoAtivo.prioridade || 'media'
+      prioridade: projetoAtivo.prioridade || 'media',
+      area: projetoAtivo.area || '',
+      progresso: projetoAtivo.progresso || 0,
+      em_risco: !!projetoAtivo.em_risco
     })
     setMostrarEditar(true)
     setMostrarGerador(false)
@@ -194,8 +210,8 @@ export default function Projetos() {
     buscarProjetos()
   }
   function baixarModeloCsv() {
-    const modelo = 'titulo,responsavel,descricao,orcamento,data_prevista_fim,prioridade,status\n' +
-      'Migracao para nuvem AWS,Carlos Mendes,Migrar infraestrutura para AWS,180000,2026-12-31,alta,em_andamento\n'
+    const modelo = 'titulo,responsavel,descricao,orcamento,data_prevista_fim,prioridade,status,area,progresso,em_risco\n' +
+      'Migracao para nuvem AWS,Carlos Mendes,Migrar infraestrutura para AWS,180000,2026-12-31,alta,em_andamento,Infraestrutura,25,false\n'
     const blob = new Blob([modelo], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -235,6 +251,46 @@ export default function Projetos() {
   }
   async function atualizarTarefa(id, campos) {
     await fetch('/api/tarefas', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...campos }) })
+    buscarTarefas(projetoAtivo.id)
+  }
+  function toggleColapso(id) {
+    setColapsados(prev => {
+      const novo = new Set(prev)
+      if (novo.has(id)) novo.delete(id); else novo.add(id)
+      return novo
+    })
+  }
+  function statusEDT(t) {
+    const hoje = new Date()
+    const atrasada = !!t.data_entrega && t.status !== 'concluido' && new Date(t.data_entrega + 'T23:59:59') < hoje
+    if (t.status === 'concluido') return { cor: C.verde, atrasada: false, label: 'Concluido' }
+    if (atrasada) return { cor: C.vermelho, atrasada: true, label: 'Atrasado' }
+    if (t.status === 'em_andamento') return { cor: C.statusInfo, atrasada: false, label: 'Em andamento' }
+    return { cor: C.ambar, atrasada: false, label: 'Pendente' }
+  }
+  function valorEdicao(tarefa, campo) {
+    const e = edicoesTarefas[tarefa.id]
+    if (e && e[campo] !== undefined) return e[campo]
+    if (campo === 'progresso') return tarefa.progresso || 0
+    return tarefa[campo] || ''
+  }
+  function alterarEdicao(id, campo, valor) {
+    setEdicoesTarefas(prev => ({ ...prev, [id]: { ...prev[id], [campo]: valor } }))
+  }
+  async function salvarEdicoesTarefas() {
+    const ids = Object.keys(edicoesTarefas)
+    if (ids.length === 0) { setMostrarEditarTarefas(false); return }
+    setSalvandoEdicoes(true)
+    await Promise.all(ids.map(id => {
+      const campos = edicoesTarefas[id]
+      const corpo = { id }
+      if (campos.progresso !== undefined) corpo.progresso = Math.max(0, Math.min(100, Number(campos.progresso) || 0))
+      if (campos.data_inicio !== undefined) corpo.data_inicio = campos.data_inicio || null
+      if (campos.data_entrega !== undefined) corpo.data_entrega = campos.data_entrega || null
+      return fetch('/api/tarefas', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
+    }))
+    setSalvandoEdicoes(false)
+    setEdicoesTarefas({})
     buscarTarefas(projetoAtivo.id)
   }
   async function gerarTarefasIA() {
@@ -277,12 +333,17 @@ export default function Projetos() {
 
   const tarefasPai = tarefas.filter(t => !t.tarefa_pai_id)
   const tarefasFilho = (paiId) => tarefas.filter(t => t.tarefa_pai_id === paiId)
-  const tarefasComDatas = tarefas.filter(t => t.data_entrega).map(t => ({
-    ...t,
-    inicio: parseData(t.data_inicio) || parseData(t.data_entrega),
-    fim: parseData(t.data_entrega)
-  }))
   const pctProjeto = tarefas.length > 0 ? Math.round(tarefas.reduce((s, t) => s + (t.progresso || 0), 0) / tarefas.length) : 0
+
+  const listaEDT = []
+  tarefasPai.forEach((pai, idxPai) => {
+    const filhos = tarefasFilho(pai.id)
+    const numero = String(idxPai + 1)
+    listaEDT.push({ tarefa: pai, numero, nivel: 0, contagem: filhos.length })
+    filhos.forEach((filho, idxFilho) => {
+      listaEDT.push({ tarefa: filho, numero: numero + '.' + (idxFilho + 1), nivel: 1, paiId: pai.id, contagem: 0 })
+    })
+  })
 
   const btnHeader = { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: C.fundo, border: `1px solid ${C.borda}`, borderRadius: '8px', color: C.texto, fontSize: '13px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }
   const inputStyle = { width: '100%', padding: '11px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', color: C.texto }
@@ -300,7 +361,7 @@ export default function Projetos() {
         </>
       }
     >
-      <div className="page-pad" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+      <div className="page-pad" style={{ maxWidth: '1180px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         {mostrarImportar && (
           <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
@@ -311,7 +372,7 @@ export default function Projetos() {
               </button>
             </div>
             <p style={{ color: C.textoSec, fontSize: '13px', margin: '0 0 16px' }}>
-              Colunas aceitas: <strong>titulo</strong> (obrigatorio), responsavel, descricao, orcamento, data_prevista_fim (AAAA-MM-DD), prioridade (baixa/media/alta), status (pendente/em_andamento/concluido).
+              Colunas aceitas: <strong>titulo</strong> (obrigatorio), responsavel, descricao, orcamento, data_prevista_fim (AAAA-MM-DD), prioridade (baixa/media/alta), status (pendente/em_andamento/concluido), area, progresso (0-100), em_risco (true/false).
               Se o titulo ja existir em um projeto cadastrado, os dados dele sao atualizados; senao, um projeto novo e criado.
             </p>
             <input type="file" accept=".csv,text/csv" onChange={lidarComArquivoCsv}
@@ -371,22 +432,134 @@ export default function Projetos() {
             <p style={{ fontSize: '14px' }}>Crie um projeto ou faca uma entrevista de processo</p>
           </div>
         )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {projetos.map(p => (
-            <div key={p.id} onClick={() => abrirProjeto(p)} className="card-elevate" style={{ background: C.branco, border: `1px solid #E7ECF3`, borderLeft: `5px solid ${coresStatus[p.status] || C.royal}`, borderRadius: '14px', padding: '20px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.04)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ margin: '0 0 6px 0', color: C.texto, fontSize: '15px' }}>{p.titulo}</h3>
-                  <p style={{ margin: 0, color: C.textoMudo, fontSize: '13px' }}>{p.responsavel || 'Sem responsavel'} • {new Date(p.criado_em).toLocaleDateString('pt-BR')}</p>
+
+        {projetos.length > 0 && (() => {
+          const comStatus = projetos.map(p => ({ p, st: statusPortfolio(p) }))
+          const contagem = { concluido: 0, atrasado: 0, em_risco: 0, no_prazo: 0, planejado: 0 }
+          comStatus.forEach(x => { contagem[x.st.chave]++ })
+          const total = projetos.length
+          const emAndamento = projetos.filter(p => p.status === 'em_andamento').length
+          const planejadas = projetos.filter(p => p.status === 'pendente').length
+          const concluidas = projetos.filter(p => p.status === 'concluido').length
+
+          const statCards = [
+            { label: 'Iniciativas', valor: total, cor: C.texto },
+            { label: 'Em andamento', valor: emAndamento, cor: C.statusInfo },
+            { label: 'Planejadas', valor: planejadas, cor: C.textoMudo },
+            { label: 'Concluidas', valor: concluidas, cor: C.verde },
+            { label: 'Atrasadas', valor: contagem.atrasado, cor: C.vermelho },
+            { label: 'Em risco', valor: contagem.em_risco, cor: C.ambar },
+          ]
+
+          const barSegmentos = [
+            { chave: 'atrasado', label: 'Atrasado', cor: C.vermelho },
+            { chave: 'em_risco', label: 'Em risco', cor: C.ambar },
+            { chave: 'no_prazo', label: 'No prazo', cor: C.statusInfo },
+            { chave: 'planejado', label: 'Planejado', cor: C.textoMudo },
+            { chave: 'concluido', label: 'Concluido', cor: C.verde },
+          ]
+
+          const grupos = {}
+          projetos.forEach(p => {
+            const chave = p.area || 'Sem area'
+            if (!grupos[chave]) grupos[chave] = []
+            grupos[chave].push(p)
+          })
+          const gruposOrdenados = Object.entries(grupos).sort((a, b) => b[1].length - a[1].length)
+
+          return (
+            <>
+              <div className="grid-6" style={{ marginBottom: '18px' }}>
+                {statCards.map(c => (
+                  <div key={c.label} style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '16px 18px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+                    <p style={{ margin: '0 0 6px', fontSize: '11px', color: C.textoMudo, fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase' }}>{c.label}</p>
+                    <p style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: c.cor }}>{c.valor}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', padding: '20px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
+                <p style={{ margin: '0 0 12px', fontSize: '12px', color: C.textoMudo, fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase' }}>Avanco medio do portfolio</p>
+                <div style={{ display: 'flex', width: '100%', height: '10px', borderRadius: '6px', overflow: 'hidden', background: C.fundo, marginBottom: '12px' }}>
+                  {barSegmentos.map(seg => contagem[seg.chave] > 0 && (
+                    <div key={seg.chave} style={{ width: (contagem[seg.chave] / total * 100) + '%', background: seg.cor }} />
+                  ))}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ background: coresStatus[p.status] || C.royal, color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>{p.status}</span>
-                  <button onClick={e => deletarProjeto(e, p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '4px' }} title="Deletar projeto"><Trash2 size={16} /></button>
+                <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap' }}>
+                  {barSegmentos.map(seg => (
+                    <span key={seg.chave} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: C.textoSec }}>
+                      <span style={{ width: '9px', height: '9px', borderRadius: '3px', background: seg.cor, display: 'inline-block' }} />
+                      {seg.label} · {contagem[seg.chave]}
+                    </span>
+                  ))}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                {gruposOrdenados.map(([area, itens]) => {
+                  const emAndamentoArea = itens.filter(p => p.status === 'em_andamento').length
+                  const emRiscoArea = itens.filter(p => statusPortfolio(p).chave === 'em_risco').length
+                  const avancoArea = itens.length > 0 ? Math.round(itens.reduce((s, p) => s + (p.progresso || 0), 0) / itens.length) : 0
+                  return (
+                    <div key={area} style={{ background: C.branco, border: `1px solid ${C.borda}`, borderRadius: '10px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)', overflow: 'hidden' }}>
+                      <div style={{ padding: '18px 20px', borderBottom: `1px solid ${C.borda}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+                        <div>
+                          <h3 style={{ margin: '0 0 3px', color: C.texto, fontSize: '15px', fontWeight: 800 }}>{area}</h3>
+                          <p style={{ margin: 0, color: C.textoMudo, fontSize: '12px' }}>{itens.length} iniciativa(s) · {emAndamentoArea} em andamento</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '1 1 220px', maxWidth: '320px' }}>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '10px', color: C.textoMudo, fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase' }}>Avanco medio</p>
+                            <div style={{ width: '100%', height: '7px', borderRadius: '4px', background: C.fundo, overflow: 'hidden' }}>
+                              <div style={{ height: '100%', width: avancoArea + '%', background: C.statusInfo }} />
+                            </div>
+                          </div>
+                          <span style={{ fontSize: '15px', fontWeight: 800, color: C.texto }}>{avancoArea}%</span>
+                          {emRiscoArea > 0 && (
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: C.ambar, background: '#FFFBEB', padding: '4px 10px', borderRadius: '20px', whiteSpace: 'nowrap' }}>{emRiscoArea} em risco</span>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        {itens.map(p => {
+                          const st = statusPortfolio(p)
+                          const hoje = new Date()
+                          const prazoProximo = !!p.data_prevista_fim && st.chave !== 'concluido' && st.chave !== 'atrasado' && (new Date(p.data_prevista_fim + 'T23:59:59') - hoje) < 1000 * 60 * 60 * 24 * 60
+                          return (
+                            <div key={p.id} onClick={() => abrirProjeto(p)} className="card-elevate" style={{ padding: '14px 20px', borderBottom: `1px solid ${C.fundo}`, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                              <div style={{ flex: '2 1 260px', minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                  <p style={{ margin: 0, color: C.texto, fontSize: '13.5px', fontWeight: 600 }}>{p.titulo}</p>
+                                  <span style={{ fontSize: '11px', fontWeight: 700, color: st.cor, background: st.bg, padding: '3px 10px', borderRadius: '20px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: st.cor, display: 'inline-block' }} />
+                                    {st.label}
+                                  </span>
+                                </div>
+                                {p.responsavel && <p style={{ margin: '3px 0 0', color: C.textoMudo, fontSize: '11.5px' }}>{p.responsavel}</p>}
+                              </div>
+                              <div style={{ flex: '1 1 140px', maxWidth: '180px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ flex: 1, height: '6px', borderRadius: '4px', background: C.fundo, overflow: 'hidden' }}>
+                                  <div style={{ height: '100%', width: (p.progresso || 0) + '%', background: st.cor }} />
+                                </div>
+                                <span style={{ fontSize: '12px', fontWeight: 700, color: C.textoSec, minWidth: '30px', textAlign: 'right' }}>{p.progresso || 0}%</span>
+                              </div>
+                              <div style={{ minWidth: '110px', textAlign: 'right' }}>
+                                <p style={{ margin: 0, fontSize: '12px', color: C.textoSec }}>{p.data_prevista_fim ? new Date(p.data_prevista_fim + 'T12:00:00').toLocaleDateString('pt-BR') : 'sem prazo'}</p>
+                                {st.chave === 'atrasado' && <p style={{ margin: 0, fontSize: '10.5px', color: C.vermelho, fontStyle: 'italic' }}>atrasada</p>}
+                                {prazoProximo && <p style={{ margin: 0, fontSize: '10.5px', color: C.textoMudo, fontStyle: 'italic' }}>prazo proximo</p>}
+                              </div>
+                              <button onClick={e => deletarProjeto(e, p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '4px' }} title="Deletar projeto"><Trash2 size={15} /></button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )
+        })()}
       </div>
     </AppShell>
   )
@@ -399,6 +572,8 @@ export default function Projetos() {
           <input placeholder="Titulo do projeto" value={novoProj.titulo} onChange={e => setNovoProj({ ...novoProj, titulo: e.target.value })}
             style={{ ...inputStyle, marginBottom: '12px' }} />
           <input placeholder="Responsavel" value={novoProj.responsavel} onChange={e => setNovoProj({ ...novoProj, responsavel: e.target.value })}
+            style={{ ...inputStyle, marginBottom: '12px' }} />
+          <input placeholder="Area (ex: Data Science, Infraestrutura)" value={novoProj.area} onChange={e => setNovoProj({ ...novoProj, area: e.target.value })}
             style={{ ...inputStyle, marginBottom: '12px' }} />
           <textarea placeholder="Descricao (opcional)" value={novoProj.descricao} onChange={e => setNovoProj({ ...novoProj, descricao: e.target.value })} rows={3}
             style={{ ...inputStyle, marginBottom: '12px', resize: 'vertical' }} />
@@ -476,25 +651,111 @@ export default function Projetos() {
           </div>
         )}
 
-        {/* Cronograma */}
+        {/* Cronograma — EDT */}
         {tarefas.length > 0 && (
           <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-              <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><GanttChartSquare size={16} color={C.royal} /> Cronograma</h3>
-              <span style={{ fontSize: '12px', color: C.textoSec }}>{tarefasComDatas.length} tarefa(s) com data</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', flexWrap: 'wrap', gap: '8px' }}>
+              <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><GanttChartSquare size={16} color={C.royal} /> Visao de projeto (EDT)</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <button onClick={() => setMostrarEditarTarefas(!mostrarEditarTarefas)} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: mostrarEditarTarefas ? '#EEF2FF' : C.fundo, border: `1px solid ${C.borda}`, borderRadius: '6px', padding: '6px 12px', color: C.royal, fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
+                  <ListChecks size={13} /> Editar tarefas (% e datas)
+                </button>
+                <span style={{ fontSize: '12px', color: C.textoSec }}>{tarefas.length} tarefa(s)</span>
+              </div>
             </div>
-            {tarefasComDatas.length === 0 ? (
-              <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Defina uma data de entrega nas tarefas para ver o cronograma</p>
-            ) : (
-              <GanttChart
-                itens={tarefasComDatas}
-                colunaLabel="Tarefa"
-                getCor={(item) => coresStatus[item.status] || C.textoMudo}
-                getLabel={(item) => (item.progresso || 0) + '%'}
-                getSubLabel={(item) => item.status + ' • ate ' + fmt(item.fim)}
-                colNome={160}
-              />
+            <p style={{ margin: '0 0 14px', fontSize: '11px', color: C.textoMudo }}>Clique nos itens com seta para expandir/recolher</p>
+
+            {mostrarEditarTarefas && (
+              <div style={{ background: C.fundo, border: `1px solid ${C.borda}`, borderRadius: '8px', padding: '18px', marginBottom: '18px' }}>
+                <h4 style={{ margin: '0 0 4px', fontSize: '13px', fontWeight: 700, color: C.texto }}>Editar tarefas (% e datas)</h4>
+                <p style={{ margin: '0 0 14px', fontSize: '11px', color: C.textoMudo }}>Altere conclusao e datas; os indicadores recalculam ao salvar.</p>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
+                    <thead>
+                      <tr>
+                        {['EDT', 'Descricao', 'Status', '% Conclusao', 'Inicio', 'Termino'].map(h => (
+                          <th key={h} style={{ padding: '6px 10px', textAlign: 'left', fontSize: '11px', color: C.textoSec, fontWeight: 700, borderBottom: `1px solid ${C.borda}` }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listaEDT.map(item => {
+                        const st = statusEDT(item.tarefa)
+                        return (
+                          <tr key={item.tarefa.id}>
+                            <td style={{ padding: '7px 10px', fontSize: '11px', color: C.textoMudo, borderBottom: `1px solid ${C.borda}` }}>{item.numero}</td>
+                            <td style={{ padding: '7px 10px', fontSize: '12px', color: C.texto, borderBottom: `1px solid ${C.borda}`, paddingLeft: (item.nivel * 16 + 10) + 'px', maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.tarefa.titulo}</td>
+                            <td style={{ padding: '7px 10px', fontSize: '11px', color: st.cor, fontWeight: 700, borderBottom: `1px solid ${C.borda}` }}>{st.label}</td>
+                            <td style={{ padding: '5px 10px', borderBottom: `1px solid ${C.borda}` }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <input type="number" min="0" max="100" value={valorEdicao(item.tarefa, 'progresso')}
+                                  onChange={e => alterarEdicao(item.tarefa.id, 'progresso', e.target.value)}
+                                  style={{ width: '54px', padding: '5px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '12px', textAlign: 'center' }} />
+                                <span style={{ fontSize: '11px', color: C.textoMudo }}>%</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '5px 10px', borderBottom: `1px solid ${C.borda}` }}>
+                              <input type="date" value={valorEdicao(item.tarefa, 'data_inicio')}
+                                onChange={e => alterarEdicao(item.tarefa.id, 'data_inicio', e.target.value)}
+                                style={{ padding: '5px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '12px' }} />
+                            </td>
+                            <td style={{ padding: '5px 10px', borderBottom: `1px solid ${C.borda}` }}>
+                              <input type="date" value={valorEdicao(item.tarefa, 'data_entrega')}
+                                onChange={e => alterarEdicao(item.tarefa.id, 'data_entrega', e.target.value)}
+                                style={{ padding: '5px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '12px' }} />
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                  <button onClick={() => { setMostrarEditarTarefas(false); setEdicoesTarefas({}) }} style={{ padding: '9px 16px', background: C.branco, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Cancelar</button>
+                  <button onClick={salvarEdicoesTarefas} disabled={salvandoEdicoes} style={{ padding: '9px 20px', background: salvandoEdicoes ? C.textoMudo : C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '6px', cursor: salvandoEdicoes ? 'not-allowed' : 'pointer', fontSize: '13px', fontWeight: 700 }}>
+                    {salvandoEdicoes ? 'Salvando...' : 'Salvar alteracoes'}
+                  </button>
+                </div>
+              </div>
             )}
+
+            <div>
+              {listaEDT.filter(item => item.nivel === 0 || !colapsados.has(item.paiId)).map(item => {
+                const st = statusEDT(item.tarefa)
+                const t = item.tarefa
+                return (
+                  <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 6px', paddingLeft: (item.nivel * 22 + 6) + 'px', borderBottom: `1px solid ${C.fundo}`, flexWrap: 'wrap' }}>
+                    <div style={{ width: '16px', display: 'flex', justifyContent: 'center', cursor: item.nivel === 0 && item.contagem > 0 ? 'pointer' : 'default', flexShrink: 0 }}
+                      onClick={() => item.nivel === 0 && item.contagem > 0 && toggleColapso(t.id)}>
+                      {item.nivel === 0 && item.contagem > 0 ? (colapsados.has(t.id) ? <ChevronRight size={14} color={C.textoMudo} /> : <ChevronDown size={14} color={C.textoMudo} />) : null}
+                    </div>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: st.cor, flexShrink: 0 }} />
+                    <span style={{ fontSize: '11px', color: C.textoMudo, minWidth: '32px' }}>{item.numero}</span>
+                    <span style={{ fontSize: item.nivel === 0 ? '13px' : '12.5px', fontWeight: item.nivel === 0 ? 700 : 500, color: item.nivel === 0 ? C.texto : C.royal, flex: '1 1 200px', minWidth: 0 }}>{t.titulo}</span>
+                    {st.atrasada && <span style={{ fontSize: '10px', fontWeight: 700, color: C.vermelho, background: '#FEF2F2', padding: '2px 8px', borderRadius: '20px', flexShrink: 0 }}>Atrasada</span>}
+                    {t.responsavel && <span style={{ fontSize: '11px', color: C.textoMudo, minWidth: '90px', flexShrink: 0 }}>{t.responsavel}</span>}
+                    <span style={{ fontSize: '11px', color: C.textoMudo, minWidth: '150px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Calendar size={11} />
+                      {t.data_inicio ? new Date(t.data_inicio + 'T12:00:00').toLocaleDateString('pt-BR') : '—'} &rarr; {t.data_entrega ? new Date(t.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: '90px', flexShrink: 0 }}>
+                      <div style={{ width: '50px', height: '6px', background: C.fundo, borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: (t.progresso || 0) + '%', background: st.cor }} />
+                      </div>
+                      <span style={{ fontSize: '11px', color: C.textoSec, fontWeight: 700 }}>{t.progresso || 0}%</span>
+                    </div>
+                    {item.contagem > 0 && <span style={{ fontSize: '10px', color: C.textoMudo, background: C.fundo, padding: '2px 8px', borderRadius: '20px', flexShrink: 0 }}>{item.contagem} tarefa(s)</span>}
+                    <select value={t.status} onChange={e => mudarStatusTarefa(t.id, e.target.value)}
+                      style={{ padding: '4px 8px', borderRadius: '6px', border: `1px solid ${C.borda}`, background: C.branco, color: C.textoSec, cursor: 'pointer', fontSize: '11px', flexShrink: 0 }}>
+                      <option value="pendente">Pendente</option>
+                      <option value="em_andamento">Em andamento</option>
+                      <option value="concluido">Concluido</option>
+                    </select>
+                    <button onClick={() => deletarTarefa(t.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '2px', flexShrink: 0 }}><Trash2 size={14} /></button>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
 
@@ -504,6 +765,7 @@ export default function Projetos() {
             <h3 style={{ margin: '0 0 16px 0', color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><Pencil size={16} color={C.royal} /> Editar projeto</h3>
             <input placeholder="Titulo do projeto" value={editProj.titulo} onChange={e => setEditProj({ ...editProj, titulo: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
             <input placeholder="Responsavel" value={editProj.responsavel} onChange={e => setEditProj({ ...editProj, responsavel: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
+            <input placeholder="Area (ex: Data Science, Infraestrutura)" value={editProj.area} onChange={e => setEditProj({ ...editProj, area: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
             <textarea placeholder="Descricao" value={editProj.descricao} onChange={e => setEditProj({ ...editProj, descricao: e.target.value })} rows={2} style={{ ...inputStyle, marginBottom: '10px', resize: 'vertical' }} />
             <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: '140px' }}>
@@ -525,6 +787,17 @@ export default function Projetos() {
                   <option value="alta">Alta</option>
                 </select>
               </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <div style={{ flex: 1, minWidth: '140px' }}>
+                <label style={{ fontSize: '12px', color: C.textoSec }}>Progresso geral (%)</label>
+                <input type="number" min="0" max="100" value={editProj.progresso} onChange={e => setEditProj({ ...editProj, progresso: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })}
+                  style={{ width: '100%', padding: '10px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
+              </div>
+              <label style={{ flex: 1, minWidth: '160px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: C.texto, padding: '10px 0' }}>
+                <input type="checkbox" checked={editProj.em_risco} onChange={e => setEditProj({ ...editProj, em_risco: e.target.checked })} />
+                Marcar como em risco
+              </label>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setMostrarEditar(false)} style={{ flex: 1, padding: '10px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Cancelar</button>
@@ -691,76 +964,6 @@ export default function Projetos() {
             <p style={{ fontSize: '15px' }}>Nenhuma tarefa. Clique em "Nova Tarefa" ou "Gerar com IA" para comecar.</p>
           </div>
         )}
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {tarefasPai.map(tarefa => (
-            <div key={tarefa.id}>
-              <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresStatus[tarefa.status] || C.royal}`, borderRadius: '8px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                  <div>
-                    <p style={{ margin: '0 0 4px 0', fontWeight: 'bold', color: C.texto, fontSize: '14px' }}>{tarefa.titulo}</p>
-                    <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: C.textoMudo, flexWrap: 'wrap', alignItems: 'center' }}>
-                      {tarefa.responsavel && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><User size={12} /> {tarefa.responsavel}</span>}
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                        <Calendar size={12} />
-                        <input type="date" defaultValue={tarefa.data_entrega || ''} onBlur={e => atualizarTarefa(tarefa.id, { data_entrega: e.target.value || null })}
-                          style={{ border: `1px solid ${C.borda}`, borderRadius: '4px', background: 'transparent', fontSize: '12px', color: C.textoSec, padding: '2px 4px' }} />
-                      </span>
-                      {tarefasFilho(tarefa.id).length > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><Paperclip size={12} /> {tarefasFilho(tarefa.id).length} subtarefa(s)</span>}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      <input type="number" min="0" max="100" defaultValue={tarefa.progresso || 0}
-                        onBlur={e => atualizarTarefa(tarefa.id, { progresso: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })}
-                        style={{ width: '44px', padding: '5px 4px', borderRadius: '6px', border: `1px solid ${C.borda}`, fontSize: '12px', textAlign: 'center' }} />
-                      <span style={{ fontSize: '11px', color: C.textoMudo }}>%</span>
-                    </div>
-                    <select value={tarefa.status} onChange={e => mudarStatusTarefa(tarefa.id, e.target.value)}
-                      style={{ padding: '6px 10px', borderRadius: '6px', border: 'none', background: coresStatus[tarefa.status] || C.royal, color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>
-                      <option value="pendente">Pendente</option>
-                      <option value="em_andamento">Em andamento</option>
-                      <option value="concluido">Concluido</option>
-                    </select>
-                    <button onClick={() => deletarTarefa(tarefa.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '4px' }}><Trash2 size={15} /></button>
-                  </div>
-                </div>
-              </div>
-              {tarefasFilho(tarefa.id).map(filho => (
-                <div key={filho.id} style={{ marginLeft: '28px', marginTop: '4px', background: C.fundo, border: `1px solid ${C.borda}`, borderLeft: `4px solid ${coresStatus[filho.status] || C.textoMudo}`, borderRadius: '8px', padding: '14px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <p style={{ margin: '0 0 4px 0', color: C.texto, fontSize: '13px' }}>{filho.titulo}</p>
-                      <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: C.textoMudo, alignItems: 'center' }}>
-                        {filho.responsavel && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><User size={11} /> {filho.responsavel}</span>}
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          <Calendar size={11} />
-                          <input type="date" defaultValue={filho.data_entrega || ''} onBlur={e => atualizarTarefa(filho.id, { data_entrega: e.target.value || null })}
-                            style={{ border: `1px solid ${C.borda}`, borderRadius: '4px', background: 'transparent', fontSize: '11px', color: C.textoMudo, padding: '2px 4px' }} />
-                        </span>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                        <input type="number" min="0" max="100" defaultValue={filho.progresso || 0}
-                          onBlur={e => atualizarTarefa(filho.id, { progresso: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })}
-                          style={{ width: '40px', padding: '4px', borderRadius: '6px', border: `1px solid ${C.borda}`, fontSize: '11px', textAlign: 'center' }} />
-                        <span style={{ fontSize: '10px', color: C.textoMudo }}>%</span>
-                      </div>
-                      <select value={filho.status} onChange={e => mudarStatusTarefa(filho.id, e.target.value)}
-                        style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', background: coresStatus[filho.status] || C.textoMudo, color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>
-                        <option value="pendente">Pendente</option>
-                        <option value="em_andamento">Em andamento</option>
-                        <option value="concluido">Concluido</option>
-                      </select>
-                      <button onClick={() => deletarTarefa(filho.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textoMudo, padding: '4px' }}><Trash2 size={13} /></button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
 
       </div>
     </AppShell>

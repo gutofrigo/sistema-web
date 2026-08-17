@@ -12,7 +12,7 @@ function extrairProjetos(relatorio, responsavel) {
   for (let i = 0; i < linhas.length; i++) {
     const linha = linhas[i].trim()
     
-    if (linha.match(/sugest[aã]o\s*\d|melhoria\s*\d|\d\)\s*[A-Z]/i)) {
+    if (linha.match(/sugest[aã]o\s*\d|melhoria\s*\d|\d[\.\)]\s*[A-Z]/i)) {
       const titulo = linha.replace(/^\d[\.\)]\s*/, '').substring(0, 80)
       if (titulo.length > 10) {
         projetos.push({
@@ -45,7 +45,15 @@ export async function POST(req) {
     const respostas = body.respostas
 
     let texto = respostas.map(r => 'P: ' + r.pergunta + ' R: ' + r.resposta).join(' ')
-    const prompt = 'Analise o processo ' + processo + ' e gere exatamente: 1) Problemas encontrados 2) 3 Sugestoes de melhoria numeradas como 1. 2. 3. 3) Proximos passos. Dados: ' + texto
+    const prompt = 'Voce e um Gerente de Projetos e Produto senior, atuando como consultor externo contratado para fazer um diagnostico critico do processo "' + processo + '". ' +
+      'Analise com o mais alto padrao de criticidade de mercado: nao seja condescendente, nao elogie sem necessidade, e aponte falhas e riscos reais mesmo que a pessoa entrevistada nao tenha percebido ou perguntado sobre eles diretamente. ' +
+      'Baseie toda a analise em boas praticas reconhecidas de mercado (PMBOK/PMI, metodologias ageis, Lean, Six Sigma, gestao de produto) e cite a pratica relevante ao fazer cada recomendacao. ' +
+      'Alem de responder com base nas respostas da entrevista abaixo, identifique proativamente riscos, gargalos, gaps de governanca ou falta de indicadores que sao tipicos nesse tipo de processo, mesmo que nao tenham sido mencionados explicitamente nas respostas. ' +
+      'Gere exatamente esta estrutura: ' +
+      '1) Diagnostico critico (problemas e riscos reais identificados, incluindo os que voce percebeu alem do que foi perguntado) ' +
+      '2) 3 Sugestoes de melhoria priorizadas, numeradas como "1." "2." "3.", cada uma indicando o nivel de criticidade (Alta/Media/Baixa) e a pratica de mercado em que se baseia ' +
+      '3) Proximos passos objetivos e acionaveis, com responsavel sugerido e prazo estimado. ' +
+      'Seja direto, especifico e critico - evite generalidades vagas ou respostas mornas. Dados da entrevista: ' + texto
 
     const resposta = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',

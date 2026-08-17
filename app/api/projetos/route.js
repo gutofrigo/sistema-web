@@ -39,7 +39,10 @@ export async function POST(req) {
           orcamento: linha.orcamento ? Number(linha.orcamento) : null,
           data_prevista_fim: linha.data_prevista_fim || null,
           prioridade: prioridadesValidas.includes(linha.prioridade) ? linha.prioridade : 'media',
-          status: statusValidos.includes(linha.status) ? linha.status : 'pendente'
+          status: statusValidos.includes(linha.status) ? linha.status : 'pendente',
+          area: linha.area || null,
+          progresso: linha.progresso ? Math.max(0, Math.min(100, Number(linha.progresso) || 0)) : 0,
+          em_risco: String(linha.em_risco).toLowerCase() === 'true' || String(linha.em_risco) === '1'
         }
         const { data: existentes, error: erroBusca } = await supabase
           .from('projetos')
@@ -86,7 +89,8 @@ export async function POST(req) {
         orcamento: body.orcamento || null,
         data_prevista_fim: body.data_prevista_fim || null,
         prioridade: body.prioridade || 'media',
-        status: 'pendente'
+        status: 'pendente',
+        area: body.area || null
       })
       .select()
     if (error) {
@@ -101,7 +105,7 @@ export async function PATCH(req) {
   try {
     const body = await req.json()
     if (!body.id) return Response.json({ erro: 'id obrigatorio' })
-    const campos = ['titulo', 'descricao', 'responsavel', 'orcamento', 'data_prevista_fim', 'prioridade', 'status']
+    const campos = ['titulo', 'descricao', 'responsavel', 'orcamento', 'data_prevista_fim', 'prioridade', 'status', 'area', 'progresso', 'em_risco']
     const update = {}
     for (const campo of campos) {
       if (body[campo] !== undefined) update[campo] = body[campo]
