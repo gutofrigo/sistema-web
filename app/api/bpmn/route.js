@@ -4,7 +4,7 @@ export async function POST(req) {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
     const body = await req.json()
     const { descricao } = body
-    const prompt = 'Voce e um especialista em modelagem de processos BPMN. Analise a descricao abaixo e gere um modelo de processo estruturado.\n\n' +
+    const prompt = 'Voce e um especialista em modelagem de processos BPMN, contratado para desenhar um diagrama detalhado e fiel ao processo real, no nivel de granularidade que um analista de processos experiente produziria — nao um resumo superficial.\n\n' +
       'DESCRICAO DO PROCESSO:\n' + descricao + '\n\n' +
       'Retorne APENAS um JSON com esta estrutura exata:\n' +
       '{\n' +
@@ -28,17 +28,17 @@ export async function POST(req) {
       '  ]\n' +
       '}\n\n' +
       'Regras importantes:\n' +
-      '- Identifique todos os participantes/setores envolvidos no processo\n' +
-      '- Gere entre 6 e 12 elementos\n' +
-      '- Use exatamente um elemento "inicio" e um ou dois elementos "fim"\n' +
-      '- Gateways representam decisoes ou bifurcacoes no processo\n' +
-      '- Mantenha os nomes curtos (max 4 palavras)\n' +
+      '- Identifique TODOS os participantes/setores/sistemas envolvidos no processo, sem limitar a um numero fixo\n' +
+      '- Gere entre 14 e 26 elementos — quebre o processo em passos realmente atomicos (cada verificacao, aprovacao, registro, notificacao e handoff entre areas vira um elemento proprio, nao agrupe varias acoes em um so item generico)\n' +
+      '- Use exatamente um elemento "inicio" e um ou mais elementos "fim" (um "fim" para cada desfecho distinto do processo, ex: aprovado, rejeitado, cancelado)\n' +
+      '- Gateways representam toda decisao, verificacao condicional ou bifurcacao — inclua tambem fluxos de excecao, rejeicao, re-trabalho e retorno para correcao quando a descricao permitir inferir esses casos, mesmo que nao tenham sido detalhados explicitamente\n' +
+      '- Nomes das atividades devem ser especificos e descritivos (ate 6 palavras) — evite nomes genericos como "Processar" ou "Verificar", prefira "Verificar limite de credito disponivel"\n' +
       '- Responda APENAS com o JSON, sem markdown, sem explicacoes'
     const completion = await groq.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model: 'openai/gpt-oss-20b',
-      temperature: 0.3,
-      max_tokens: 2000
+      temperature: 0.4,
+      max_tokens: 4000
     })
     const texto = completion.choices[0].message.content
     const inicio = texto.indexOf('{')

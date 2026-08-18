@@ -11,12 +11,33 @@ const TEXTO_PARTICIPANTE = ['#3730A3', '#166534', '#9A3412', '#9D174D', '#075985
 const RAIA_H_BASE = 110
 const PADDING_TOP = 20
 const PADDING_LEFT = 50
-const ELEM_W = 100
-const ELEM_H = 40
-const COL_W = 140
-const STACK_STEP = 50
+const ELEM_W = 130
+const ELEM_H = 50
+const COL_W = 170
+const STACK_STEP = 62
 const LEGENDA_H = 34
 const FAIXA_LOOP = 30
+
+// Quebra um nome em ate 2 linhas para caber na largura do elemento
+function quebrarNome(nome, maxCharsPorLinha) {
+  const palavras = String(nome || '').split(' ')
+  const linhas = []
+  let atual = ''
+  for (const p of palavras) {
+    const tentativa = atual ? atual + ' ' + p : p
+    if (tentativa.length > maxCharsPorLinha && atual) {
+      linhas.push(atual)
+      atual = p
+      if (linhas.length === 2) break
+    } else {
+      atual = tentativa
+    }
+  }
+  if (linhas.length < 2 && atual) linhas.push(atual)
+  if (linhas.length > 2) linhas.length = 2
+  if (linhas[1] && linhas[1].length > maxCharsPorLinha) linhas[1] = linhas[1].substring(0, maxCharsPorLinha - 1) + '…'
+  return linhas
+}
 
 // Calcula posicoes do diagrama: colunas pelo caminho mais longo (ignorando arestas de retorno,
 // que vao para "loop"), e empilhamento vertical quando mais de um elemento cai na mesma raia+coluna.
@@ -149,11 +170,19 @@ function DiagramaBPMN({ dados }) {
         </g>
       )
     }
+    const linhas = quebrarNome(el.nome, 20)
     return (
       <g key={el.id}>
         <rect x={x - ELEM_W / 2} y={y - ELEM_H / 2} width={ELEM_W} height={ELEM_H} rx="6" fill="white" stroke={C.borda} strokeWidth="1.5"/>
-        <text x={x} y={y - 4} fontSize="9" fill={C.texto} textAnchor="middle" fontFamily="Arial">{el.nome.length > 14 ? el.nome.substring(0, 14) + '...' : el.nome}</text>
-        <text x={x} y={y + 8} fontSize="8" fill={C.textoMudo} textAnchor="middle" fontFamily="Arial">{el.participante}</text>
+        {linhas.length === 1 ? (
+          <text x={x} y={y - 3} fontSize="9" fill={C.texto} textAnchor="middle" fontFamily="Arial">{linhas[0]}</text>
+        ) : (
+          <>
+            <text x={x} y={y - 11} fontSize="9" fill={C.texto} textAnchor="middle" fontFamily="Arial">{linhas[0]}</text>
+            <text x={x} y={y - 1} fontSize="9" fill={C.texto} textAnchor="middle" fontFamily="Arial">{linhas[1]}</text>
+          </>
+        )}
+        <text x={x} y={y + 16} fontSize="8" fill={C.textoMudo} textAnchor="middle" fontFamily="Arial">{el.participante}</text>
       </g>
     )
   }
