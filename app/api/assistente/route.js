@@ -28,7 +28,7 @@ export async function POST(req) {
     msgs.push({ role: 'user', content: pergunta })
     const completion = await groq.chat.completions.create({
       messages: msgs,
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
       temperature: 0.5,
       max_tokens: 1000
     })
