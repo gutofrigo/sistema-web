@@ -1,9 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from 'recharts'
-import { AlertTriangle, Map as MapIcon, Calendar, ClipboardList, ArrowRight } from 'lucide-react'
+import { AlertTriangle, Map as MapIcon, ClipboardList, ArrowRight, ArrowLeft } from 'lucide-react'
 import AppShell from '../components/AppShell'
-import { theme as C, estiloCard, estiloEyebrow, estiloStatNumero } from '../theme'
+import { theme as C, estiloCard } from '../theme'
 
 const corRag = { verde: C.verde, ambar: C.ambar, vermelho: C.vermelho, cinza: C.textoMudo }
 const labelRag = { verde: 'No prazo', ambar: 'Atencao', vermelho: 'Critico', cinza: 'Sem dados' }
@@ -37,9 +37,15 @@ export default function PMO() {
     setCarregando(false)
   }
 
+  const voltarInicio = (
+    <a href="/inicio" className="btn-ghost-hover" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.branco, border: `1px solid ${C.borda}`, color: C.texto, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 600 }}>
+      <ArrowLeft size={14} /> Visao geral
+    </a>
+  )
+
   if (carregando) {
     return (
-      <AppShell title="PMO — Visao de Portfolio" subtitle="Sistema de Melhoria">
+      <AppShell title="PMO — Analise de Portfolio" subtitle="Graficos, riscos e orcamento por projeto" actions={voltarInicio}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <p style={{ color: C.textoSec, fontSize: '15px' }}>Carregando painel de PMO...</p>
         </div>
@@ -49,7 +55,7 @@ export default function PMO() {
 
   if (!dados || dados.erro) {
     return (
-      <AppShell title="PMO — Visao de Portfolio" subtitle="Sistema de Melhoria">
+      <AppShell title="PMO — Analise de Portfolio" subtitle="Graficos, riscos e orcamento por projeto" actions={voltarInicio}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <p style={{ color: C.vermelho }}>Erro ao carregar dados{dados?.erro ? ': ' + dados.erro : ''}</p>
         </div>
@@ -57,17 +63,7 @@ export default function PMO() {
     )
   }
 
-  const { projetos, resumo, tendencia, tarefasProximas, entrevistasRecentes, iniciativasPorCategoria, iniciativasBacklog, iniciativasTotal } = dados
-
-  function corPrazo(dataEntrega) {
-    const hoje = new Date()
-    hoje.setHours(0, 0, 0, 0)
-    const entrega = new Date(dataEntrega + 'T12:00:00')
-    const diff = Math.ceil((entrega - hoje) / (1000 * 60 * 60 * 24))
-    if (diff < 0) return { icon: C.vermelho, texto: 'Venceu ' + Math.abs(diff) + ' dia(s) atras' }
-    if (diff === 0) return { icon: C.ambar, texto: 'Vence hoje' }
-    return { icon: C.textoSec, texto: 'Vence em ' + diff + ' dia(s)' }
-  }
+  const { projetos, resumo, tendencia, entrevistasRecentes, iniciativasPorCategoria, iniciativasBacklog, iniciativasTotal } = dados
 
   function diasAtras(data) {
     const diff = Math.floor((new Date() - new Date(data)) / (1000 * 60 * 60 * 24))
@@ -94,62 +90,12 @@ export default function PMO() {
 
   const dadosTendencia = tendencia.map(t => ({ mes: t.mes.slice(5, 7) + '/' + t.mes.slice(2, 4), concluidas: t.concluidas }))
 
-  const burnPctTotal = resumo.orcamentoTotal > 0 ? Math.round((resumo.realizadoTotal / resumo.orcamentoTotal) * 100) : null
-
   return (
-    <AppShell title="PMO — Visao de Portfolio" subtitle="Sistema de Melhoria">
+    <AppShell title="PMO — Analise de Portfolio" subtitle="Graficos, riscos e orcamento por projeto" actions={voltarInicio}>
       <div className="page-pad" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
-        {/* Resumo */}
-        <div className="grid-4" style={{ marginBottom: '20px' }}>
-          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.royal}` }}>
-            <p style={estiloEyebrow}>Total de projetos</p>
-            <p style={estiloStatNumero}>{resumo.totalProjetos}</p>
-            <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>no portfolio</p>
-          </div>
-          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.vermelho}` }}>
-            <p style={estiloEyebrow}>Projetos em atencao</p>
-            <p style={{ ...estiloStatNumero, color: C.vermelho }}>{resumo.emAtencao}</p>
-            <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>status amarelo ou vermelho</p>
-          </div>
-          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.royal}` }}>
-            <p style={estiloEyebrow}>Orcado x Realizado</p>
-            <p style={{ ...estiloStatNumero, fontSize: '22px' }}>{formatarMoeda(resumo.realizadoTotal)}</p>
-            <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>de {formatarMoeda(resumo.orcamentoTotal)}{burnPctTotal !== null ? ' (' + burnPctTotal + '%)' : ''}</p>
-          </div>
-          <div className="card-elevate" style={{ ...cardEstilo, padding: '22px', borderTop: `4px solid ${C.ambar}` }}>
-            <p style={estiloEyebrow}>Riscos abertos</p>
-            <p style={{ ...estiloStatNumero, color: C.ambar }}>{resumo.riscosAbertos.baixa + resumo.riscosAbertos.media + resumo.riscosAbertos.alta}</p>
-            <p style={{ fontSize: '12px', color: C.textoMudo, margin: 0 }}>{resumo.riscosAbertos.alta} alto • {resumo.riscosAbertos.media} medio • {resumo.riscosAbertos.baixa} baixo</p>
-          </div>
-        </div>
-
-        {/* Prazos + Relatorios + Iniciativas */}
-        <div className="grid-3" style={{ marginBottom: '16px' }}>
-          <div className="card-elevate" style={cardEstilo}>
-            <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Tarefas com prazo proximo</h2>
-            {tarefasProximas.length === 0 ? (
-              <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Nenhuma tarefa com prazo proximo</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {tarefasProximas.map(t => {
-                  const prazo = corPrazo(t.data_entrega)
-                  return (
-                    <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '10px', borderBottom: `1px solid ${C.fundo}` }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: C.fundo, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Calendar size={15} color={prazo.icon} />
-                      </div>
-                      <div>
-                        <p style={{ fontSize: '13px', fontWeight: 'bold', margin: '0 0 2px', color: C.texto }}>{t.titulo}</p>
-                        <p style={{ fontSize: '12px', color: prazo.icon, margin: 0 }}>{prazo.texto}{t.responsavel ? ' • ' + t.responsavel : ''}</p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-
+        {/* Relatorios + Iniciativas */}
+        <div className="grid-2" style={{ marginBottom: '16px' }}>
           <div className="card-elevate" style={cardEstilo}>
             <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 16px' }}>Relatorios recentes</h2>
             {entrevistasRecentes.length === 0 ? (

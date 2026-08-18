@@ -27,6 +27,49 @@ export async function POST(req) {
   try {
     const body = await req.json()
 
+    if (body.importar_csv && Array.isArray(body.iniciativas)) {
+      const categoriasValidas = ['ti', 'processos', 'rh', 'financeiro', 'outros']
+      const statusValidos = ['backlog', 'em_analise', 'em_andamento', 'concluido']
+      const resultado = { criados: 0, atualizados: 0, erros: [] }
+
+      for (const [i, linha] of body.iniciativas.entries()) {
+        const titulo = (linha.titulo || '').trim()
+        if (!titulo) {
+          resultado.erros.push('Linha ' + (i + 2) + ': titulo em branco, ignorada')
+          continue
+        }
+        const dados = {
+          titulo,
+          descricao: linha.descricao || null,
+          categoria: categoriasValidas.includes(linha.categoria) ? linha.categoria : 'outros',
+          prioridade: linha.prioridade ? Math.max(1, Math.min(10, Number(linha.prioridade) || 5)) : 5,
+          solicitante: linha.solicitante || null,
+          responsavel: linha.responsavel || null,
+          status: statusValidos.includes(linha.status) ? linha.status : 'backlog'
+        }
+        const { data: existentes, error: erroBusca } = await supabase
+          .from('iniciativas')
+          .select('id')
+          .ilike('titulo', titulo)
+          .limit(1)
+        if (erroBusca) {
+          resultado.erros.push('Linha ' + (i + 2) + ' (' + titulo + '): ' + erroBusca.message)
+          continue
+        }
+        const existente = existentes && existentes[0]
+        if (existente) {
+          const { error } = await supabase.from('iniciativas').update(dados).eq('id', existente.id)
+          if (error) resultado.erros.push('Linha ' + (i + 2) + ' (' + titulo + '): ' + error.message)
+          else resultado.atualizados++
+        } else {
+          const { error } = await supabase.from('iniciativas').insert(dados)
+          if (error) resultado.erros.push('Linha ' + (i + 2) + ' (' + titulo + '): ' + error.message)
+          else resultado.criados++
+        }
+      }
+      return Response.json(resultado)
+    }
+
     if (body.promover && body.id) {
       const { data: iniciativa, error: erroBusca } = await supabase
         .from('iniciativas')

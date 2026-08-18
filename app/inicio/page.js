@@ -92,7 +92,7 @@ export default function Inicio() {
             ) : (
               <div>
                 {atencao.map(p => (
-                  <a key={p.id} href="/projetos" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', padding: '13px 20px', borderBottom: `1px solid ${C.fundo}`, textDecoration: 'none' }} className="btn-ghost-hover">
+                  <a key={p.id} href={'/projetos?id=' + p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', padding: '13px 20px', borderBottom: `1px solid ${C.fundo}`, textDecoration: 'none' }} className="btn-ghost-hover">
                     <div style={{ minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: C[p.rag.geral] || C.textoMudo, flexShrink: 0 }} />
