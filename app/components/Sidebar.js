@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Home, FolderKanban, Kanban, FileText, TrendingUp, Map, GanttChartSquare, Wallet, Sparkles, Workflow, Database, LogOut, Menu, X } from 'lucide-react'
+import { Home, FolderKanban, Kanban, FileText, TrendingUp, Map, GanttChartSquare, Wallet, Sparkles, Workflow, Database, Info, LogOut, Menu, X } from 'lucide-react'
 import { theme as C } from '../theme'
 
 const MODULOS = [
@@ -17,6 +17,7 @@ const MODULOS = [
   { href: '/assistente', label: 'Assistente IA', icon: Sparkles },
   { href: '/bpmn', label: 'BPMN', icon: Workflow },
   { href: '/dados', label: 'Dados', icon: Database },
+  { href: '/sobre', label: 'Sobre o sistema', icon: Info },
 ]
 
 export default function Sidebar() {

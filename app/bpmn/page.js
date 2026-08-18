@@ -8,49 +8,114 @@ const CORES_PARTICIPANTE = ['#EEF2FF', '#F0FDF4', '#FFF7ED', '#FDF2F8', '#F0F9FF
 const BORDAS_PARTICIPANTE = ['#C7D2FE', '#BBF7D0', '#FED7AA', '#FBCFE8', '#BAE6FD', '#FDE68A']
 const TEXTO_PARTICIPANTE = ['#3730A3', '#166534', '#9A3412', '#9D174D', '#075985', '#92400E']
 
-function DiagramaBPMN({ dados }) {
-  if (!dados || !dados.elementos) return null
+const RAIA_H_BASE = 110
+const PADDING_TOP = 20
+const PADDING_LEFT = 50
+const ELEM_W = 100
+const ELEM_H = 40
+const COL_W = 140
+const STACK_STEP = 50
+const LEGENDA_H = 34
+const FAIXA_LOOP = 30
+
+// Calcula posicoes do diagrama: colunas pelo caminho mais longo (ignorando arestas de retorno,
+// que vao para "loop"), e empilhamento vertical quando mais de um elemento cai na mesma raia+coluna.
+function calcularLayout(dados) {
   const participantes = dados.participantes || []
   const elementos = dados.elementos || []
-  const conexoes = dados.conexoes || []
-  const RAIA_H = 110
-  const PADDING_TOP = 20
-  const PADDING_LEFT = 50
-  const ELEM_W = 100
-  const ELEM_H = 40
-  const COL_W = 140
-  const totalH = participantes.length * RAIA_H + PADDING_TOP
-  const grupos = {}
-  participantes.forEach(p => { grupos[p] = [] })
-  elementos.forEach(el => {
-    if (!grupos[el.participante]) grupos[el.participante] = []
-    grupos[el.participante].push(el)
+  const idsValidos = new Set(elementos.map(e => e.id))
+  const conexoes = (dados.conexoes || []).filter(c => idsValidos.has(c.de) && idsValidos.has(c.para))
+
+  // 1) Deteccao de arestas de retorno (loop) via DFS, para nao distorcer o calculo de colunas
+  const adjTudo = new Map()
+  elementos.forEach(e => adjTudo.set(e.id, []))
+  conexoes.forEach(c => adjTudo.get(c.de).push(c))
+  const estado = new Map(elementos.map(e => [e.id, 0])) // 0 nao visitado, 1 na pilha, 2 concluido
+  const arestasLoop = new Set()
+  function dfs(id) {
+    estado.set(id, 1)
+    adjTudo.get(id).forEach(c => {
+      const st = estado.get(c.para)
+      if (st === 1) arestasLoop.add(c)
+      else if (st === 0) dfs(c.para)
+    })
+    estado.set(id, 2)
+  }
+  const inicioEl = elementos.find(e => e.tipo === 'inicio') || elementos[0]
+  if (inicioEl) dfs(inicioEl.id)
+  elementos.forEach(e => { if (estado.get(e.id) === 0) dfs(e.id) })
+
+  // 2) Camadas (coluna) pelo caminho mais longo, ignorando arestas de loop
+  const adjDAG = new Map()
+  const grauEntrada = new Map()
+  elementos.forEach(e => { adjDAG.set(e.id, []); grauEntrada.set(e.id, 0) })
+  conexoes.forEach(c => {
+    if (arestasLoop.has(c)) return
+    adjDAG.get(c.de).push(c.para)
+    grauEntrada.set(c.para, grauEntrada.get(c.para) + 1)
   })
-  const posicoes = {}
-  const colunaGlobal = {}
-  function getPosY(participante) {
-    const idx = participantes.indexOf(participante)
-    return PADDING_TOP + idx * RAIA_H + RAIA_H / 2
+  const coluna = new Map(elementos.map(e => [e.id, 0]))
+  const grauRestante = new Map(grauEntrada)
+  const fila = elementos.filter(e => grauEntrada.get(e.id) === 0).map(e => e.id)
+  while (fila.length > 0) {
+    const id = fila.shift()
+    adjDAG.get(id).forEach(destino => {
+      coluna.set(destino, Math.max(coluna.get(destino), coluna.get(id) + 1))
+      grauRestante.set(destino, grauRestante.get(destino) - 1)
+      if (grauRestante.get(destino) === 0) fila.push(destino)
+    })
   }
-  const visitados = new Set()
-  function calcColunas(id, col) {
-    if (visitados.has(id)) return
-    visitados.add(id)
-    colunaGlobal[id] = Math.max(colunaGlobal[id] || 0, col)
-    const saidas = conexoes.filter(c => c.de === id)
-    saidas.forEach((c) => calcColunas(c.para, col + 1))
-  }
-  const inicio = elementos.find(e => e.tipo === 'inicio')
-  if (inicio) calcColunas(inicio.id, 0)
+
+  // 3) Agrupa por raia+coluna para empilhar elementos concorrentes no mesmo lugar
+  const grupos = {} // participante -> { coluna: [ids] }
   elementos.forEach(el => {
-    if (colunaGlobal[el.id] === undefined) colunaGlobal[el.id] = 0
+    const p = el.participante
+    const c = coluna.get(el.id)
+    if (!grupos[p]) grupos[p] = {}
+    if (!grupos[p][c]) grupos[p][c] = []
+    grupos[p][c].push(el.id)
+  })
+
+  // 4) Altura de cada raia depende do maior empilhamento que ela contem
+  const laneHeight = {}
+  const laneY = {}
+  let acc = PADDING_TOP
+  participantes.forEach(p => {
+    const porColuna = grupos[p] || {}
+    const maxStack = Object.values(porColuna).reduce((m, ids) => Math.max(m, ids.length), 1)
+    laneHeight[p] = Math.max(RAIA_H_BASE, 40 + maxStack * STACK_STEP)
+    laneY[p] = acc
+    acc += laneHeight[p]
+  })
+  const temLoop = arestasLoop.size > 0
+  const totalH = acc + (temLoop ? FAIXA_LOOP : 0) + LEGENDA_H
+
+  // 5) Posicao final de cada elemento (com offset de empilhamento dentro da raia)
+  const posicoes = {}
+  elementos.forEach(el => {
+    const p = el.participante
+    const c = coluna.get(el.id)
+    const grupo = (grupos[p] && grupos[p][c]) || [el.id]
+    const idx = grupo.indexOf(el.id)
+    const count = grupo.length
+    const centerY = (laneY[p] !== undefined ? laneY[p] : PADDING_TOP) + (laneHeight[p] || RAIA_H_BASE) / 2
     posicoes[el.id] = {
-      x: PADDING_LEFT + 80 + colunaGlobal[el.id] * COL_W,
-      y: getPosY(el.participante)
+      x: PADDING_LEFT + 80 + coluna.get(el.id) * COL_W,
+      y: centerY + (idx - (count - 1) / 2) * STACK_STEP
     }
   })
-  const maxCol = Math.max(...Object.values(colunaGlobal))
+
+  const maxCol = elementos.length > 0 ? Math.max(...elementos.map(e => coluna.get(e.id))) : 0
   const totalW = Math.max(680, PADDING_LEFT + 80 + (maxCol + 1) * COL_W + 60)
+  const faixaLoopY = acc + FAIXA_LOOP / 2
+
+  return { participantes, elementos, conexoes, posicoes, laneY, laneHeight, totalW, totalH, arestasLoop, faixaLoopY, acimaLegenda: acc + (temLoop ? FAIXA_LOOP : 0) }
+}
+
+function DiagramaBPMN({ dados }) {
+  if (!dados || !dados.elementos) return null
+  const layout = calcularLayout(dados)
+  const { participantes, elementos, conexoes, posicoes, laneY, laneHeight, totalW, totalH, arestasLoop, faixaLoopY } = layout
 
   function renderElemento(el) {
     const pos = posicoes[el.id]
@@ -93,12 +158,38 @@ function DiagramaBPMN({ dados }) {
     )
   }
 
+  let loopContador = 0
+  const loopIndices = new Map()
+  conexoes.forEach(c => { if (arestasLoop.has(c)) { loopIndices.set(c, loopContador); loopContador++ } })
+
   function renderConexao(c, idx) {
     const origem = posicoes[c.de]
     const destino = posicoes[c.para]
     if (!origem || !destino) return null
     const elOrigem = elementos.find(e => e.id === c.de)
     const elDestino = elementos.find(e => e.id === c.para)
+    const corLinha = c.label === 'Sim' || c.label === 'sim' ? C.verde : c.label === 'Nao' || c.label === 'nao' ? C.vermelho : C.borda
+
+    if (arestasLoop.has(c)) {
+      const x1 = origem.x
+      const y1 = origem.y + ELEM_H / 2
+      const x2 = destino.x
+      const y2 = destino.y + ELEM_H / 2
+      const yCanal = faixaLoopY + loopIndices.get(c) * 8
+      const d = 'M ' + x1 + ' ' + y1 + ' L ' + x1 + ' ' + yCanal + ' L ' + x2 + ' ' + yCanal + ' L ' + x2 + ' ' + y2
+      return (
+        <g key={idx}>
+          <defs>
+            <marker id={'arrloop' + idx} markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill={C.royal}/>
+            </marker>
+          </defs>
+          <path d={d} fill="none" stroke={C.royal} strokeWidth="1.5" strokeDasharray="4 3" markerEnd={'url(#arrloop' + idx + ')'} />
+          {c.label && <text x={(x1 + x2) / 2} y={yCanal - 5} fontSize="9" fill={C.royal} textAnchor="middle" fontFamily="Arial" fontWeight="bold">{c.label}</text>}
+        </g>
+      )
+    }
+
     let x1 = origem.x + (elOrigem && elOrigem.tipo === 'gateway' ? 20 : ELEM_W / 2)
     let y1 = origem.y
     let x2 = destino.x - (elDestino && elDestino.tipo === 'gateway' ? 20 : ELEM_W / 2)
@@ -109,7 +200,6 @@ function DiagramaBPMN({ dados }) {
       x2 = destino.x
       y2 = destino.y + (origem.y < destino.y ? -ELEM_H / 2 : ELEM_H / 2)
     }
-    const corLinha = c.label === 'Sim' || c.label === 'sim' ? C.verde : c.label === 'Nao' || c.label === 'nao' ? C.vermelho : C.borda
     const mx = (x1 + x2) / 2
     const my = (y1 + y2) / 2
     return (
@@ -133,11 +223,12 @@ function DiagramaBPMN({ dados }) {
           const corBg = CORES_PARTICIPANTE[idx % CORES_PARTICIPANTE.length]
           const corBorda = BORDAS_PARTICIPANTE[idx % BORDAS_PARTICIPANTE.length]
           const corTexto = TEXTO_PARTICIPANTE[idx % TEXTO_PARTICIPANTE.length]
-          const y = PADDING_TOP + idx * RAIA_H
+          const y = laneY[p]
+          const h = laneHeight[p]
           return (
             <g key={p}>
-              <rect x="4" y={y} width={totalW - 8} height={RAIA_H} fill={corBg} rx="4" stroke={corBorda} strokeWidth="1"/>
-              <text x="22" y={y + RAIA_H / 2 + 4} fontSize="11" fill={corTexto} fontFamily="Arial" fontWeight="bold" transform={'rotate(-90, 22, ' + (y + RAIA_H / 2) + ')'}>{p}</text>
+              <rect x="4" y={y} width={totalW - 8} height={h} fill={corBg} rx="4" stroke={corBorda} strokeWidth="1"/>
+              <text x="22" y={y + h / 2 + 4} fontSize="11" fill={corTexto} fontFamily="Arial" fontWeight="bold" transform={'rotate(-90, 22, ' + (y + h / 2) + ')'}>{p}</text>
             </g>
           )
         })}
@@ -186,42 +277,9 @@ export default function BPMN() {
   function exportarVisio() {
     if (!dados) return
 
-    const RAIA_H = 110
-    const PADDING_TOP = 20
-    const PADDING_LEFT = 50
-    const ELEM_W = 100
-    const ELEM_H = 40
-    const COL_W = 140
     const PX = 96
-
-    const participantes = dados.participantes || []
-    const elementos = dados.elementos || []
-    const conexoes = dados.conexoes || []
-
-    const colunaGlobal = {}
-    const vis = new Set()
-    function calcCols(id, col) {
-      if (vis.has(id)) return
-      vis.add(id)
-      colunaGlobal[id] = Math.max(colunaGlobal[id] || 0, col)
-      conexoes.filter(c => c.de === id).forEach(c => calcCols(c.para, col + 1))
-    }
-    const elInicio = elementos.find(e => e.tipo === 'inicio')
-    if (elInicio) calcCols(elInicio.id, 0)
-    elementos.forEach(el => { if (colunaGlobal[el.id] === undefined) colunaGlobal[el.id] = 0 })
-
-    const maxCol = Math.max(...Object.values(colunaGlobal), 0)
-    const totalW = Math.max(680, PADDING_LEFT + 80 + (maxCol + 1) * COL_W + 60)
-    const totalH = participantes.length * RAIA_H + PADDING_TOP
-
-    const posicoes = {}
-    elementos.forEach(el => {
-      const idx = participantes.indexOf(el.participante)
-      posicoes[el.id] = {
-        x: PADDING_LEFT + 80 + colunaGlobal[el.id] * COL_W,
-        y: PADDING_TOP + idx * RAIA_H + RAIA_H / 2
-      }
-    })
+    const layout = calcularLayout(dados)
+    const { participantes, elementos, conexoes, posicoes, laneY, laneHeight, totalW, totalH } = layout
 
     const f = v => (v / PX).toFixed(4)
     const fy = y => ((totalH - y) / PX).toFixed(4)
@@ -230,12 +288,12 @@ export default function BPMN() {
     let nextId = 1
     const shapeMap = {}
 
-    const lanesXml = participantes.map((p, idx) => {
+    const lanesXml = participantes.map((p) => {
       const id = nextId++
       const cx = totalW / 2
-      const cy = PADDING_TOP + idx * RAIA_H + RAIA_H / 2
+      const cy = laneY[p] + laneHeight[p] / 2
       const w = (totalW / PX).toFixed(4)
-      const h = (RAIA_H / PX).toFixed(4)
+      const h = (laneHeight[p] / PX).toFixed(4)
       return `        <Shape ID="${id}" Type="Shape">
           <XForm><PinX>${f(cx)}</PinX><PinY>${fy(cy)}</PinY><Width>${w}</Width><Height>${h}</Height><LocPinX>Width*0.5</LocPinX><LocPinY>Height*0.5</LocPinY></XForm>
           <Fill><FillForegnd>#EEF2FF</FillForegnd></Fill>
