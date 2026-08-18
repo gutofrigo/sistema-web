@@ -534,7 +534,7 @@ ${conexoes}
 
         {dados && (
           <div style={{ background: C.branco, borderRadius: '8px', padding: '24px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: dados.metodologia ? '8px' : '16px', flexWrap: 'wrap', gap: '10px' }}>
               <h2 style={{ color: C.texto, fontSize: '15px', margin: 0, fontWeight: 'bold' }}>{dados.nome}</h2>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {dados.participantes && dados.participantes.map((p, i) => (
@@ -542,6 +542,11 @@ ${conexoes}
                 ))}
               </div>
             </div>
+            {dados.metodologia && (
+              <p style={{ fontSize: '12px', color: C.textoSec, background: C.fundo, border: `1px solid ${C.borda}`, borderRadius: '6px', padding: '8px 12px', margin: '0 0 16px', lineHeight: '1.5' }}>
+                <strong style={{ color: C.royal }}>Metodologia aplicada:</strong> {dados.metodologia}
+              </p>
+            )}
             <DiagramaBPMN dados={dados} />
             <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button onClick={() => { setDados(null); setDescricao('') }} style={{ padding: '8px 16px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>
