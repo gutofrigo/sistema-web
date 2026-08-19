@@ -10,7 +10,10 @@ export async function GET() {
       .from('tarefas')
       .select('*')
       .order('data_inicio', { ascending: true })
-    return Response.json({ projetos: projetos || [], tarefas: tarefas || [] })
+    const { data: dependencias } = await supabase
+      .from('tarefa_dependencias')
+      .select('*')
+    return Response.json({ projetos: projetos || [], tarefas: tarefas || [], dependencias: dependencias || [] })
   } catch (e) {
     return Response.json({ erro: e.message }, { status: 500 })
   }

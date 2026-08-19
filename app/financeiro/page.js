@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { BarChart3, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
+import { BarChart3, Plus, Trash2, ArrowUp, ArrowDown, TrendingUp } from 'lucide-react'
+import { ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import AppShell from '../components/AppShell'
 import { theme as C, estiloCard, estiloEyebrow, estiloStatNumero } from '../theme'
 
@@ -31,6 +32,8 @@ export default function Financeiro() {
   const [diaSelecionado, setDiaSelecionado] = useState(null)
   const [totais, setTotais] = useState(null)
   const [carregandoTotais, setCarregandoTotais] = useState(false)
+  const [previsao, setPrevisao] = useState(null)
+  const [carregandoPrevisao, setCarregandoPrevisao] = useState(false)
   const [form, setForm] = useState({
     descricao: '', valor: '', tipo: 'saida', categoria: 'outros',
     data_venc: hoje.toISOString().slice(0, 10), recorrente: false, projeto_id: ''
@@ -67,6 +70,15 @@ export default function Financeiro() {
     const data = await res.json()
     if (!data.erro) setTotais(data)
     setCarregandoTotais(false)
+  }
+
+  async function abrirPrevisao() {
+    setCarregandoPrevisao(true)
+    setTela('previsao')
+    const res = await fetch('/api/financeiro?view=previsao')
+    const data = await res.json()
+    if (!data.erro) setPrevisao(data)
+    setCarregandoPrevisao(false)
   }
 
   async function salvar() {
@@ -173,6 +185,40 @@ export default function Financeiro() {
     </AppShell>
   )
 
+  // ── TELA: Previsao de caixa ─────────────────────────────────────────────────
+  const NOMES_MES_ABREV = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+  if (tela === 'previsao') return (
+    <AppShell title="Previsao de caixa" subtitle="Financeiro" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
+      <div className="page-pad" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+        {carregandoPrevisao && <div style={{ textAlign: 'center', padding: '60px', color: C.textoMudo }}>Calculando previsao...</div>}
+        {!carregandoPrevisao && previsao && (
+          <>
+            <div style={{ background: C.branco, borderRadius: '8px', padding: '20px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <p style={{ color: C.textoSec, fontSize: '12px', margin: '0 0 6px' }}>Saldo atual (base da projecao)</p>
+              <p style={{ fontSize: '24px', fontWeight: 'bold', color: previsao.saldoAtual >= 0 ? C.verde : C.vermelho, margin: 0 }}>{fmt(previsao.saldoAtual)}</p>
+            </div>
+            <div style={{ background: C.branco, borderRadius: '8px', border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.royal}`, padding: '20px 24px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <h2 style={{ color: C.texto, margin: '0 0 4px', fontSize: '15px', fontWeight: 'bold' }}>Proximos 6 meses</h2>
+              <p style={{ color: C.textoMudo, fontSize: '12px', margin: '0 0 16px' }}>Entradas/saidas pendentes ja lancadas (inclui recorrentes) e saldo acumulado projetado</p>
+              <ResponsiveContainer width="100%" height={280}>
+                <ComposedChart data={previsao.previsao.map(p => ({ ...p, mesLabel: NOMES_MES_ABREV[Number(p.mes.slice(5,7)) - 1] + '/' + p.mes.slice(2,4) }))}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={C.borda} />
+                  <XAxis dataKey="mesLabel" tick={{ fontSize: 12, fill: C.textoSec }} />
+                  <YAxis tick={{ fontSize: 11, fill: C.textoSec }} />
+                  <Tooltip formatter={v => fmt(v)} contentStyle={{ background: C.branco, border: '1px solid rgba(83,109,136,0.35)', borderRadius: '8px', color: C.texto }} />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Bar dataKey="entradas" name="Entradas" fill={C.verde} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="saidas" name="Saidas" fill={C.vermelho} radius={[4, 4, 0, 0]} />
+                  <Line type="monotone" dataKey="saldoProjetado" name="Saldo projetado" stroke={C.royal} strokeWidth={2} dot={{ r: 4 }} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
+      </div>
+    </AppShell>
+  )
+
   // ── TELA: Totais por categoria ─────────────────────────────────────────────
   if (tela === 'totais') return (
     <AppShell title="Totais por categoria" subtitle="Financeiro" actions={<button onClick={() => setTela('lista')} style={btnHeader}>← Voltar</button>}>
@@ -247,6 +293,7 @@ export default function Financeiro() {
       actions={
         <>
           <button onClick={abrirTotais} className="btn-ghost-hover" style={{ ...btnHeader, background: C.branco }}><BarChart3 size={14} /> Totais</button>
+          <button onClick={abrirPrevisao} className="btn-ghost-hover" style={{ ...btnHeader, background: C.branco }}><TrendingUp size={14} /> Previsao</button>
           <button onClick={() => setTela('novo')} className="btn-hover" style={{ ...btnHeader, background: C.royal, color: C.textoSobreAccent, border: 'none' }}><Plus size={14} /> Novo</button>
         </>
       }

@@ -1,8 +1,16 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { GanttChartSquare, AlertTriangle, Pencil, Sparkles, Plus, Trash2, User, Wallet, Upload, Download, ChevronRight, ChevronDown, ListChecks, Calendar } from 'lucide-react'
+import { useState, useEffect, Fragment } from 'react'
+import { GanttChartSquare, AlertTriangle, Pencil, Sparkles, Plus, Trash2, User, Wallet, Upload, Download, ChevronRight, ChevronDown, ListChecks, Calendar, Wand2 } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { theme as C } from '../theme'
+
+const PESO_PROBABILIDADE = { baixa: 1, media: 2, alta: 3 }
+const PESO_IMPACTO = { baixo: 1, medio: 2, alto: 3 }
+function corScore(score) {
+  if (score >= 6) return C.vermelho
+  if (score >= 3) return C.ambar
+  return C.verde
+}
 
 const coresStatus = { pendente: C.ambar, em_andamento: C.statusInfo, concluido: C.verde }
 const coresImpacto = { baixo: C.verde, medio: C.ambar, alto: C.vermelho }
@@ -84,6 +92,9 @@ export default function Projetos() {
   const [mostrarEditarTarefas, setMostrarEditarTarefas] = useState(false)
   const [edicoesTarefas, setEdicoesTarefas] = useState({})
   const [salvandoEdicoes, setSalvandoEdicoes] = useState(false)
+  const [dependencias, setDependencias] = useState([])
+  const [sugestoesRiscoIA, setSugestoesRiscoIA] = useState(null)
+  const [detectandoRiscoIA, setDetectandoRiscoIA] = useState(false)
 
   useEffect(() => { init() }, [])
 
@@ -116,6 +127,11 @@ export default function Projetos() {
     const res = await fetch('/api/roadmap?projeto_id=' + projetoId)
     const data = await res.json()
     setRoadmapVinculado(data && data.id ? data : null)
+  }
+  async function buscarDependencias(projetoId) {
+    const res = await fetch('/api/tarefas/dependencias?projeto_id=' + projetoId)
+    const data = await res.json()
+    setDependencias(data.dependencias || [])
   }
   async function criarProjeto() {
     if (!novoProj.titulo) return alert('Digite o titulo do projeto')
@@ -236,6 +252,8 @@ export default function Projetos() {
     await buscarTarefas(projeto.id)
     await buscarRiscos(projeto.id)
     await buscarRoadmapVinculado(projeto.id)
+    await buscarDependencias(projeto.id)
+    setSugestoesRiscoIA(null)
     setTela('projeto')
   }
   async function criarTarefa() {
@@ -277,6 +295,15 @@ export default function Projetos() {
   function alterarEdicao(id, campo, valor) {
     setEdicoesTarefas(prev => ({ ...prev, [id]: { ...prev[id], [campo]: valor } }))
   }
+  function predecessoresDe(tarefaId) {
+    const e = edicoesTarefas[tarefaId]
+    if (e && e.predecessores !== undefined) return e.predecessores
+    return dependencias.filter(d => d.tarefa_id === tarefaId).map(d => d.predecessor_id)
+  }
+  function alterarPredecessores(id, selectEl) {
+    const ids = Array.from(selectEl.selectedOptions).map(o => o.value)
+    alterarEdicao(id, 'predecessores', ids)
+  }
   async function salvarEdicoesTarefas() {
     const ids = Object.keys(edicoesTarefas)
     if (ids.length === 0) { setMostrarEditarTarefas(false); return }
@@ -287,11 +314,35 @@ export default function Projetos() {
       if (campos.progresso !== undefined) corpo.progresso = Math.max(0, Math.min(100, Number(campos.progresso) || 0))
       if (campos.data_inicio !== undefined) corpo.data_inicio = campos.data_inicio || null
       if (campos.data_entrega !== undefined) corpo.data_entrega = campos.data_entrega || null
-      return fetch('/api/tarefas', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
+      const chamadas = [fetch('/api/tarefas', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })]
+      if (campos.predecessores !== undefined) {
+        const atuais = dependencias.filter(d => d.tarefa_id === id).map(d => d.predecessor_id)
+        const novos = campos.predecessores
+        const adicionar = novos.filter(pid => !atuais.includes(pid))
+        const remover = atuais.filter(pid => !novos.includes(pid))
+        for (const predecessor_id of adicionar) chamadas.push(fetch('/api/tarefas/dependencias', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tarefa_id: id, predecessor_id }) }))
+        for (const predecessor_id of remover) chamadas.push(fetch('/api/tarefas/dependencias', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tarefa_id: id, predecessor_id }) }))
+      }
+      return Promise.all(chamadas)
     }))
     setSalvandoEdicoes(false)
     setEdicoesTarefas({})
     buscarTarefas(projetoAtivo.id)
+    buscarDependencias(projetoAtivo.id)
+  }
+  async function detectarRiscosIA() {
+    setDetectandoRiscoIA(true)
+    setSugestoesRiscoIA(null)
+    const res = await fetch('/api/riscos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ detectar_ia: true, projeto_id: projetoAtivo.id }) })
+    const data = await res.json()
+    setDetectandoRiscoIA(false)
+    if (data.erro) return alert('Erro ao detectar riscos: ' + data.erro)
+    setSugestoesRiscoIA(data.sugestoes || [])
+  }
+  async function aceitarSugestaoRisco(sugestao, idx) {
+    await fetch('/api/riscos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...sugestao, projeto_id: projetoAtivo.id }) })
+    setSugestoesRiscoIA(prev => prev.filter((_, i) => i !== idx))
+    buscarRiscos(projetoAtivo.id)
   }
   async function gerarTarefasIA() {
     if (!objetivoIA.trim()) return alert('Descreva o objetivo')
@@ -673,7 +724,7 @@ export default function Projetos() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
                     <thead>
                       <tr>
-                        {['EDT', 'Descricao', 'Status', '% Conclusao', 'Inicio', 'Termino'].map(h => (
+                        {['EDT', 'Descricao', 'Status', '% Conclusao', 'Inicio', 'Termino', 'Predecessoras'].map(h => (
                           <th key={h} style={{ padding: '6px 10px', textAlign: 'left', fontSize: '11px', color: C.textoSec, fontWeight: 700, borderBottom: `1px solid ${C.borda}` }}>{h}</th>
                         ))}
                       </tr>
@@ -703,6 +754,14 @@ export default function Projetos() {
                               <input type="date" value={valorEdicao(item.tarefa, 'data_entrega')}
                                 onChange={e => alterarEdicao(item.tarefa.id, 'data_entrega', e.target.value)}
                                 style={{ padding: '5px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '12px' }} />
+                            </td>
+                            <td style={{ padding: '5px 10px', borderBottom: `1px solid ${C.borda}` }}>
+                              <select multiple value={predecessoresDe(item.tarefa.id)} onChange={e => alterarPredecessores(item.tarefa.id, e.target)}
+                                style={{ padding: '4px', border: `1px solid ${C.borda}`, borderRadius: '6px', fontSize: '11px', minWidth: '140px', height: '56px' }}>
+                                {tarefas.filter(t => t.id !== item.tarefa.id).map(t => (
+                                  <option key={t.id} value={t.id}>{t.titulo}</option>
+                                ))}
+                              </select>
                             </td>
                           </tr>
                         )
@@ -811,12 +870,72 @@ export default function Projetos() {
           <div style={{ background: C.branco, border: `1px solid ${C.borda}`, borderLeft: `3px solid ${C.ambar}`, borderRadius: '8px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, color: C.texto, fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={16} color={C.ambar} /> Riscos do projeto</h3>
-              {roadmapVinculado && roadmapVinculado.riscos && roadmapVinculado.riscos.length > 0 && (
-                <button onClick={importarRiscosRoadmap} style={{ padding: '7px 14px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.royal}`, borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
-                  Importar sugestoes do roadmap ({roadmapVinculado.riscos.length})
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button onClick={detectarRiscosIA} disabled={detectandoRiscoIA} style={{ padding: '7px 14px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.royal}`, borderRadius: '6px', cursor: detectandoRiscoIA ? 'not-allowed' : 'pointer', fontSize: '12px', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Wand2 size={13} /> {detectandoRiscoIA ? 'Analisando...' : 'Detectar riscos com IA'}
                 </button>
-              )}
+                {roadmapVinculado && roadmapVinculado.riscos && roadmapVinculado.riscos.length > 0 && (
+                  <button onClick={importarRiscosRoadmap} style={{ padding: '7px 14px', background: '#EEF2FF', color: C.royal, border: `1px solid ${C.royal}`, borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+                    Importar sugestoes do roadmap ({roadmapVinculado.riscos.length})
+                  </button>
+                )}
+              </div>
             </div>
+
+            {sugestoesRiscoIA && (
+              <div style={{ marginBottom: '18px' }}>
+                {sugestoesRiscoIA.length === 0 ? (
+                  <p style={{ color: C.textoMudo, fontSize: '12.5px', background: C.fundo, padding: '10px 14px', borderRadius: '8px' }}>A IA nao encontrou sinais suficientes para sugerir novos riscos agora.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {sugestoesRiscoIA.map((s, i) => (
+                      <div key={i} style={{ border: `1px dashed ${C.royal}`, borderRadius: '8px', padding: '12px 14px', background: '#EEF2FF' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                          <div style={{ flex: 1, minWidth: '200px' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '13px', fontWeight: 'bold', color: C.texto }}>{s.descricao}</p>
+                            <div style={{ display: 'flex', gap: '10px', fontSize: '11px', color: C.textoMudo, flexWrap: 'wrap' }}>
+                              {s.categoria && <span>{s.categoria}</span>}
+                              <span>Probabilidade: {s.probabilidade}</span>
+                              <span>Impacto: {s.impacto}</span>
+                            </div>
+                            {s.mitigacao && <p style={{ margin: '6px 0 0', fontSize: '12px', color: C.textoSec }}>Mitigacao: {s.mitigacao}</p>}
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <button onClick={() => aceitarSugestaoRisco(s, i)} style={{ padding: '6px 12px', background: C.royal, color: C.textoSobreAccent, border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Adicionar</button>
+                            <button onClick={() => setSugestoesRiscoIA(prev => prev.filter((_, idx) => idx !== i))} style={{ padding: '6px 12px', background: C.branco, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '6px', cursor: 'pointer', fontSize: '11px' }}>Ignorar</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {riscos.filter(r => r.status === 'aberto').length > 0 && (
+              <div style={{ marginBottom: '18px' }}>
+                <p style={{ margin: '0 0 8px', fontSize: '11px', fontWeight: 700, color: C.textoSec, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Matriz de probabilidade x impacto</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto repeat(3, 1fr)', gap: '3px', maxWidth: '440px' }}>
+                  <div />
+                  {['Baixo', 'Medio', 'Alto'].map(l => <div key={l} style={{ textAlign: 'center', fontSize: '10px', color: C.textoMudo, fontWeight: 700 }}>{l}</div>)}
+                  {['alta', 'media', 'baixa'].map(prob => (
+                    <Fragment key={prob}>
+                      <div style={{ fontSize: '10px', color: C.textoMudo, fontWeight: 700, display: 'flex', alignItems: 'center', paddingRight: '6px', textTransform: 'capitalize' }}>{prob}</div>
+                      {['baixo', 'medio', 'alto'].map(imp => {
+                        const celulaRiscos = riscos.filter(r => r.status === 'aberto' && r.probabilidade === prob && r.impacto === imp)
+                        const score = PESO_PROBABILIDADE[prob] * PESO_IMPACTO[imp]
+                        return (
+                          <div key={prob + imp} title={celulaRiscos.map(r => r.descricao).join(', ')}
+                            style={{ minHeight: '40px', borderRadius: '6px', background: corScore(score), opacity: celulaRiscos.length > 0 ? 1 : 0.18, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '13px', fontWeight: 800 }}>
+                            {celulaRiscos.length > 0 ? celulaRiscos.length : ''}
+                          </div>
+                        )
+                      })}
+                    </Fragment>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {riscos.length === 0 && <p style={{ color: C.textoMudo, fontSize: '13px', margin: '0 0 16px' }}>Nenhum risco registrado ainda</p>}
 

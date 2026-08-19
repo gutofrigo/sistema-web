@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { FolderKanban } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { GanttChart, fmt, parseData } from '../components/GanttChart'
+import { calcularCaminhoCritico } from '../lib/cpm'
 import { theme as C } from '../theme'
 
 const CORES_STATUS = { concluido: C.verde, em_andamento: C.statusInfo, pendente: C.ambar }
@@ -12,6 +13,7 @@ export default function Gantt() {
   const [modo, setModo] = useState('programa')
   const [projetos, setProjetos] = useState([])
   const [tarefas, setTarefas] = useState([])
+  const [dependencias, setDependencias] = useState([])
   const [projetoSelecionado, setProjetoSelecionado] = useState(null)
   const [carregando, setCarregando] = useState(true)
 
@@ -23,6 +25,7 @@ export default function Gantt() {
     const data = await res.json()
     setProjetos(data.projetos || [])
     setTarefas(data.tarefas || [])
+    setDependencias(data.dependencias || [])
     setCarregando(false)
   }
 
@@ -53,10 +56,16 @@ export default function Gantt() {
 
   const projetosComDatas = projetoComDatas()
   const projetoAtual = projetoSelecionado ? projetos.find(p => p.id === projetoSelecionado) : null
-  const tarefasAtuais = projetoSelecionado ? tarefasDoProjeto(projetoSelecionado).map(t => ({
+  const tarefasDoProjetoAtual = projetoSelecionado ? tarefasDoProjeto(projetoSelecionado) : []
+  const dependenciasDoProjeto = dependencias.filter(d => tarefasDoProjetoAtual.some(t => t.id === d.tarefa_id))
+  const { porTarefa: cpmPorTarefa } = projetoSelecionado
+    ? calcularCaminhoCritico(tarefasDoProjetoAtual, dependenciasDoProjeto)
+    : { porTarefa: new Map() }
+  const tarefasAtuais = projetoSelecionado ? tarefasDoProjetoAtual.map(t => ({
     ...t,
     inicio: parseData(t.data_inicio) || parseData(t.data_entrega),
-    fim: parseData(t.data_entrega)
+    fim: parseData(t.data_entrega),
+    critico: cpmPorTarefa.get(t.id)?.critico || false
   })).filter(t => t.fim) : []
 
   return (
@@ -141,6 +150,7 @@ export default function Gantt() {
                     getCor={(item) => CORES_STATUS[item.status] || C.textoMudo}
                     getLabel={(item) => item.responsavel || fmt(item.fim)}
                     getSubLabel={(item) => item.status + ' • ate ' + fmt(item.fim)}
+                    getCritico={(item) => item.critico}
                     colNome={160}
                   />
                 )}
@@ -154,6 +164,10 @@ export default function Gantt() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <div style={{ width: '2px', height: '12px', background: C.vermelho }}></div>
                     <span style={{ fontSize: '11px', color: C.textoSec }}>Hoje</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '12px', height: '12px', borderRadius: '2px', border: `1.5px solid ${C.vermelho}` }}></div>
+                    <span style={{ fontSize: '11px', color: C.textoSec }}>Caminho critico</span>
                   </div>
                 </div>
               </div>

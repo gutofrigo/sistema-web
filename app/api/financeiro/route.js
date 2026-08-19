@@ -26,6 +26,32 @@ export async function GET(req) {
       })
     }
 
+    if (view === 'previsao') {
+      const hoje = new Date()
+      const [{ data: pagos }, { data: futuros }] = await Promise.all([
+        supabase.from('lancamentos').select('valor, tipo').eq('status', 'pago'),
+        supabase.from('lancamentos').select('valor, tipo, data_venc').gte('data_venc', hoje.toISOString().slice(0, 10))
+      ])
+      if (!pagos && !futuros) return Response.json({ erro: 'Erro ao buscar previsao' })
+
+      const saldoAtual = (pagos || []).reduce((s, l) => s + (l.tipo === 'entrada' ? Number(l.valor) : -Number(l.valor)), 0)
+
+      const meses = []
+      for (let i = 0; i < 6; i++) {
+        const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1)
+        meses.push(d.toISOString().slice(0, 7))
+      }
+      let saldoAcumulado = saldoAtual
+      const previsao = meses.map(mes => {
+        const doMes = (futuros || []).filter(l => l.data_venc.slice(0, 7) === mes)
+        const entradas = doMes.filter(l => l.tipo === 'entrada').reduce((s, l) => s + Number(l.valor), 0)
+        const saidas = doMes.filter(l => l.tipo === 'saida').reduce((s, l) => s + Number(l.valor), 0)
+        saldoAcumulado += entradas - saidas
+        return { mes, entradas, saidas, saldoProjetado: saldoAcumulado }
+      })
+      return Response.json({ previsao, saldoAtual })
+    }
+
     const mes = searchParams.get('mes') || new Date().toISOString().slice(0, 7)
     const [ano, m] = mes.split('-').map(Number)
     const inicio = `${mes}-01`

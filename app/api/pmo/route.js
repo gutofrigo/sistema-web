@@ -100,9 +100,55 @@ function ultimosMeses(n, hoje) {
   return arr
 }
 
-export async function GET() {
+function mesStr(d) {
+  return d.toISOString().slice(0, 7)
+}
+function mesesEntre(inicio, fim) {
+  const arr = []
+  const d = new Date(inicio.getFullYear(), inicio.getMonth(), 1)
+  const limite = new Date(fim.getFullYear(), fim.getMonth(), 1)
+  while (d <= limite) {
+    arr.push(mesStr(d))
+    d.setMonth(d.getMonth() + 1)
+  }
+  return arr
+}
+
+export async function GET(req) {
   try {
+    const url = new URL(req.url)
+    const curvaSProjetoId = url.searchParams.get('curvaS')
     const hoje = new Date()
+
+    if (curvaSProjetoId) {
+      const [{ data: projeto }, { data: tarefasP }, { data: lancP }] = await Promise.all([
+        supabase.from('projetos').select('*').eq('id', curvaSProjetoId).single(),
+        supabase.from('tarefas').select('concluido_em').eq('projeto_id', curvaSProjetoId),
+        supabase.from('lancamentos').select('valor, tipo, data_venc').eq('projeto_id', curvaSProjetoId).eq('status', 'pago')
+      ])
+      if (!projeto || !projeto.orcamento) return Response.json({ curvaS: [] })
+
+      const inicio = new Date(projeto.criado_em)
+      const fimPrevisto = projeto.data_prevista_fim ? new Date(projeto.data_prevista_fim) : hoje
+      const fim = fimPrevisto > hoje ? fimPrevisto : hoje
+      const meses = mesesEntre(inicio, fim)
+      const totalMs = fim - inicio
+
+      const totalTarefas = (tarefasP || []).length
+      const pesoTarefa = totalTarefas > 0 ? projeto.orcamento / totalTarefas : 0
+
+      const curvaS = meses.map(mes => {
+        const fimMes = new Date(mes + '-01T23:59:59')
+        const ultimoDiaMes = new Date(fimMes.getFullYear(), fimMes.getMonth() + 1, 0, 23, 59, 59)
+        const pontoData = ultimoDiaMes < fim ? ultimoDiaMes : fim
+        const decorridoMs = Math.min(Math.max(pontoData - inicio, 0), totalMs)
+        const planejado = totalMs > 0 ? Math.round((decorridoMs / totalMs) * projeto.orcamento) : projeto.orcamento
+        const agregado = Math.round((tarefasP || []).filter(t => t.concluido_em && new Date(t.concluido_em) <= pontoData).length * pesoTarefa)
+        const real = Math.round((lancP || []).filter(l => l.tipo === 'saida' && l.data_venc && new Date(l.data_venc) <= pontoData).reduce((s, l) => s + Number(l.valor), 0))
+        return { mes, planejado, agregado, real }
+      })
+      return Response.json({ curvaS, orcamento: projeto.orcamento })
+    }
 
     const [{ data: projetos }, { data: tarefas }, { data: lancamentos }, { data: riscos }, { data: roadmaps }, { data: entrevistas }, { data: iniciativas }] = await Promise.all([
       supabase.from('projetos').select('*').order('criado_em', { ascending: false }),
@@ -149,8 +195,23 @@ export async function GET() {
 
       const totalTarefas = tarefasP.length
       const concluidas = tarefasP.filter(t => t.status === 'concluido').length
+      const pctConcluido = totalTarefas > 0 ? Math.round((concluidas / totalTarefas) * 100) : 0
       const atrasadas = tarefasP.filter(t => t.data_entrega && t.status !== 'concluido' && new Date(t.data_entrega + 'T23:59:59') < hoje).length
       const riscosAbertos = riscosP.filter(r => r.status === 'aberto')
+
+      let evm = null
+      if (projeto.orcamento) {
+        const pv = (pctTempoDecorrido(projeto.criado_em, projeto.data_prevista_fim || projeto.criado_em, hoje) / 100) * projeto.orcamento
+        const ev = (pctConcluido / 100) * projeto.orcamento
+        const ac = realizado
+        evm = {
+          pv: Math.round(pv),
+          ev: Math.round(ev),
+          ac: Math.round(ac),
+          spi: pv > 0 ? Math.round((ev / pv) * 100) / 100 : null,
+          cpi: ac > 0 ? Math.round((ev / ac) * 100) / 100 : null
+        }
+      }
 
       return {
         id: projeto.id,
@@ -163,9 +224,10 @@ export async function GET() {
         data_prevista_fim: projeto.data_prevista_fim,
         totalTarefas,
         concluidas,
-        pctConcluido: totalTarefas > 0 ? Math.round((concluidas / totalTarefas) * 100) : 0,
+        pctConcluido,
         atrasadas,
         rag,
+        evm,
         riscosAbertos: riscosAbertos.length,
         riscosPorSeveridade: {
           baixa: riscosAbertos.filter(r => r.impacto === 'baixo').length,
@@ -217,7 +279,18 @@ export async function GET() {
     })).filter(c => c.qtd > 0)
     const iniciativasBacklog = iniciativasAtivas.filter(i => i.status === 'backlog').length
 
-    return Response.json({ projetos: projetosOut, resumo, tendencia, tarefasProximas, entrevistasRecentes: entrevistas || [], iniciativasPorCategoria, iniciativasBacklog, iniciativasTotal: iniciativasAtivas.length })
+    const cargaMap = new Map()
+    for (const t of tarefas || []) {
+      if (t.status === 'concluido') continue
+      const nome = t.responsavel || 'Sem responsavel'
+      if (!cargaMap.has(nome)) cargaMap.set(nome, { responsavel: nome, abertas: 0, atrasadas: 0 })
+      const c = cargaMap.get(nome)
+      c.abertas++
+      if (t.data_entrega && new Date(t.data_entrega + 'T23:59:59') < hoje) c.atrasadas++
+    }
+    const cargaPorResponsavel = [...cargaMap.values()].sort((a, b) => b.abertas - a.abertas).slice(0, 12)
+
+    return Response.json({ projetos: projetosOut, resumo, tendencia, tarefasProximas, entrevistasRecentes: entrevistas || [], iniciativasPorCategoria, iniciativasBacklog, iniciativasTotal: iniciativasAtivas.length, cargaPorResponsavel })
   } catch (e) {
     return Response.json({ erro: e.message })
   }

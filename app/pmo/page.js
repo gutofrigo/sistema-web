@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from 'recharts'
+import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, Legend } from 'recharts'
 import { AlertTriangle, Map as MapIcon, ClipboardList, ArrowRight, ArrowLeft } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { theme as C, estiloCard } from '../theme'
@@ -26,8 +26,12 @@ const cardEstilo = { ...estiloCard, padding: '20px' }
 export default function PMO() {
   const [dados, setDados] = useState(null)
   const [carregando, setCarregando] = useState(true)
+  const [evmProjetoId, setEvmProjetoId] = useState('')
+  const [curvaS, setCurvaS] = useState(null)
+  const [carregandoCurvaS, setCarregandoCurvaS] = useState(false)
 
   useEffect(() => { buscarDados() }, [])
+  useEffect(() => { if (evmProjetoId) { buscarCurvaS(evmProjetoId) } else { setCurvaS(null) } }, [evmProjetoId])
 
   async function buscarDados() {
     setCarregando(true)
@@ -35,6 +39,14 @@ export default function PMO() {
     const data = await res.json()
     setDados(data)
     setCarregando(false)
+  }
+
+  async function buscarCurvaS(projetoId) {
+    setCarregandoCurvaS(true)
+    const res = await fetch('/api/pmo?curvaS=' + projetoId)
+    const data = await res.json()
+    setCurvaS(data.curvaS || [])
+    setCarregandoCurvaS(false)
   }
 
   const voltarInicio = (
@@ -218,6 +230,83 @@ export default function PMO() {
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* EVM */}
+        <div className="card-elevate" style={{ ...cardEstilo, marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: 0 }}>EVM — Valor agregado</h2>
+            <select value={evmProjetoId} onChange={e => setEvmProjetoId(e.target.value)}
+              style={{ padding: '8px 12px', border: `1px solid ${C.borda}`, borderRadius: '8px', fontSize: '13px', color: C.texto, minWidth: '220px' }}>
+              <option value="">Selecione um projeto com orcamento</option>
+              {projetos.filter(p => p.orcamento).map(p => <option key={p.id} value={p.id}>{p.titulo}</option>)}
+            </select>
+          </div>
+
+          {!evmProjetoId && <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '30px 0' }}>Selecione um projeto para ver SPI, CPI e a curva S</p>}
+
+          {evmProjetoId && (() => {
+            const p = projetos.find(x => x.id === evmProjetoId)
+            const evm = p?.evm
+            const corIndice = v => v == null ? C.textoMudo : v >= 1 ? C.verde : v >= 0.9 ? C.ambar : C.vermelho
+            return (
+              <>
+                {evm && (
+                  <div className="grid-3" style={{ marginBottom: '18px' }}>
+                    <div style={{ padding: '14px 16px', background: C.fundo, borderRadius: '8px' }}>
+                      <p style={{ margin: '0 0 4px', fontSize: '11px', color: C.textoSec }}>SPI (prazo)</p>
+                      <p style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: corIndice(evm.spi) }}>{evm.spi ?? '—'}</p>
+                    </div>
+                    <div style={{ padding: '14px 16px', background: C.fundo, borderRadius: '8px' }}>
+                      <p style={{ margin: '0 0 4px', fontSize: '11px', color: C.textoSec }}>CPI (custo)</p>
+                      <p style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: corIndice(evm.cpi) }}>{evm.cpi ?? '—'}</p>
+                    </div>
+                    <div style={{ padding: '14px 16px', background: C.fundo, borderRadius: '8px' }}>
+                      <p style={{ margin: '0 0 4px', fontSize: '11px', color: C.textoSec }}>VP / VA / CR</p>
+                      <p style={{ margin: 0, fontSize: '12.5px', fontWeight: 700, color: C.texto }}>{formatarMoeda(evm.pv)} / {formatarMoeda(evm.ev)} / {formatarMoeda(evm.ac)}</p>
+                    </div>
+                  </div>
+                )}
+                {carregandoCurvaS && <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Calculando curva S...</p>}
+                {!carregandoCurvaS && curvaS && curvaS.length > 0 && (
+                  <ResponsiveContainer width="100%" height={240}>
+                    <LineChart data={curvaS.map(c => ({ ...c, mes: c.mes.slice(5, 7) + '/' + c.mes.slice(2, 4) }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={C.borda} />
+                      <XAxis dataKey="mes" tick={{ fontSize: 12, fill: C.textoSec }} />
+                      <YAxis tick={{ fontSize: 11, fill: C.textoSec }} />
+                      <Tooltip formatter={v => formatarMoeda(v)} contentStyle={{ background: C.branco, border: '1px solid rgba(83,109,136,0.35)', borderRadius: '8px', color: C.texto }} />
+                      <Legend wrapperStyle={{ fontSize: '12px' }} />
+                      <Line type="monotone" dataKey="planejado" name="Planejado (VP)" stroke={C.textoMudo} strokeWidth={2} dot={false} strokeDasharray="4 4" />
+                      <Line type="monotone" dataKey="agregado" name="Valor agregado (VA)" stroke={C.royal} strokeWidth={2} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="real" name="Custo real (CR)" stroke={C.vermelho} strokeWidth={2} dot={{ r: 3 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+                {!carregandoCurvaS && curvaS && curvaS.length === 0 && (
+                  <p style={{ color: C.textoMudo, fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>Projeto sem orcamento ou dados insuficientes para a curva S</p>
+                )}
+              </>
+            )
+          })()}
+        </div>
+
+        {/* Carga de trabalho */}
+        {dados.cargaPorResponsavel && dados.cargaPorResponsavel.length > 0 && (
+          <div className="card-elevate" style={{ ...cardEstilo, marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: C.texto, margin: '0 0 4px' }}>Carga de trabalho por responsavel</h2>
+            <p style={{ fontSize: '11px', color: C.textoMudo, margin: '0 0 16px' }}>Tarefas abertas (nao concluidas) por pessoa, em todos os projetos</p>
+            <ResponsiveContainer width="100%" height={Math.max(180, dados.cargaPorResponsavel.length * 34)}>
+              <BarChart data={dados.cargaPorResponsavel} layout="vertical" margin={{ left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={C.borda} />
+                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: C.textoSec }} />
+                <YAxis type="category" dataKey="responsavel" width={130} tick={{ fontSize: 11, fill: C.textoSec }} />
+                <Tooltip contentStyle={{ background: C.branco, border: '1px solid rgba(83,109,136,0.35)', borderRadius: '8px', color: C.texto }} />
+                <Bar dataKey="abertas" name="Tarefas abertas" radius={[0, 4, 4, 0]}>
+                  {dados.cargaPorResponsavel.map((d, i) => <Cell key={i} fill={d.atrasadas > 0 ? C.vermelho : C.royal} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {/* Cards de portfolio */}
         <h2 style={{ fontSize: '16px', fontWeight: 800, color: C.texto, margin: '8px 0 14px', letterSpacing: '-0.01em' }}>Portfolio de projetos</h2>

@@ -10,6 +10,12 @@ function prioridadeParaTexto(n) {
   return 'baixa'
 }
 
+function riceScore(i) {
+  const { rice_reach, rice_impact, rice_confidence, rice_effort } = i
+  if (!rice_reach || !rice_impact || !rice_confidence || !rice_effort) return null
+  return Math.round((rice_reach * rice_impact * rice_confidence / rice_effort) * 10) / 10
+}
+
 export async function GET() {
   try {
     const { data, error } = await supabase
@@ -17,7 +23,7 @@ export async function GET() {
       .select('*')
       .order('criado_em', { ascending: false })
     if (error) return Response.json({ erro: error.message })
-    return Response.json({ iniciativas: data })
+    return Response.json({ iniciativas: (data || []).map(i => ({ ...i, riceScore: riceScore(i) })) })
   } catch (e) {
     return Response.json({ erro: e.message })
   }
@@ -108,11 +114,15 @@ export async function POST(req) {
         prioridade: body.prioridade || 5,
         solicitante: body.solicitante || null,
         responsavel: body.responsavel || null,
-        status: body.status || 'backlog'
+        status: body.status || 'backlog',
+        rice_reach: body.rice_reach || null,
+        rice_impact: body.rice_impact || null,
+        rice_confidence: body.rice_confidence || null,
+        rice_effort: body.rice_effort || null
       })
       .select()
     if (error) return Response.json({ erro: error.message })
-    return Response.json({ iniciativa: data[0] })
+    return Response.json({ iniciativa: { ...data[0], riceScore: riceScore(data[0]) } })
   } catch (e) {
     return Response.json({ erro: e.message })
   }
@@ -122,7 +132,7 @@ export async function PATCH(req) {
   try {
     const body = await req.json()
     if (!body.id) return Response.json({ erro: 'id obrigatorio' })
-    const campos = ['titulo', 'descricao', 'categoria', 'prioridade', 'solicitante', 'responsavel', 'status']
+    const campos = ['titulo', 'descricao', 'categoria', 'prioridade', 'solicitante', 'responsavel', 'status', 'rice_reach', 'rice_impact', 'rice_confidence', 'rice_effort']
     const update = {}
     for (const campo of campos) {
       if (body[campo] !== undefined) update[campo] = body[campo]
@@ -133,7 +143,7 @@ export async function PATCH(req) {
       .eq('id', body.id)
       .select()
     if (error) return Response.json({ erro: error.message })
-    return Response.json({ iniciativa: data[0] })
+    return Response.json({ iniciativa: { ...data[0], riceScore: riceScore(data[0]) } })
   } catch (e) {
     return Response.json({ erro: e.message })
   }

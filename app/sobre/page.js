@@ -19,8 +19,10 @@ const MODULOS = [
     itens: [
       'Visão de portfólio agrupada por Área, com cards de indicadores e barra de avanço do portfólio',
       'EDT (Estrutura Analítica) hierárquica por projeto — numeração, status, atraso, responsável, datas e progresso',
-      'Painel de edição em massa ("Editar tarefas") para atualizar % e datas de várias tarefas de uma vez',
-      'Registro de riscos por projeto, com severidade e mitigação',
+      'Painel de edição em massa ("Editar tarefas") para atualizar % e datas de várias tarefas de uma vez, incluindo dependências entre tarefas',
+      'Caminho crítico (CPM) calculado a partir das dependências e destacado no Gantt do projeto',
+      'Registro de riscos por projeto, com severidade, mitigação e matriz visual de probabilidade x impacto',
+      'Detecção de riscos por IA — analisa atrasos, tarefas sem responsável e orçamento para sugerir riscos ainda não registrados',
       'Importação de projetos por CSV, com atualização automática de projetos já existentes',
       'Geração de tarefas com IA a partir da descrição do projeto',
     ],
@@ -31,6 +33,7 @@ const MODULOS = [
     itens: [
       'Quadro Kanban (Backlog → Em análise → Em andamento → Concluído) com arrastar-e-soltar',
       'Categorias fixas (TI, Processos, RH, Financeiro, Outros) e prioridade numérica de 1 a 10',
+      'Priorização por RICE (Reach, Impact, Confidence, Effort) opcional, com badge de score e ordenação automática no quadro',
       'Promoção de uma iniciativa para Projeto formal com um clique',
     ],
   },
@@ -48,6 +51,8 @@ const MODULOS = [
     itens: [
       'Status RAG (verde / âmbar / vermelho) por projeto, com o motivo de cada sinal',
       'Gráficos: projetos por status, riscos por severidade, orçado × realizado, tendência de conclusão de tarefas',
+      'EVM (Earned Value Management): SPI, CPI e curva S (planejado x valor agregado x custo real) por projeto',
+      'Carga de trabalho por responsável — tarefas abertas e atrasadas por pessoa, em todos os projetos',
       'Relatórios recentes de Análise de Processo e iniciativas por categoria',
     ],
   },
@@ -64,7 +69,11 @@ const MODULOS = [
   {
     titulo: 'Financeiro', rota: '/financeiro', icone: Wallet,
     proposito: 'Controle de lançamentos financeiros, usado como base do orçado × realizado no PMO.',
-    itens: ['Lançamentos de entrada e saída, por categoria e por projeto', 'Totais por categoria e saldo consolidado'],
+    itens: [
+      'Lançamentos de entrada e saída, por categoria e por projeto',
+      'Totais por categoria e saldo consolidado',
+      'Previsão de caixa para os próximos 6 meses, com saldo projetado acumulado',
+    ],
   },
   {
     titulo: 'Assistente IA', rota: '/assistente', icone: Sparkles,
@@ -130,7 +139,7 @@ export default function Sobre() {
         </p>
 
         <div style={{ display: 'flex', gap: '0', marginBottom: '32px', border: `1px solid ${C.borda}`, borderRadius: '10px', overflow: 'hidden', background: C.branco, boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }}>
-          {[{ n: '11', l: 'módulos ativos' }, { n: '16', l: 'rotas de API' }, { n: '100%', l: 'em produção' }].map((s, i) => (
+          {[{ n: '11', l: 'módulos ativos' }, { n: '17', l: 'rotas de API' }, { n: '100%', l: 'em produção' }].map((s, i) => (
             <div key={s.l} style={{ flex: 1, padding: '16px 18px', borderLeft: i > 0 ? `1px solid ${C.borda}` : 'none' }}>
               <p style={{ margin: '0 0 4px', fontSize: '22px', fontWeight: 800, color: C.texto, fontVariantNumeric: 'tabular-nums' }}>{s.n}</p>
               <p style={{ margin: 0, fontSize: '12px', color: C.textoMudo }}>{s.l}</p>

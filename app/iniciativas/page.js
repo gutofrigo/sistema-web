@@ -30,8 +30,13 @@ function corPrioridade(n) {
   if (n >= 4) return C.ambar
   return C.verde
 }
+function corRice(score) {
+  if (score >= 5) return C.vermelho
+  if (score >= 2) return C.ambar
+  return C.verde
+}
 
-const formInicial = { titulo: '', descricao: '', categoria: 'outros', prioridade: 5, solicitante: '', responsavel: '' }
+const formInicial = { titulo: '', descricao: '', categoria: 'outros', prioridade: 5, solicitante: '', responsavel: '', rice_reach: '', rice_impact: '', rice_confidence: '', rice_effort: '' }
 
 export default function Iniciativas() {
   const [iniciativas, setIniciativas] = useState([])
@@ -41,6 +46,7 @@ export default function Iniciativas() {
   const [salvando, setSalvando] = useState(false)
   const [arrastando, setArrastando] = useState(null)
   const [promovendo, setPromovendo] = useState(null)
+  const [mostrarRice, setMostrarRice] = useState(false)
 
   useEffect(() => { buscarIniciativas() }, [])
 
@@ -144,6 +150,31 @@ export default function Iniciativas() {
               <input placeholder="Responsavel (opcional)" value={novaIniciativa.responsavel} onChange={e => setNovaIniciativa({ ...novaIniciativa, responsavel: e.target.value })}
                 style={{ ...inputStyle, flex: 1, minWidth: '160px' }} />
             </div>
+
+            <button type="button" onClick={() => setMostrarRice(!mostrarRice)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.royal, fontSize: '12.5px', fontWeight: 700, padding: 0, marginBottom: mostrarRice ? '10px' : '16px' }}>
+              {mostrarRice ? '- Ocultar RICE' : '+ RICE (opcional): priorizar por alcance, impacto, confianca e esforco'}
+            </button>
+            {mostrarRice && (
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px', padding: '12px', background: C.fundo, borderRadius: '8px' }}>
+                <div style={{ flex: 1, minWidth: '100px' }}>
+                  <label style={{ fontSize: '11px', color: C.textoSec }}>Reach (pessoas/periodo)</label>
+                  <input type="number" min="0" placeholder="ex: 500" value={novaIniciativa.rice_reach} onChange={e => setNovaIniciativa({ ...novaIniciativa, rice_reach: e.target.value })} style={inputStyle} />
+                </div>
+                <div style={{ flex: 1, minWidth: '100px' }}>
+                  <label style={{ fontSize: '11px', color: C.textoSec }}>Impact (0.25-3)</label>
+                  <input type="number" min="0.25" max="3" step="0.25" placeholder="ex: 2" value={novaIniciativa.rice_impact} onChange={e => setNovaIniciativa({ ...novaIniciativa, rice_impact: e.target.value })} style={inputStyle} />
+                </div>
+                <div style={{ flex: 1, minWidth: '100px' }}>
+                  <label style={{ fontSize: '11px', color: C.textoSec }}>Confidence (0-1)</label>
+                  <input type="number" min="0" max="1" step="0.1" placeholder="ex: 0.8" value={novaIniciativa.rice_confidence} onChange={e => setNovaIniciativa({ ...novaIniciativa, rice_confidence: e.target.value })} style={inputStyle} />
+                </div>
+                <div style={{ flex: 1, minWidth: '100px' }}>
+                  <label style={{ fontSize: '11px', color: C.textoSec }}>Effort (pessoa-semana)</label>
+                  <input type="number" min="0.5" step="0.5" placeholder="ex: 3" value={novaIniciativa.rice_effort} onChange={e => setNovaIniciativa({ ...novaIniciativa, rice_effort: e.target.value })} style={inputStyle} />
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => { setMostrarForm(false); setNovaIniciativa(formInicial) }} style={{ flex: 1, padding: '10px', background: C.fundo, color: C.textoSec, border: `1px solid ${C.borda}`, borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>Cancelar</button>
               <button onClick={criarIniciativa} disabled={salvando} className="btn-hover" style={{ flex: 2, padding: '10px', background: salvando ? C.textoMudo : C.royal, color: 'white', border: 'none', borderRadius: '8px', cursor: salvando ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 700 }}>
@@ -159,7 +190,7 @@ export default function Iniciativas() {
           <div style={{ ...estiloCard, padding: 0, overflow: 'hidden', width: 'fit-content', maxWidth: '100%' }}>
             <div style={{ display: 'flex', overflowX: 'auto', alignItems: 'stretch' }}>
               {COLUNAS.map((coluna, idx) => {
-                const itens = iniciativas.filter(i => i.status === coluna.id).sort((a, b) => b.prioridade - a.prioridade)
+                const itens = iniciativas.filter(i => i.status === coluna.id).sort((a, b) => (b.riceScore ?? b.prioridade) - (a.riceScore ?? a.prioridade))
                 return (
                   <div key={coluna.id}
                     onDragOver={e => e.preventDefault()}
@@ -185,7 +216,11 @@ export default function Iniciativas() {
                         <p style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 700, color: C.texto }}>{item.titulo}</p>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
                           <span style={{ fontSize: '10px', fontWeight: 700, color: 'white', background: corCategoria(item.categoria), padding: '2px 8px', borderRadius: '20px' }}>{labelCategoria(item.categoria)}</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: corPrioridade(item.prioridade), background: C.fundo, border: `1px solid ${corPrioridade(item.prioridade)}`, padding: '2px 8px', borderRadius: '20px' }}>P{item.prioridade}</span>
+                          {item.riceScore != null ? (
+                            <span title="RICE score" style={{ fontSize: '10px', fontWeight: 700, color: corRice(item.riceScore), background: C.fundo, border: `1px solid ${corRice(item.riceScore)}`, padding: '2px 8px', borderRadius: '20px' }}>RICE {item.riceScore}</span>
+                          ) : (
+                            <span style={{ fontSize: '10px', fontWeight: 700, color: corPrioridade(item.prioridade), background: C.fundo, border: `1px solid ${corPrioridade(item.prioridade)}`, padding: '2px 8px', borderRadius: '20px' }}>P{item.prioridade}</span>
+                          )}
                         </div>
                         {item.solicitante && (
                           <p style={{ margin: '0 0 8px', fontSize: '11px', color: C.textoMudo, display: 'flex', alignItems: 'center', gap: '4px' }}><User size={11} /> {item.solicitante}</p>

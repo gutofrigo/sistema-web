@@ -12,7 +12,7 @@ export function parseData(s) {
   return new Date(s + 'T12:00:00')
 }
 
-export function GanttChart({ itens, colunaLabel, getCor, getLabel, getSubLabel, colNome }) {
+export function GanttChart({ itens, colunaLabel, getCor, getLabel, getSubLabel, colNome, getCritico }) {
   const hoje = new Date()
   hoje.setHours(12,0,0,0)
   const datas = itens.flatMap(i => [i.inicio, i.fim]).filter(Boolean)
@@ -59,11 +59,12 @@ export function GanttChart({ itens, colunaLabel, getCor, getLabel, getSubLabel, 
           const cor = getCor(item, idx)
           const label = getLabel(item)
           const sub = getSubLabel(item)
+          const critico = getCritico ? getCritico(item, idx) : false
           return (
             <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '5px 0', borderBottom: `0.5px solid ${C.fundo}` }}>
               <div style={{ width: nomesCol + 'px', flexShrink: 0, paddingRight: '12px' }}>
                 <p style={{ fontSize: '13px', margin: '0 0 1px', color: C.texto, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.titulo}</p>
-                <p style={{ fontSize: '11px', color: C.textoMudo, margin: 0 }}>{sub}</p>
+                <p style={{ fontSize: '11px', color: critico ? C.vermelho : C.textoMudo, margin: 0, fontWeight: critico ? 700 : 400 }}>{critico ? 'Critico • ' : ''}{sub}</p>
               </div>
               <div style={{ position: 'relative', flex: 1 }}>
                 <div style={{ display: 'flex' }}>
@@ -72,7 +73,7 @@ export function GanttChart({ itens, colunaLabel, getCor, getLabel, getSubLabel, 
                     return <div key={i} style={{ width: colW + 'px', height: '28px', borderLeft: isHoje ? `1.5px solid ${C.vermelho}` : `0.5px solid ${C.fundo}`, background: isHoje ? '#fff8f8' : '', boxSizing: 'border-box', flexShrink: 0 }}></div>
                   })}
                 </div>
-                <div style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: (startOffset * colW) + 'px', width: (duracao * colW) + 'px', height: '20px', background: cor, borderRadius: '4px', display: 'flex', alignItems: 'center', padding: '0 8px', boxSizing: 'border-box', zIndex: 1, minWidth: '20px' }}>
+                <div style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: (startOffset * colW) + 'px', width: (duracao * colW) + 'px', height: '20px', background: cor, borderRadius: '4px', display: 'flex', alignItems: 'center', padding: '0 8px', boxSizing: 'border-box', zIndex: 1, minWidth: '20px', border: critico ? `1.5px solid ${C.vermelho}` : 'none' }}>
                   <span style={{ fontSize: '10px', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
                 </div>
               </div>
